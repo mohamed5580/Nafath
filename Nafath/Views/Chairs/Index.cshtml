@@ -1,0 +1,333 @@
+﻿@model IEnumerable<Nafath.Models.Chairs>
+@{
+    ViewData["Title"] = "Index";
+}
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
+
+<!-- Start Hero Section -->
+<div class="hero">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-lg-5">
+                <div class="intro-excerpt">
+                    <h1>Shop</h1>
+                </div>
+              
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Hero Section -->
+
+<div class="container ml-5">
+    <div class="content-page">
+
+        <div class="container-fluid">
+            <!-- HEADER -->
+            <div class="row mb-4">
+                <div lang="ar" dir="rtl" class="col-lg-12 d-flex align-items-center justify-content-between">
+                   
+                    
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <div class="pt-5">
+                            <h1 class="mb-1">كراسي المكتب</h1>
+                            <p class="mb-0">
+
+
+                            </p>
+
+                        </div>
+                        <button type="button"
+                        class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createModal"
+                        onclick="resetCreateForm()">
+                            اضافة كرسي  <i class="fa-solid fa-plus"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <div class="pt-5">
+                            <h1 class="mb-1">كراسي المكتب</h1>
+                            <p class="mb-0">
+                                
+
+                            </p>
+
+                        </div>
+                        
+                    }
+                </div>
+            </div>
+            <div class="untree_co-section product-section before-footer-section">
+                <div class="container">
+                    <div class="row">
+                        @foreach (var chair in Model)
+                        {
+                            <!-- Start Column 1 -->
+                            <div class="col-12 col-md-4 col-lg-3 mb-5">
+                                <a class="product-item" href="#">
+                                    <input type="type" name="name" value="@chair.Id" hidden />
+                                    <img src="@chair.ImageUrl" alt="@chair.Name" class="img-fluid product-thumbnail">
+                                    <h3 class="product-title">@chair.Name</h3>
+                                    <strong class="product-price">$@chair.Price</strong>
+
+
+                                    <span class="icon-cross" data-bs-toggle="modal"
+                                          data-bs-target="#viewModal-@chair.Id"
+                                          onclick="resetCreateForm()">
+                                        <i class="fa-solid fa-display" style="color: #fbfcfe;"></i>
+                                    </span>
+                                   
+                                
+                                </a>
+                            </div>
+                            <!-- End Column 1 -->
+                        }
+
+
+
+                    </div>
+                </div>
+            </div>
+
+
+
+
+        </div>
+
+        <!-- CREATE MODAL -->
+        <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog card card-success card-outline">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">New Chair</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form asp-controller="Chairs" asp-action="Create" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input name="Name" class="form-control" />
+                                <span data-valmsg-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <input name="Description" class="form-control" />
+                                <span data-valmsg-for="Description" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Price</label>
+                                <input name="Price" class="form-control" />
+                                <span data-valmsg-for="Price" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Image</label>
+                                <div class="mb-4 d-flex justify-content-center">
+                                    <img id="selectedImage" src="https://mdbootstrap.com/img/Photos/Others/placeholder.jpg"
+                                         alt="example placeholder" style="width: 300px;" />
+                                </div>
+                                <div class="d-flex justify-content-center">
+                                    <div data-mdb-ripple-init class="btn btn-primary btn-rounded">
+                                        <label class="form-label text-white m-1" for="customFile1">Choose file</label>
+
+                                        <!--
+                                            CORRECTION: The name must match your IFormFile property: "ImageFile".
+                                        -->
+                                        <input name="ImageFile" type="file" class="form-control d-none" id="customFile1" onchange="displaySelectedImage(event, 'selectedImage')" />
+                                    </div>
+                                </div>
+                                <!-- This validation message should be for "ImageFile" -->
+                                <span data-valmsg-for="ImageFile" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-check mt-2">
+                                <!--
+                                    CORRECTION: A hidden field is needed to ensure 'false' is posted when unchecked.
+                                    The checkbox itself sends 'true' only when checked.
+                                -->
+                                <input type="hidden" name="IsAvailable" value="false" />
+                                <input name="IsAvailable" type="checkbox" class="form-check-input" value="true" id="isAvailableCheck" checked />
+                                <label class="form-check-label" for="isAvailableCheck">Available</label>
+                                <span data-valmsg-for="IsAvailable" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+@* Similar to Create, but binding to Edit action *@
+@if (Model != null)
+{
+    @foreach (var chair in Model)
+    {
+        <div class="modal fade" id="editModal-@chair.Id" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog card card-success card-outline">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Chair</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form asp-controller="Chairs" asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="Id" value="@chair.Id" />
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input name="Name" class="form-control" value="@chair.Name" />
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <input name="Description" class="form-control" value="@chair.Description" />
+                            </div>
+                            <div class="form-group">
+                                <label>ImageUrl</label>
+                                <input name="ImageUrl" class="form-control" value="@chair.ImageUrl" />
+                            </div>
+                            <div class="form-check mt-2">
+                                <input name="IsAvailable" type="checkbox" class="form-check-input" @(chair.IsAvailable ? "checked" : "") />
+                                <label class="form-check-label">Available</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<!-- VIEW MODAL -->
+@if (Model != null)
+{
+
+    @foreach (var chair in Model)
+    {
+        <div class="modal fade" id="viewModal-@chair.Id" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog card card-success card-outline">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">View Chair</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Name</dt>
+                            <dd class="col-sm-8">@chair.Name</dd>
+                            <dt class="col-sm-4">Description</dt>
+                            <dd class="col-sm-8">@chair.Description</dd>
+                            <dt class="col-sm-4">Image</dt>
+                            <dd class="col-sm-8"><img src="@chair.ImageUrl" class="img-fluid" /></dd>
+                            <dt class="col-sm-4">Available</dt>
+                            <dd class="col-sm-8">@(chair.IsAvailable ? "Yes" : "No")</dd>
+                        </dl>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function resetCreateForm() { var form = document.querySelector('#createModal form'); if (form) form.reset(); }
+
+        function displaySelectedImage(event, elementId) {
+            const selectedImage = document.getElementById(elementId);
+            const fileInput = event.target;
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    selectedImage.src = e.target.result;
+                };
+
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+              jQuery(document).ready(function () {
+          ImgUpload();
+        });
+
+        function ImgUpload() {
+          var imgWrap = "";
+          var imgArray = [];
+
+          $('.upload__inputfile').each(function () {
+            $(this).on('change', function (e) {
+              imgWrap = $(this).closest('.upload__box').find('.upload__img-wrap');
+              var maxLength = $(this).attr('data-max_length');
+
+              var files = e.target.files;
+              var filesArr = Array.prototype.slice.call(files);
+              var iterator = 0;
+              filesArr.forEach(function (f, index) {
+
+                if (!f.type.match('image.*')) {
+                  return;
+                }
+
+                if (imgArray.length > maxLength) {
+                  return false
+                } else {
+                  var len = 0;
+                  for (var i = 0; i < imgArray.length; i++) {
+                    if (imgArray[i] !== undefined) {
+                      len++;
+                    }
+                  }
+                  if (len > maxLength) {
+                    return false;
+                  } else {
+                    imgArray.push(f);
+
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                      var html = "<div class='upload__img-box'><div style='background-image: url(" + e.target.result + ")' data-number='" + $(".upload__img-close").length + "' data-file='" + f.name + "' class='img-bg'><div class='upload__img-close'></div></div></div>";
+                      imgWrap.append(html);
+                      iterator++;
+                    }
+                    reader.readAsDataURL(f);
+                  }
+                }
+              });
+            });
+          });
+
+          $('body').on('click', ".upload__img-close", function (e) {
+            var file = $(this).parent().data("file");
+            for (var i = 0; i < imgArray.length; i++) {
+              if (imgArray[i].name === file) {
+                imgArray.splice(i, 1);
+                break;
+              }
+            }
+            $(this).parent().parent().remove();
+          });
+        }
+    </script>
+  
+}

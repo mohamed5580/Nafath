@@ -1,0 +1,356 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+<partial name="_Notifications" />
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="iq-edit-list usr-edit">
+                        <ul class="iq-edit-profile d-flex nav nav-pills">
+                            <li class="col-md-3 p-0">
+                                <a class="nav-link active" data-toggle="pill" href="#personal-information">
+                                    Personal Information
+                                </a>
+                            </li>
+                            <li class="col-md-3 p-0">
+                                <a class="nav-link" data-toggle="pill" href="#chang-pwd">
+                                    Change Password
+                                </a>
+                            </li>
+                            <li class="col-md-3 p-0">
+                                <a class="nav-link" data-toggle="pill" href="#emailandsms">
+                                    Email and SMS
+                                </a>
+                            </li>
+                            <li class="col-md-3 p-0">
+                                <a class="nav-link" data-toggle="pill" href="#manage-contact">
+                                    Manage Contact
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="iq-edit-list-data">
+                <div class="tab-content">
+                    <div class="tab-pane fade active show" id="personal-information" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="iq-header-title">
+                                    <h4 class="card-title">Personal Information</h4>
+                                </div>
+                            </div>
+                            <div class="card-body">
+
+                                @* Update Detils *@
+                                <form id="profile-form" method="post" enctype="multipart/form-data" asp-page-handler="Profile">
+                                    @Html.AntiForgeryToken()
+                                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                                    <div class="row">
+                                        <div class="col-md-12 text-center mb-4">
+                                            <div class="crm-profile-img-edit position-relative d-inline-block">
+                                                <img id="avatar-preview"
+                                                     class="crm-profile-pic rounded-circle avatar-100"
+                                                     src="@(Url.Content(Model.Input.AvatarUrl ?? "~/assets/images/user/11.png"))"
+                                                     alt="profile-pic" />
+                                                <div class="crm-p-image bg-primary position-absolute top-0 end-0 rounded-circle p-2">
+                                                    <i class="las la-pen upload-button text-white"></i>
+                                                    <input asp-for="Input.AvatarFile"
+                                                           class="file-upload"
+                                                           type="file"
+                                                           accept="image/*" />
+                                                </div>
+                                            </div>
+                                            <input type="hidden" asp-for="Input.AvatarUrl" />
+                                        </div>
+
+                                        <div class="form-group col-sm-6 mb-3">
+                                            <label asp-for="Input.FullName"></label>
+                                            <input asp-for="Input.FullName" class="form-control" placeholder="First Name" />
+                                            <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="form-group col-sm-6 mb-3">
+                                            <label asp-for="Input.LastName"></label>
+                                            <input asp-for="Input.LastName" class="form-control" placeholder="Last Name" />
+                                            <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="form-group col-sm-6 mb-3">
+                                            <label asp-for="Input.UserName"></label>
+                                            <input asp-for="Input.UserName" class="form-control" disabled />
+                                            <input type="hidden" asp-for="Input.UserName" />
+                                        </div>
+
+                                        <div class="form-group col-sm-6 mb-3">
+                                            <label asp-for="Input.PhoneNumber"></label>
+                                            <input asp-for="Input.PhoneNumber" class="form-control" />
+                                            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                        <!-- City -->
+                                        <div class="form-group col-sm-6 mb-3">
+                                            <label asp-for="Input.City"></label>
+                                            <input asp-for="Input.City" class="form-control" placeholder="City" />
+                                            <span asp-validation-for="Input.City" class="text-danger"></span>
+                                        </div>
+
+                                        <!-- Gender -->
+                                        <fieldset class="form-group col-sm-6 mb-3">
+                                            <legend class="col-form-label mb-2">Gender</legend>
+                                            <div class="form-check form-check-inline">
+                                                <input asp-for="Input.Gender" class="form-check-input" type="radio" value="Male" />
+                                                <label class="form-check-label">Male</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input asp-for="Input.Gender" class="form-check-input" type="radio" value="Female" />
+                                                <label class="form-check-label">Female</label>
+                                            </div>
+                                            <span asp-validation-for="Input.Gender" class="text-danger d-block"></span>
+                                        </fieldset>
+
+                                        <!-- Date of Birth -->
+                                        <div class="form-group col-sm-6 mb-3">
+                                            <label asp-for="Input.DateOfBirth"></label>
+                                            <input asp-for="Input.DateOfBirth" class="form-control" type="date" />
+                                            <span asp-validation-for="Input.DateOfBirth" class="text-danger"></span>
+                                        </div>
+
+                                        <!-- Marital Status -->
+                                        <div class="form-group col-sm-6 mb-3">
+                                            <label asp-for="Input.MaritalStatus"></label>
+                                            <select asp-for="Input.MaritalStatus" class="form-control">
+                                                <option value="">-- select status --</option>
+                                                <option>Single</option>
+                                                <option>Married</option>
+                                                <option>Widowed</option>
+                                                <option>Divorced</option>
+                                                <option>Separated</option>
+                                            </select>
+                                            <span asp-validation-for="Input.MaritalStatus" class="text-danger"></span>
+                                        </div>
+
+                                        <!-- Age Range -->
+                                        <div class="form-group col-sm-6 mb-3">
+                                            <label asp-for="Input.AgeRange"></label>
+                                            <select asp-for="Input.AgeRange" class="form-control">
+                                                <option>12-18</option>
+                                                <option>19-32</option>
+                                                <option>33-45</option>
+                                                <option>46-62</option>
+                                                <option>63+</option>
+                                            </select>
+                                            <span asp-validation-for="Input.AgeRange" class="text-danger"></span>
+                                        </div>
+
+                                        <!-- Country -->
+                                        <div class="form-group col-sm-6 mb-3">
+                                            <label asp-for="Input.Country"></label>
+                                            <select asp-for="Input.Country" class="form-control">
+                                                <option>Canada</option>
+                                                <option>Noida</option>
+                                                <option>USA</option>
+                                                <option>India</option>
+                                                <option>Africa</option>
+                                            </select>
+                                            <span asp-validation-for="Input.Country" class="text-danger"></span>
+                                        </div>
+
+                                        <!-- State -->
+                                        <div class="form-group col-sm-6 mb-3">
+                                            <label asp-for="Input.State"></label>
+                                            <select asp-for="Input.State" class="form-control">
+                                                <option>California</option>
+                                                <option>Florida</option>
+                                                <option>Georgia</option>
+                                                <option>Connecticut</option>
+                                                <option>Louisiana</option>
+                                            </select>
+                                            <span asp-validation-for="Input.State" class="text-danger"></span>
+                                        </div>
+
+                                        <!-- Address -->
+                                        <div class="form-group col-sm-12 mb-3">
+                                            <label asp-for="Input.Address"></label>
+                                            <textarea asp-for="Input.Address"
+                                                      class="form-control"
+                                                      rows="5"
+                                                      placeholder="Address"></textarea>
+                                            <span asp-validation-for="Input.Address" class="text-danger"></span>
+                                        </div>
+
+                                       
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary mr-2">Save Profile</button>
+                                    <button type="reset" class="btn btn-danger">Cancel</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="chang-pwd" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="iq-header-title">
+                                    <h4 class="card-title">Change Password</h4>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                @* Update Passowrds *@
+
+                                <form id="profile-form" method="post" enctype="multipart/form-data" asp-page-handler="Password">
+                                    @Html.AntiForgeryToken()
+                                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                                    <div class="form-group col-sm-6 mb-3">
+                                        <label asp-for="Input.CurrentPassword"></label>
+                                        <input asp-for="Input.CurrentPassword" class="form-control" />
+                                        <span asp-validation-for="Input.CurrentPassword" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-sm-6 mb-3">
+                                        <label asp-for="Input.NewPassword"></label>
+                                        <input asp-for="Input.NewPassword" class="form-control" />
+                                        <span asp-validation-for="Input.NewPassword" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-sm-6 mb-3">
+                                        <label asp-for="Input.ConfirmPassword"></label>
+                                        <input asp-for="Input.ConfirmPassword" class="form-control" />
+                                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mr-2">Save Profile & Password</button>
+                                    <button type="reset" class="btn btn-danger">Cancel</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="emailandsms" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="iq-header-title">
+                                    <h4 class="card-title">Email and SMS</h4>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                @* Update Email and SMS *@
+
+                                <form >
+                                    <div class="form-group row align-items-center">
+                                        <label class="col-md-3" for="emailnotification">Email Notification:</label>
+                                        <div class="col-md-9 custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="emailnotification" checked="">
+                                            <label class="custom-control-label" for="emailnotification"></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row align-items-center">
+                                        <label class="col-md-3" for="smsnotification">SMS Notification:</label>
+                                        <div class="col-md-9 custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="smsnotification" checked="">
+                                            <label class="custom-control-label" for="smsnotification"></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row align-items-center">
+                                        <label class="col-md-3" for="npass">When To Email</label>
+                                        <div class="col-md-9">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="email01">
+                                                <label class="custom-control-label" for="email01">You have new notifications.</label>
+                                            </div>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="email02">
+                                                <label class="custom-control-label" for="email02">You're sent a direct message</label>
+                                            </div>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="email03" checked="">
+                                                <label class="custom-control-label" for="email03">Someone adds you as a connection</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row align-items-center">
+                                        <label class="col-md-3" for="npass">When To Escalate Emails</label>
+                                        <div class="col-md-9">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="email04">
+                                                <label class="custom-control-label" for="email04"> Upon new order.</label>
+                                            </div>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="email05">
+                                                <label class="custom-control-label" for="email05"> New membership approval</label>
+                                            </div>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="email06" checked="">
+                                                <label class="custom-control-label" for="email06"> Member registration</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                    <button type="reset" class="btn iq-bg-danger">Cancel</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="manage-contact" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="iq-header-title">
+                                    <h4 class="card-title">Manage Contact</h4>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                @* update contact  *@
+                                <form>
+                                    <div class="form-group">
+                                        <label for="cno">Contact Number:</label>
+                                        <input type="text" class="form-control" id="cno" value="001 2536 123 458">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email:</label>
+                                        <input type="text" class="form-control" id="email" value="Barryjone@demo.com">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="url">Url:</label>
+                                        <input type="text" class="form-control" id="url" value="https://getbootstrap.com">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                    <button type="reset" class="btn iq-bg-danger">Cancel</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileUpload = document.querySelector('.file-upload');
+            const avatarPreview = document.getElementById('avatar-preview');
+
+            fileUpload.addEventListener('change', function(event) {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        avatarPreview.src = e.target.result;
+                    }
+
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        });
+    </script>
+}

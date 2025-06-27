@@ -1,0 +1,21 @@
+﻿@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout !=  null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    }
+}
+<div class="container ml-5">
+    <div class="content-page">
+
+        @RenderBody()
+
+    </div>
+</div>
+</div>
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

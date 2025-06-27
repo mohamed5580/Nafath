@@ -1,26 +1,31 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
 
-<ul class="navbar-nav">
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+
+    <div class="d-flex align-items-center justify-content-center mt-3">
+
+        <a id="manage" class="nav-link " asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+
+        <form id="logoutForm" class="d-flex align-items-center justify-content-center mt-3" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <a class="btn border mr-2" asp-area="Identity" asp-page="/Account/Manage/Index">Profile</a>
+            <button id="logout" type="submit" class="btn border ">Logout</button>
         </form>
-    </li>
+    </div>
+
+
+
 }
 else
 {
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
+    <div class="d-flex align-items-center justify-content-center mt-3">
+        <a class="btn border mr-2" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
+
+        <a class="btn border " id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    </div>
 }
-</ul>
+

@@ -1,51 +1,240 @@
-﻿<!DOCTYPE html>
+﻿
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Nafath</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Nafath.styles.css" asp-append-version="true" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Nafath</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="author" content="Untree.co">
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Nafath - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="author" content="Untree.co">
+
+	<meta name="description" content="" />
+	<meta name="keywords" content="bootstrap, bootstrap4" />
+	<link rel="icon" type="image/x-icon" href="~/image/image_no_background.png">
+
+	<!-- Bootstrap CSS -->
+	<link href="~/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+	<link href="~/css/tiny-slider.css" rel="stylesheet">
+	<link href="~/css/style.css" rel="stylesheet">
+	<title>Nafath </title>
+</head>
+
+<body>
+
+	<!-- Start Header/Navigation -->
+	<nav lang="ar" dir="rtl" class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="شريط التنقل في نفاذ" >
+
+		<div class="container">
+			<a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand"> <img class="logo" src="~/image/image_no_background_100x100.png" alt="">  نفاذ<span>.</span></a>
+
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="تبديل التنقل">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse " id="navbarsFurni">
+				<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+					<li class="nav-item active">
+						<a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link ">الرئيسية</a>
+					</li>
+					<li>
+						<a asp-area="" asp-controller="Chairs" asp-action="Index"
+						   class="nav-link">المتجر</a>
+					</li>
+
+					<li><a class="nav-link" href="about.html">من نحن</a></li>
+					<li class=""><a class="nav-link" href="services.html">الخدمات</a></li>
+					<li><a class="nav-link" href="blog.html">المدونة</a></li>
+					<li><a class="nav-link" href="contact.html">اتصل بنا</a></li>
+				</ul>
+
+				<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+					<li><a class="nav-link" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong"><img src="~/images/user.svg"></a></li>
+					<li><a class="nav-link" href="cart.html"><img src="~/images/cart.svg"></a></li>
+
+
+					<!-- Modal -->
+					<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body">
+									<partial name="_LoginPartial" />
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</ul>
+			</div>
+			
+		</div>
+
+	</nav>
+	
+	
+	@RenderBody()
+
+
+
+
+
+	<div class="loading">
+		<div class="loader" id="loading">
+			<ul class="hexagon-container">
+				<li class="hexagon hex_1"></li>
+				<li class="hexagon hex_2"></li>
+				<li class="hexagon hex_3"></li>
+				<li class="hexagon hex_4"></li>
+				<li class="hexagon hex_5"></li>
+				<li class="hexagon hex_6"></li>
+				<li class="hexagon hex_7"></li>
+			</ul>
+		</div>
+	</div>
+	<!-- Start Footer Section -->
+	<footer lang="ar" dir="rtl" class="footer-section">
+		<div class="container relative">
+
+			<div class="sofa-img justify-content-end ">
+				<img src="~/images/sofa.png" alt="صورة" class="img-fluid">
+			</div>
+
+			<div class="row">
+				<div class="col-lg-8">
+					<div class="subscription-form">
+						<h3 class="d-flex align-items-center"><span class="me-1"><img src="~/images/envelope-outline.svg" alt="صورة" class="img-fluid"></span><span>اشترك في النشرة الإخبارية</span></h3>
+
+						<form action="#" class="row g-3">
+							<div class="col-auto">
+								<input type="text" class="form-control" placeholder="أدخل اسمك">
+							</div>
+							<div class="col-auto">
+								<input type="email" class="form-control" placeholder="أدخل بريدك الإلكتروني">
+							</div>
+							<div class="col-auto">
+								<button class="btn btn-primary">
+									<span class="fa fa-paper-plane"></span>
+								</button>
+							</div>
+						</form>
+
+					</div>
+				</div>
+			</div>
+
+
+			<div class="row g-5 mb-5">
+				<div class="col-lg-4">
+					<div class="mb-4 footer-logo-wrap"><a href="#" class="footer-logo">نفاذ<span>.</span></a></div>
+					<p class="mb-4">نحن متخصصون في توفير أفضل الأثاث والتصميمات الداخلية لعملائنا. نسعى لتقديم تجربة تسوق ممتازة وجودة عالية.</p>
+
+					<ul class="list-unstyled custom-social">
+						<li><a href="#"><span class="fa fa-brands fa-facebook-f"></span></a></li>
+						<li><a href="#"><span class="fa fa-brands fa-twitter"></span></a></li>
+						<li><a href="#"><span class="fa fa-brands fa-instagram"></span></a></li>
+						<li><a href="#"><span class="fa fa-brands fa-linkedin"></span></a></li>
+					</ul>
+				</div>
+
+				<div class="col-lg-8">
+					<div class="row links-wrap">
+						<div class="col-6 col-sm-6 col-md-3">
+							<ul class="list-unstyled">
+								<li><a href="#">من نحن</a></li>
+								<li><a href="#">الخدمات</a></li>
+								<li><a href="#">المدونة</a></li>
+								<li><a href="#">اتصل بنا</a></li>
+							</ul>
+						</div>
+
+						<div class="col-6 col-sm-6 col-md-3">
+							<ul class="list-unstyled">
+								<li><a href="#">الدعم</a></li>
+								<li><a href="#">قاعدة المعرفة</a></li>
+								<li><a href="#">الدردشة المباشرة</a></li>
+							</ul>
+						</div>
+
+						<div class="col-6 col-sm-6 col-md-3">
+							<ul class="list-unstyled">
+								<li><a href="#">الوظائف</a></li>
+								<li><a href="#">فريقنا</a></li>
+								<li><a href="#">القيادة</a></li>
+								<li><a href="#">سياسة الخصوصية</a></li>
+							</ul>
+						</div>
+
+						<div class="col-6 col-sm-6 col-md-3">
+							<ul class="list-unstyled">
+								<li><a href="#">كرسي نورديك</a></li>
+								<li><a href="#">كرسي كروزو إيرو</a></li>
+								<li><a href="#">كرسي إرغونوميك</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="border-top copyright">
+				<div class="row pt-4">
+					<div class="col-lg-6">
+						<p class="mb-2 text-center text-lg-start">
+							
+						</p>
+					</div>
+
+					<div class="col-lg-6 text-center text-lg-end">
+						<ul class="list-unstyled d-inline-flex ms-auto">
+							<li class="me-4"><a href="#">الشروط والأحكام</a></li>
+							<li><a href="#">سياسة الخصوصية</a></li>
+						</ul>
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</footer>
+	<!-- End Footer Section -->
+
+
+
+	<script src="~/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/tiny-slider.js"></script>
+	<script src="~/js/custom.js"></script>\
+	<script src="~/js/nav.js"></script>
+	<!-- Backend Bundle JavaScript -->
+	<script src="~/assets/js/backend-bundle.min.js"></script>
+
+	<!-- Table Treeview JavaScript -->
+	<script src="~/assets/js/table-treeview.js"></script>
+
+	<!-- Chart Custom JavaScript -->
+	<script src="~/assets/js/customizer.js"></script>
+
+	<!-- Chart Custom JavaScript -->
+	<script async src="~/assets/js/chart-custom.js"></script>
+
+	<!-- app JavaScript -->Z
+	<script src="~/assets/js/app.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>
+
+
+
+
+
