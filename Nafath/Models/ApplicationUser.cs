@@ -5,10 +5,12 @@ using System.Diagnostics.CodeAnalysis;
 namespace Nafath.Models
 {
     using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Diagnostics.CodeAnalysis;
 
+    [Area("Identity")]
     public class ApplicationUser : IdentityUser
     {
         [MaxLength(100)]

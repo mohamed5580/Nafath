@@ -2,9 +2,6 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="author" content="Untree.co">
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -15,14 +12,17 @@
 	<link rel="icon" type="image/x-icon" href="~/image/image_no_background.png">
 
 	<!-- Bootstrap CSS -->
-	<link href="~/css/bootstrap.min.css" rel="stylesheet">
+
+	<link href="~/Nafath/css/bootstrap.min.css" rel="stylesheet">
+	<link href="~/Nafath/css/tiny-slider.css" rel="stylesheet">
+	<link href="~/Nafath/css/style.css" rel="stylesheet">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-	<link href="~/css/tiny-slider.css" rel="stylesheet">
-	<link href="~/css/style.css" rel="stylesheet">
+	<link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 	<title>Nafath </title>
 </head>
 
 <body>
+	<partial name="_Notifications" />
 
 	<!-- Start Header/Navigation -->
 	<nav lang="ar" dir="rtl" class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="شريط التنقل في نفاذ" >
@@ -36,9 +36,11 @@
 
 			<div class="collapse navbar-collapse " id="navbarsFurni">
 				<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+
 					<li class="nav-item active">
 						<a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link ">الرئيسية</a>
 					</li>
+
 					<li>
 						<a asp-area="" asp-controller="Chairs" asp-action="Index"
 						   class="nav-link">المتجر</a>
@@ -210,24 +212,12 @@
 
 
 
-	<script src="~/js/bootstrap.bundle.min.js"></script>
-	<script src="~/js/tiny-slider.js"></script>
-	<script src="~/js/custom.js"></script>\
-	<script src="~/js/nav.js"></script>
+	<script src="~/Nafath/js/bootstrap.bundle.min.js"></script>
+	<script src="~/Nafath/js/tiny-slider.js"></script>
+	<script src="~/Nafath/js/custom.js"></script>
+	<script src="~/Nafath/js/nav.js"></script>
 	<!-- Backend Bundle JavaScript -->
-	<script src="~/assets/js/backend-bundle.min.js"></script>
 
-	<!-- Table Treeview JavaScript -->
-	<script src="~/assets/js/table-treeview.js"></script>
-
-	<!-- Chart Custom JavaScript -->
-	<script src="~/assets/js/customizer.js"></script>
-
-	<!-- Chart Custom JavaScript -->
-	<script async src="~/assets/js/chart-custom.js"></script>
-
-	<!-- app JavaScript -->Z
-	<script src="~/assets/js/app.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 	@await RenderSectionAsync("Scripts", required: false)
 </body>

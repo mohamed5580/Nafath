@@ -1,21 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Nafath.Data;
 using Nafath.Models;
+using Nafath.Repository.Base;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Nafath.Controllers
 {
     public class ChairsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IRepository<Chairs> _context;
+
         private readonly IWebHostEnvironment _env;
 
-        public ChairsController(ApplicationDbContext context, IWebHostEnvironment env)
+        public ChairsController(IRepository<Chairs> context, IWebHostEnvironment env)
         {
             _context = context;
             _env = env;
@@ -24,7 +26,7 @@ namespace Nafath.Controllers
         // GET: Chairs
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Chairs.ToListAsync());
+            return View(_context.FindAll());
         }
 
         // GET: Chairs/Details/5
@@ -35,8 +37,7 @@ namespace Nafath.Controllers
                 return NotFound();
             }
 
-            var chairs = await _context.Chairs
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var chairs = await _context.FindByIdasync(id.Value);
             if (chairs == null)
             {
                 return NotFound();
@@ -89,11 +90,10 @@ namespace Nafath.Controllers
             }
 
             // Add the new chair object to the EF Core context
-            _context.Add(chairs);
+            _context.AddOne(chairs);
 
             // Save all changes to the database
-            await _context.SaveChangesAsync();
-
+            TempData["Success"] = "the Chair Add succses";
             // Redirect to the index page to show the updated list of chairs
             return RedirectToAction(nameof(Index));
         }
@@ -107,7 +107,7 @@ namespace Nafath.Controllers
                 return NotFound();
             }
 
-            var chairs = await _context.Chairs.FindAsync(id);
+            var chairs = _context.FindById(id);
             if (chairs == null)
             {
                 return NotFound();
@@ -131,8 +131,7 @@ namespace Nafath.Controllers
             {
                 try
                 {
-                    _context.Update(chairs);
-                    await _context.SaveChangesAsync();
+                    _context.UpdateOne(chairs);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -158,8 +157,7 @@ namespace Nafath.Controllers
                 return NotFound();
             }
 
-            var chairs = await _context.Chairs
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var chairs = await _context.FindByIdasync(id.Value);
             if (chairs == null)
             {
                 return NotFound();
@@ -169,23 +167,27 @@ namespace Nafath.Controllers
         }
 
         // POST: Chairs/Delete/5
-        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int? id)
         {
-            var chairs = await _context.Chairs.FindAsync(id);
-            if (chairs != null)
+            if (id == null)
             {
-                _context.Chairs.Remove(chairs);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            var chairs = await _context.FindByIdasync(id.Value); // Correct method to find the entity by ID
+            if (chairs != null)
+            {
+                _context.DeleteOne(chairs); // Delete the entity
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
         private bool ChairsExists(int id)
         {
-            return _context.Chairs.Any(e => e.Id == id);
+            // Use FindById or FindAll to check existence
+            return _context.FindById(id) != null;
         }
     }
 }
