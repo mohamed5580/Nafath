@@ -19,7 +19,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
-using Nafath.Models;
+using Infrastructure.Models;
 
 namespace Nafath.Areas.Identity.Pages.Account
 {

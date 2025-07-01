@@ -1,11 +1,11 @@
-﻿@model IEnumerable<Nafath.Models.Chairs>
+﻿@model IEnumerable<Domin.Entity.Chairs>
 @{
     ViewData["Title"] = "Index";
 }
-@using Microsoft.AspNetCore.Identity
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+
 <partial name="_Notifications" />
 
 
@@ -83,7 +83,7 @@
                                     <span class="icon-cross" data-bs-toggle="modal"
                                           data-bs-target="#viewModal-@chair.Id"
                                           onclick="resetCreateForm()">
-                                        <i class="fa-solid fa-display" style="color: #fbfcfe;"></i>
+                                        <svg style="width:26px; height:26px;margin-top:5px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 20H16M12 20H8M12 20V16M12 16H5C4.44772 16 4 15.5523 4 15V6C4 5.44771 4.44772 5 5 5H19C19.5523 5 20 5.44772 20 6M12 16H19C19.5523 16 20 15.5523 20 15V10" stroke="#ffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
                                     </span>
                                    
                                 

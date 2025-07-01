@@ -12,7 +12,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Nafath.Models;
+using Infrastructure.Models;
+
 
 namespace Nafath.Areas.Identity.Pages.Account.Manage
 {

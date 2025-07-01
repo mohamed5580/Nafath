@@ -1,13 +1,13 @@
-﻿using Habanero.Util;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using Nafath.Data;
-using Nafath.Models;
-using Nafath.Repository;
-using Nafath.Repository.Base;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-
+using Infrastructure.Data;
+using Infrastructure.IRepository;
+using Infrastructure.IRepository.Base;
+using Infrastructure.Models;
+using Domin.Entity;
+using Habanero.Util;
+using Nafath.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +37,8 @@ builder.Services.AddTransient(typeof(IRepository<>), typeof(MainRepository<>));
 // 3) MVC + Razor Pages
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-builder.Services.AddTransient<IEmailSender, clsEmailConfirm>();
+builder.Services.AddTransient<IEmailSender, Nafath.Services.EmailSender>();
+
 
 var app = builder.Build();
 
@@ -66,16 +67,17 @@ app.UseAuthorization();
 // Required to serve the built-in Identity Razor Pages:
 app.MapRazorPages();
 
-// Required to pick up any [Area] controllers:
+// Required to
 app.MapControllerRoute(
   name: "areas",
-  pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+  pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"); 
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Accounts}/{action=Login}/{id?}");
 app.MapControllerRoute(
   name: "default",
   pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
 
 app.Run();

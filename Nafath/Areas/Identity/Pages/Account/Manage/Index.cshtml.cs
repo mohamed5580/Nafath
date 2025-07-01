@@ -15,7 +15,8 @@ using System.Diagnostics.Metrics;
 using System.Net;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Nafath.Models;
+using Infrastructure.Models;
+
 
 namespace Nafath.Areas.Identity.Pages.Account.Manage
 {

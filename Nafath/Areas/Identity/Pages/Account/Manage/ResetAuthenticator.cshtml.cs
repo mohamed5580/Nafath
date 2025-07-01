@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Nafath.Models;
+using Infrastructure.Models;
 
 namespace Nafath.Areas.Identity.Pages.Account.Manage
 {

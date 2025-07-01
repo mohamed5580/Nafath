@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Nafath.Models;
+using Infrastructure.Models;
 
 namespace Nafath.Areas.Identity.Pages.Account
 {

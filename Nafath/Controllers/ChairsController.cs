@@ -1,13 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Nafath.Data;
-using Nafath.Models;
-using Nafath.Repository.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Domin.Entity;
+using Infrastructure.IRepository.Base;
 
 namespace Nafath.Controllers
 {
@@ -85,7 +79,7 @@ namespace Nafath.Controllers
                     await chairs.ImageFile.CopyToAsync(stream);
                 }
 
-                // store the relative URL that can be used in an <img> tag
+                // store t  he relative URL that can be used in an <img> tag
                 chairs.ImageUrl = $"/uploads/chairs/{fileName}";
             }
 

@@ -3,21 +3,35 @@
 <html lang="en">
 <head>
 
-	<meta charset="utf-8">
+	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="author" content="Untree.co">
+	<title>@ViewData["Title"] - Dashboard </title>
 
-	<meta name="description" content="" />
-	<meta name="keywords" content="bootstrap, bootstrap4" />
 	<link rel="icon" type="image/x-icon" href="~/image/image_no_background.png">
 
 	<!-- Bootstrap CSS -->
 
+
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+	<link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+	<link rel="shortcut icon" href="~/assets/images/favicon.ico" />
+	<link rel="stylesheet" href="~/assets/css/backend-plugin.min.css">
+	<link rel="stylesheet" href="~/assets/css/backend.css?v=1.0.0">
+	<link rel="stylesheet" href="~/assets/vendor/@@fortawesome/fontawesome-free/css/all.min.css">
+	<link rel="stylesheet" href="~/assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css">
+	<link rel="stylesheet" href="~/assets/vendor/remixicon/fonts/remixicon.css">
+	<link rel="stylesheet" href="~/assets/style.css">
+	<link href="~/Nafath/style.css" rel="stylesheet">
+
+	<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 	<link href="~/Nafath/css/bootstrap.min.css" rel="stylesheet">
 	<link href="~/Nafath/css/tiny-slider.css" rel="stylesheet">
 	<link href="~/Nafath/css/style.css" rel="stylesheet">
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-	<link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
 	<title>Nafath </title>
 </head>
 
@@ -28,7 +42,7 @@
 	<nav lang="ar" dir="rtl" class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="شريط التنقل في نفاذ" >
 
 		<div class="container">
-			<a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand"> <img class="logo" src="~/image/image_no_background_100x100.png" alt="">  نفاذ<span>.</span></a>
+			<a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand"> <img class="logo" src="~/Nafath/images/image_no_background_100x100.png" alt="" >  نفاذ<span>.</span></a>
 
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="تبديل التنقل">
 				<span class="navbar-toggler-icon"></span>
@@ -53,8 +67,8 @@
 				</ul>
 
 				<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-					<li><a class="nav-link" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong"><img src="~/images/user.svg"></a></li>
-					<li><a class="nav-link" href="cart.html"><img src="~/images/cart.svg"></a></li>
+					<li><a class="nav-link" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong"><img src="~/Nafath/images/user.svg"></a></li>
+					<li><a class="nav-link" href="cart.html"><img src="~/Nafath/images/cart.svg"></a></li>
 
 
 					<!-- Modal -->
@@ -86,10 +100,6 @@
 	
 	@RenderBody()
 
-
-
-
-
 	<div class="loading">
 		<div class="loader" id="loading">
 			<ul class="hexagon-container">
@@ -103,18 +113,22 @@
 			</ul>
 		</div>
 	</div>
+
+
 	<!-- Start Footer Section -->
-	<footer lang="ar" dir="rtl" class="footer-section">
+	<footer lang="ar" dir="rtl" class="footer-section" style="margin-top:25px">
 		<div class="container relative">
 
 			<div class="sofa-img justify-content-end ">
-				<img src="~/images/sofa.png" alt="صورة" class="img-fluid">
+				<img src="~/Nafath/images/sofa.png" alt="صورة" class="img-fluid">
 			</div>
 
-			<div class="row">
+			<div class="row " >
 				<div class="col-lg-8">
 					<div class="subscription-form">
-						<h3 class="d-flex align-items-center"><span class="me-1"><img src="~/images/envelope-outline.svg" alt="صورة" class="img-fluid"></span><span>اشترك في النشرة الإخبارية</span></h3>
+						<h3 class="d-flex align-items-left" style="margin-top:120px">
+							<span class="me-1"><img src="~/Nafath/images/envelope-outline.svg" alt="صورة" class="img-fluid"></span>
+							<span>اشترك في النشرة الإخبارية</span></h3>
 
 						<form action="#" class="row g-3">
 							<div class="col-auto">
@@ -215,10 +229,23 @@
 	<script src="~/Nafath/js/bootstrap.bundle.min.js"></script>
 	<script src="~/Nafath/js/tiny-slider.js"></script>
 	<script src="~/Nafath/js/custom.js"></script>
-	<script src="~/Nafath/js/nav.js"></script>
 	<!-- Backend Bundle JavaScript -->
+	<script src="~/assets/js/backend-bundle.min.js"></script>
 
+	<!-- Table Treeview JavaScript -->
+	<script src="~/assets/js/table-treeview.js"></script>
+
+	<!-- Chart Custom JavaScript -->
+	<script src="~/assets/js/customizer.js"></script>
+
+	<!-- Chart Custom JavaScript -->
+	<script async src="~/assets/js/chart-custom.js"></script>
+
+	<!-- app JavaScript -->
+	<script src="~/assets/js/app.js"></script>
+	<script src="~/assets/script.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+	<script src="~/Nafath/nav.js"></script>
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
 

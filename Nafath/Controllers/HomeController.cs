@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Nafath.Models;
+using Infrastructure.Models;
+using Domin.Entity;
 
 namespace Nafath.Controllers
 {

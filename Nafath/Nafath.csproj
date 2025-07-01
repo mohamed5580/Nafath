@@ -31,4 +31,8 @@
     <PackageReference Include="toastr" Version="2.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\infrastructure\Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

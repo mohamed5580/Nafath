@@ -1,5 +1,5 @@
-﻿@using Nafath.ViewModel
-@using Nafath.Resource
+﻿@using Infrastructure.Models.ViewModel
+
 @model RolesViewModel
 @{
     ViewData["Title"] = "Roles";
@@ -10,12 +10,17 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0 text-dark">@ResourceWeb.lbRoleUser</h1>
+                    <h1 class="m-0 text-dark">
+                        @ResourceWeb.lbRoleUser
+
+                    </h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/Admin/Home/Index">@ResourceWeb.lbHomePage</a></li>
+
                         <li class="breadcrumb-item active">@ResourceWeb.lbManageBook</li>
+
                     </ol>
                 </div>
             </div>
@@ -33,6 +38,7 @@
                             <!-- Button trigger modal -->
                             <button type="button" style="margin-top:-5px"
                                     class="btn btn-outline-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
+
                                 @ResourceWeb.lbbtnSaveNewRole
                             </button>
                         </div>
@@ -88,36 +94,31 @@
 </div>
 
 
+
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog card card-success card-outline">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">@ResourceWeb.lbbtnSaveNewRole</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="title">@ResourceWeb.lbbtnSaveNewRole</h5>
+                <a href="#" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</a>
             </div>
-            <form asp-area="Admin"
-                  asp-controller="Accounts"
-                  asp-action="Roles"
-                  method="post">
-                @Html.AntiForgeryToken()
-
-                <div class="modal-body">
-                    <!-- hidden RoleId -->
-                    <input asp-for="NewRole.RoleId" type="hidden" id="roleId" />
-
+            <div class="modal-body">
+                <form asp-action="Roles" asp-controller="Accounts" method="post">
                     <div class="form-group">
-                        <label asp-for="NewRole.RoleName">@ResourceWeb.lbNameRole</label>
-                        <input asp-for="NewRole.RoleName" class="form-control" id="roleName" />
+                        <input type="text" hidden class="form-control" asp-for="NewRole.RoleId" id="roleId" />
+                        <label asp-for="NewRole.RoleName" class="control-lable">@ResourceWeb.lbNameRole</label>
+                        <input type="text" class="form-control" asp-for="NewRole.RoleName" id="roleName" />
                         <span asp-validation-for="NewRole.RoleName" class="text-danger"></span>
                     </div>
-                </div>
 
-                <div class="modal-footer-rtl" style="padding:0 15px 15px 0">
-                    <button type="submit" class="btn btn-success">@ResourceWeb.lbbtnSave</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </form>
+                    <div class="modal-footer-rtl" style="padding:0 15px 15px 0">
+                        <input type="submit" class="btn btn-success" value="@ResourceWeb.lbbtnSave" id="btnSave" />
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>

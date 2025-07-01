@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Nafath.Models;
+using Infrastructure.Models;
 
 namespace Nafath.Areas.Identity.Pages.Account.Manage
 {
