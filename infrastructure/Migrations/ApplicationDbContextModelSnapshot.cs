@@ -56,26 +56,22 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domin.Entity.VwUser", b =>
                 {
-                    b.Property<bool>("ActiveUser")
+                    b.Property<bool?>("ActiveUser")
                         .HasColumnType("bit");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUser")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable((string)null);

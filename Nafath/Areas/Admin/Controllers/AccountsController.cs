@@ -54,37 +54,42 @@ namespace Nafath.Areas.Admin.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Roles(RolesViewModel model)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid) // CORRECTED: Check for VALID model state
             {
-                //var role = new IdentityRole
-                //{
-                //    Id = model.NewRole.RoleId,
-                //    Name = model.NewRole.RoleName
-                //};
-                // Create
                 if (model.NewRole.RoleId == null)
                 {
-                    //role.Id = Guid.NewGuid().ToString();
+                    // Create new role
                     var result = await _roleManager.CreateAsync(new IdentityRole(model.NewRole.RoleName));
 
-                    if (result.Succeeded)// Succeeded 
+                    if (result.Succeeded)
                         SessionMsg(Helper.Success, ResourceWeb.lbSave, ResourceWeb.lbSaveMsgRole);
-                    else // Not Successeded
+                    else
                         SessionMsg(Helper.Error, ResourceWeb.lbNotSaved, ResourceWeb.lbNotSavedMsgRole);
-                }//Update
-                else
-                {
-                    var RoleUpdate = await _roleManager.FindByIdAsync(model.NewRole.RoleId);
-                    RoleUpdate.Id = model.NewRole.RoleId;
-                    RoleUpdate.Name = model.NewRole.RoleName;
-                    var Result = await _roleManager.UpdateAsync(RoleUpdate);
-                    if (Result.Succeeded) // Succeeded
-                        SessionMsg(Helper.Success, ResourceWeb.lbUpdate, ResourceWeb.lbUpdateMsgRole);
-                    else  // Not Successeded
-                        SessionMsg(Helper.Error, ResourceWeb.lbNotUpdate, ResourceWeb.lbNotUpdateMsgRole);
                 }
+                else // Update existing role
+                {
+                    var roleUpdate = await _roleManager.FindByIdAsync(model.NewRole.RoleId);
+                    if (roleUpdate == null)
+                    {
+                        ModelState.AddModelError("", ResourceWeb.lbNotSaved);
+                    }
+                    else
+                    {
+                        roleUpdate.Name = model.NewRole.RoleName;
+                        var result = await _roleManager.UpdateAsync(roleUpdate);
+
+                        if (result.Succeeded)
+                            SessionMsg(Helper.Success, ResourceWeb.lbUpdate, ResourceWeb.lbUpdateMsgRole);
+                        else
+                            SessionMsg(Helper.Error, ResourceWeb.lbNotUpdate, ResourceWeb.lbNotUpdateMsgRole);
+                    }
+                }
+                return RedirectToAction("Roles");
             }
-            return RedirectToAction("Roles");
+
+            // If model is INVALID, return to view with errors
+            model.Roles = _roleManager.Roles.OrderBy(x => x.Name).ToList();
+            return View(model);
         }
 
         [Authorize(Roles = "Admin")]
@@ -97,14 +102,16 @@ namespace Nafath.Areas.Admin.Controllers
             return RedirectToAction("Roles");
         }
 
+       
+
         [Authorize(Roles = "Admin,User")]
         public IActionResult Registers()
         {
             var model = new RegisterViewModel
             {
                 NewRegister = new NewRegister(),
-                Roles = _roleManager.Roles.OrderBy(x => x.Name).ToList(),
-                Users = _context.VwUsers.OrderBy(x => x.Role).ToList() //_userManager.Users.OrderBy(x=>x.Name).ToList()
+                Roles = _roleManager.Roles.OrderBy(r => r.Name).ToList(),
+                Users = _context.VwUsers.OrderBy(u => u.Role).ToList()
             };
             return View(model);
         }
@@ -114,74 +121,90 @@ namespace Nafath.Areas.Admin.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Registers(RegisterViewModel model)
         {
+            // Always repopulate Roles & Users when re-displaying form
+            model.Roles = _roleManager.Roles.OrderBy(r => r.Name).ToList();
+            model.Users = _context.VwUsers.OrderBy(u => u.Role).ToList();
+
             if (!ModelState.IsValid)
             {
-                var file = HttpContext.Request.Form.Files;
-                if (file.Count() > 0)
+                return View(model);
+            }
+
+            // Handle file upload
+            var file = HttpContext.Request.Form.Files.FirstOrDefault();
+            if (file != null)
+            {
+                var imageName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                var savePath = Path.Combine("wwwroot", Helper.PathSaveImageuser, imageName);
+                using var stream = new FileStream(savePath, FileMode.Create);
+                await file.CopyToAsync(stream);
+                model.NewRegister.ImageUser = imageName;
+            }
+
+            var isNew = string.IsNullOrEmpty(model.NewRegister.Id);
+            ApplicationUser user;
+
+            if (isNew)
+            {
+                // Create new user
+                user = new ApplicationUser
                 {
-                    string ImageName = Guid.NewGuid().ToString() + Path.GetExtension(file[0].FileName);
-                    var fileStream = new FileStream(Path.Combine(@"wwwroot/", Helper.PathSaveImageuser, ImageName), FileMode.Create);
-                    file[0].CopyTo(fileStream);
-                    model.NewRegister.ImageUser = ImageName;
-                }
-                else
-                {
-                    model.NewRegister.ImageUser = model.NewRegister.ImageUser;
-                }
-                var user = new ApplicationUser
-                {
-                    Id = model.NewRegister.Id,
+                    Id = Guid.NewGuid().ToString(),
                     FullName = model.NewRegister.Name,
                     UserName = model.NewRegister.Email,
                     Email = model.NewRegister.Email,
                     AcceptTerms = model.NewRegister.ActiveUser,
                     AvatarUrl = model.NewRegister.ImageUser
                 };
-                if (user.Id == null)
+
+                var result = await _userManager.CreateAsync(user, model.NewRegister.Password);
+                if (result.Succeeded)
                 {
-                    //Craete
-                    user.Id = Guid.NewGuid().ToString();
-                    var result = await _userManager.CreateAsync(user, model.NewRegister.Password);
-                    if (result.Succeeded)
-                    {
-                        //Succsseded
-                        var Role = await _userManager.AddToRoleAsync(user, model.NewRegister.RoleName);
-                        if (Role.Succeeded)
-                            SessionMsg(Helper.Success, ResourceWeb.lbSave, ResourceWeb.lbNotSavedMsgUserRole);
-                        else
-                            SessionMsg(Helper.Error, ResourceWeb.lbNotSaved, ResourceWeb.lbNotSavedMsgUser);
-                    }
-                    else //Not Successeded
-                        SessionMsg(Helper.Error, ResourceWeb.lbNotSaved, ResourceWeb.lbNotUpdateMsgUser);
+                    var roleResult = await _userManager.AddToRoleAsync(user, model.NewRegister.RoleName);
+                    if (roleResult.Succeeded)
+                        SessionMsg(Helper.Success, ResourceWeb.lbSave, ResourceWeb.lbNotSavedMsgUserRole);
+                    else
+                        SessionMsg(Helper.Error, ResourceWeb.lbNotSaved, ResourceWeb.lbNotSavedMsgUser);
                 }
                 else
                 {
-                    //Update
-                    var userUpdate = await _userManager.FindByIdAsync(user.Id);
-                    userUpdate.Id = model.NewRegister.Id;
-                    userUpdate.FullName = model.NewRegister.Name;
-                    userUpdate.UserName = model.NewRegister.Email;
-                    userUpdate.Email = model.NewRegister.Email;
-                    userUpdate.AcceptTerms = model.NewRegister.ActiveUser;
-                    userUpdate.AvatarUrl = model.NewRegister.ImageUser;
-
-                    var result = await _userManager.UpdateAsync(userUpdate);
-                    if (result.Succeeded)
-                    {
-                        var oldRole = await _userManager.GetRolesAsync(userUpdate);
-                        await _userManager.RemoveFromRolesAsync(userUpdate, oldRole);
-                        var AddRole = await _userManager.AddToRoleAsync(userUpdate, model.NewRegister.RoleName);
-                        if (AddRole.Succeeded)
-                            SessionMsg(Helper.Success, ResourceWeb.lbUpdate, ResourceWeb.lbNotUpdateMsgUserRole);
-                        else
-                            SessionMsg(Helper.Error, ResourceWeb.lbNotUpdate, ResourceWeb.lbNotUpdateMsgUserRole);
-                    }
-                    else // Not Successeded
-                        SessionMsg(Helper.Error, ResourceWeb.lbNotUpdate, ResourceWeb.lbNotUpdateMsgUser);
+                    SessionMsg(Helper.Error, ResourceWeb.lbNotSaved, ResourceWeb.lbNotUpdateMsgUser);
                 }
-                return RedirectToAction("Registers", "Accounts");
             }
-            return RedirectToAction("Registers", "Accounts");
+            else
+            {
+                // Update existing user
+                user = await _userManager.FindByIdAsync(model.NewRegister.Id);
+                if (user == null)
+                {
+                    SessionMsg(Helper.Error, ResourceWeb.lbMsgErrorLogin, ResourceWeb.lbMsgErrorLogin);
+                    return RedirectToAction("Registers");
+                }
+
+                user.FullName = model.NewRegister.Name;
+                user.UserName = model.NewRegister.Email;
+                user.Email = model.NewRegister.Email;
+                user.AcceptTerms = model.NewRegister.ActiveUser;
+                user.AvatarUrl = model.NewRegister.ImageUser;
+
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (updateResult.Succeeded)
+                {
+                    var oldRoles = await _userManager.GetRolesAsync(user);
+                    await _userManager.RemoveFromRolesAsync(user, oldRoles);
+                    var addRoleResult = await _userManager.AddToRoleAsync(user, model.NewRegister.RoleName);
+                    if (addRoleResult.Succeeded)
+                        SessionMsg(Helper.Success, ResourceWeb.lbUpdate, ResourceWeb.lbNotUpdateMsgUserRole);
+                    else
+                        SessionMsg(Helper.Error, ResourceWeb.lbNotUpdate, ResourceWeb.lbNotUpdateMsgUserRole);
+                }
+                else
+                {
+                    SessionMsg(Helper.Error, ResourceWeb.lbNotUpdate, ResourceWeb.lbNotUpdateMsgUser);
+                }
+            }
+
+            return RedirectToAction("Registers");
         }
 
         [Authorize(Roles = "Admin")]

@@ -18,7 +18,6 @@ namespace Infrastructure.IRepository.Base
         void AddList(T entity);
         void UpdateList(T entity);
         void DeleteList(T entity);
-
-
+        IEnumerable<T> GetPaged(int pageNumber, int pageSize, out int totalItems);
     }
 }

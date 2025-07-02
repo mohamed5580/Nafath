@@ -25,21 +25,21 @@ namespace Infrastructure.ViewModel
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "RegisterName")]
         [MaxLength(20, ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "MaxLength")]
         [MinLength(3, ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "MinLength")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "RoleName")]
-        public string RoleName { get; set; }
+        public string? RoleName { get; set; }
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "RegisterEmail")]
         [EmailAddress(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "RegisterEmailError")]
-        public string Email { get; set; }
-        public string ImageUser { get; set; }
-        public bool ActiveUser { get; set; }
+        public string? Email { get; set; }
+        public string? ImageUser { get; set; }
+        public bool ActiveUser { get; set; } = true;
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "Password")]
         [MaxLength(20, ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "MaxLength")]
         [MinLength(5, ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "MinLengthPassword")]
-        public string Password { get; set; }
+        public string? Password { get; set; }
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "ComparePassword")]
         [Compare("Password", ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "ComparePassword")]
-        public string ComparePassword { get; set; }
+        public string? ComparePassword { get; set; }
 
     }
 }

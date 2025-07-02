@@ -18,9 +18,15 @@ namespace Nafath.Controllers
         }
 
         // GET: Chairs
-        public async Task<IActionResult> Index()
+        public IActionResult Index(int page = 1, int pageSize = 12)
         {
-            return View(_context.FindAll());
+            int totalItems;
+            var pagedChairs = _context.GetPaged(page, pageSize, out totalItems);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            return View(pagedChairs);
         }
 
         // GET: Chairs/Details/5

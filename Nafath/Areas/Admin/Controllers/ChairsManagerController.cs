@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Domin.Entity;
+using Domin.Resource;
+using Infrastructure.IRepository.Base;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Domin.Entity;
-using Infrastructure.IRepository.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,9 +25,17 @@ namespace Nafath.Controllers
         }
 
         // GET: Chairs
-        public async Task<IActionResult> Index()
+        // GET: Admin/ChairsManager
+        public IActionResult Index(int page = 1, int pageSize = 12)
         {
-            return View(_context.FindAll());
+            int totalItems;
+            var pagedChairs = _context.GetPaged(page, pageSize, out totalItems);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            return View(pagedChairs);
+
         }
 
         // GET: Chairs/Details/5
@@ -45,60 +55,63 @@ namespace Nafath.Controllers
             return View(chairs);
         }
 
-        // GET: Chairs/Create
+        // GET: Admin/ChairsManager/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Chairs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // POST: Admin/ChairsManager/Create
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Chairs chairs)
         {
-            // First, always check if the submitted data is valid based on your model's annotations
             if (!ModelState.IsValid)
             {
-
+                // If validation failed, re-display form with errors
+                SessionMsg(Helper.Error, "خطأ", "لا يمكن ادخال قيم فارغة");
                 // If not valid, return the same view. The user will see the validation errors.
-                return View(chairs);
+                return RedirectToAction(nameof(Index));
             }
 
-            // Handle the file upload ONLY if a file was provided.
+            // Handle file upload if provided
             if (chairs.ImageFile != null && chairs.ImageFile.Length > 0)
             {
-                // pick a safe filename (GUID avoids name conflicts)
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(chairs.ImageFile.FileName)}";
-
-                // Define the directory to save the file
                 var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chairs");
-                // Ensure the directory exists
                 Directory.CreateDirectory(uploadsDir);
 
                 var filePath = Path.Combine(uploadsDir, fileName);
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await chairs.ImageFile.CopyToAsync(stream);
 
-                // Save the file to the server's filesystem
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await chairs.ImageFile.CopyToAsync(stream);
-                }
-
-                // store the relative URL that can be used in an <img> tag
                 chairs.ImageUrl = $"/uploads/chairs/{fileName}";
             }
+            if (chairs.Id == null || chairs.Name == string.Empty || chairs.Price == null || chairs.Description == string.Empty)
+            {
+                SessionMsg(Helper.Error, "خطأ", "لا يمكن ادخال قيم فارغة");
+                // If not valid, return the same view. The user will see the validation errors.
 
-            // Add the new chair object to the EF Core context
-            _context.AddOne(chairs);
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
 
-            // Save all changes to the database
-            TempData["Success"] = "the Chair Add succses";
-            // Redirect to the index page to show the updated list of chairs
+
+
+                _context.AddOne(chairs);
+
+                TempData["Success"] = "Chair added successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            SessionMsg(Helper.Error, "خطأ", "لا يمكن ادخال قيم فارغة");
+
             return RedirectToAction(nameof(Index));
+
         }
 
 
+       
         // GET: Chairs/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -120,7 +133,8 @@ namespace Nafath.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ImageUrl,Price,Category,Color,Size,Material,Brand,IsAvailable")] Chairs chairs)
+        public async Task<IActionResult> Edit(int id, [FromForm] Chairs chairs)
+
         {
             if (id != chairs.Id)
             {
@@ -131,7 +145,26 @@ namespace Nafath.Controllers
             {
                 try
                 {
+                    // Handle image upload if a new file is provided
+                    if (chairs.ImageFile != null && chairs.ImageFile.Length > 0)
+                    {
+                        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(chairs.ImageFile.FileName)}";
+                        var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chairs");
+                        Directory.CreateDirectory(uploadsDir);
+                        var filePath = Path.Combine(uploadsDir, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await chairs.ImageFile.CopyToAsync(stream);
+                        }
+
+                        chairs.ImageUrl = $"/uploads/chairs/{fileName}";
+                    }
+
                     _context.UpdateOne(chairs);
+
+                    TempData["Success"] = "Chair updated successfully";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -139,15 +172,20 @@ namespace Nafath.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(chairs);
+
+            // If we got here, something is wrong - collect errors
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
+            TempData["Error"] = errors;
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Chairs/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -188,6 +226,12 @@ namespace Nafath.Controllers
         {
             // Use FindById or FindAll to check existence
             return _context.FindById(id) != null;
+        }
+        private void SessionMsg(string MsgType, string Title, string Msg)
+        {
+            HttpContext.Session.SetString(Helper.MsgType, MsgType);
+            HttpContext.Session.SetString(Helper.Title, Title);
+            HttpContext.Session.SetString(Helper.Msg, Msg);
         }
     }
 }

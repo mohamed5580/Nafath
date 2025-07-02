@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domin.Entity
 {
-    [Area("Identity")]
     public class Chairs
     {
         [Key]

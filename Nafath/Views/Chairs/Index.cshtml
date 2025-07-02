@@ -1,10 +1,14 @@
 ﻿@model IEnumerable<Domin.Entity.Chairs>
 @{
     ViewData["Title"] = "Index";
+    var currentPage = ViewBag.CurrentPage as int? ?? 1;
+    var totalPages = ViewBag.TotalPages as int? ?? 1;
 }
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+
+
 
 <partial name="_Notifications" />
 
@@ -32,38 +36,15 @@
             <!-- HEADER -->
             <div class="row mb-4">
                 <div lang="ar" dir="rtl" class="col-lg-12 d-flex align-items-center justify-content-between">
-                   
-                    
-                    @if (SignInManager.IsSignedIn(User))
-                    {
-                        <div class="pt-5">
-                            <h1 class="mb-1">كراسي المكتب</h1>
-                            <p class="mb-0">
+                    <div class="pt-5">
+                        <h1 class="mb-1">كراسي المكتب</h1>
+                        <p class="mb-0">
+                            أثاث مكتبي مميز: من الكراسي المريحة
 
+                        </p>
 
-                            </p>
+                    </div>
 
-                        </div>
-                        <button type="button"
-                        class="btn btn-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#createModal"
-                        onclick="resetCreateForm()">
-                            اضافة كرسي  <i class="fa-solid fa-plus"></i>
-                        </button>
-                    }
-                    else
-                    {
-                        <div class="pt-5">
-                            <h1 class="mb-1">كراسي المكتب</h1>
-                            <p class="mb-0">
-                                
-
-                            </p>
-
-                        </div>
-                        
-                    }
                 </div>
             </div>
             <div class="untree_co-section product-section before-footer-section">
@@ -77,7 +58,7 @@
                                     <input type="type" name="name" value="@chair.Id" hidden />
                                     <img src="@chair.ImageUrl" alt="@chair.Name" class="img-fluid product-thumbnail">
                                     <h3 class="product-title">@chair.Name</h3>
-                                    <strong class="product-price">$@chair.Price</strong>
+                                    <strong class="product-price">@chair.Price </strong>
 
 
                                     <span class="icon-cross" data-bs-toggle="modal"
@@ -92,7 +73,25 @@
                             <!-- End Column 1 -->
                         }
 
-
+                        <nav aria-label="...">
+                            <ul class="pagination">
+                                <!-- Previous Button -->
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <a class="page-link" href="@(currentPage > 1 ? Url.Action("Index", new { page = currentPage - 1 }) : "#")">Previous</a>
+                                </li>
+                                <!-- Page Numbers -->
+                                @for (int i = 1; i <= totalPages; i++)
+                                {
+                                    <li class="page-item @(i == currentPage ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                                    </li>
+                                }
+                                <!-- Next Button -->
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <a class="page-link" href="@(currentPage<totalPages? Url.Action("Index", new { page = currentPage + 1 }) : "#")">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
                                     
                     </div>
                 </div>

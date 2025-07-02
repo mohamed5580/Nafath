@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.EntityFrameworkCore;
+﻿using Domin.Entity;
 using Infrastructure.Data;
 using Infrastructure.IRepository;
 using Infrastructure.IRepository.Base;
 using Infrastructure.Models;
-using Domin.Entity;
-using Habanero.Util;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Nafath.Services;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // 2. Add Identity Services
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+     .AddDefaultUI()                // <— brings in the Razor pages for login/register/confirm
+    .AddDefaultTokenProviders()    // <— for email confirmation, password reset, etc.
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddSession(); // Add session support
 // ✅ Add session support
@@ -32,7 +35,6 @@ builder.Services.AddSession(options =>
 
 // ... rest of the code
 builder.Services.AddTransient(typeof(IRepository<>), typeof(MainRepository<>));
-
 
 // 3) MVC + Razor Pages
 builder.Services.AddControllersWithViews();
@@ -67,6 +69,21 @@ app.UseAuthorization();
 // Required to serve the built-in Identity Razor Pages:
 app.MapRazorPages();
 
+
+// grab the env
+var env = app.Services.GetRequiredService<IWebHostEnvironment>();
+
+var uploadsPath = Path.Combine(env.ContentRootPath, "Uploads", "Users");
+if (!Directory.Exists(uploadsPath))
+{
+    Directory.CreateDirectory(uploadsPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/user-images"
+});
 // Required to
 app.MapControllerRoute(
   name: "areas",

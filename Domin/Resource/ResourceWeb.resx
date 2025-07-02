@@ -171,6 +171,9 @@
   <data name="lbDate" xml:space="preserve">
     <value>التاريخ</value>
   </data>
+  <data name="lbDeleteMsg" xml:space="preserve">
+    <value>تم الحذف بنجاح</value>
+  </data>
   <data name="lbDescription" xml:space="preserve">
     <value>وصف الفئة</value>
   </data>
@@ -285,6 +288,9 @@
   <data name="lbSave" xml:space="preserve">
     <value>تم الحفظ</value>
   </data>
+  <data name="lbSaveMsg" xml:space="preserve">
+    <value>تم حفظ البيانات بنجاح</value>
+  </data>
   <data name="lbSaveMsgRole" xml:space="preserve">
     <value>تم حفظ مجموعة المستخدم بنجاح</value>
   </data>
@@ -311,6 +317,9 @@
   </data>
   <data name="lbUpdate" xml:space="preserve">
     <value>تم التعديل</value>
+  </data>
+  <data name="lbUpdateMsg" xml:space="preserve">
+    <value>تم تعديل البيانات بنجاح</value>
   </data>
   <data name="lbUpdateMsgRole" xml:space="preserve">
     <value>تم تعديل مجموعة المستخدم بنجاح</value>

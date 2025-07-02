@@ -223,6 +223,15 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to تم الحذف بنجاح.
+        /// </summary>
+        public static string lbDeleteMsg {
+            get {
+                return ResourceManager.GetString("lbDeleteMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to وصف الفئة.
         /// </summary>
         public static string lbDescription {
@@ -565,6 +574,15 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to تم حفظ البيانات بنجاح.
+        /// </summary>
+        public static string lbSaveMsg {
+            get {
+                return ResourceManager.GetString("lbSaveMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to تم حفظ مجموعة المستخدم بنجاح.
         /// </summary>
         public static string lbSaveMsgRole {
@@ -642,6 +660,15 @@ namespace Domin.Resource {
         public static string lbUpdate {
             get {
                 return ResourceManager.GetString("lbUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تم تعديل البيانات بنجاح.
+        /// </summary>
+        public static string lbUpdateMsg {
+            get {
+                return ResourceManager.GetString("lbUpdateMsg", resourceCulture);
             }
         }
         

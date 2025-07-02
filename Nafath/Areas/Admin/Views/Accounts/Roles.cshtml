@@ -104,16 +104,19 @@
                 <a href="#" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</a>
             </div>
             <div class="modal-body">
-                <form asp-action="Roles" asp-controller="Accounts" method="post">
+                <form asp-action="Roles" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
                     <div class="form-group">
-                        <input type="text" hidden class="form-control" asp-for="NewRole.RoleId" id="roleId" />
-                        <label asp-for="NewRole.RoleName" class="control-lable">@ResourceWeb.lbNameRole</label>
-                        <input type="text" class="form-control" asp-for="NewRole.RoleName" id="roleName" />
+                        <input type="hidden" asp-for="NewRole.RoleId" />
+
+                        <label asp-for="NewRole.RoleName" class="control-label"></label>
+                        <input asp-for="NewRole.RoleName" class="form-control" />
                         <span asp-validation-for="NewRole.RoleName" class="text-danger"></span>
                     </div>
 
-                    <div class="modal-footer-rtl" style="padding:0 15px 15px 0">
-                        <input type="submit" class="btn btn-success" value="@ResourceWeb.lbbtnSave" id="btnSave" />
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">@ResourceWeb.lbbtnSave</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
