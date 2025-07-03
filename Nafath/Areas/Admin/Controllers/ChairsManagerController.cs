@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Nafath.Controllers
 {
@@ -134,57 +135,63 @@ namespace Nafath.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [FromForm] Chairs chairs)
-
         {
-            if (id != chairs.Id)
+            if (id != chairs.Id) return NotFound();
+
+            // 1) Load existing
+            var existing = _context.FindById(id);
+            if (existing == null) return NotFound();
+
+            // 2) Check for no‑op:
+            var nothingChanged =
+                chairs.ImageFile == null &&
+                chairs.Name == existing.Name &&
+                chairs.Description == existing.Description &&
+                chairs.Price == existing.Price &&
+                chairs.IsAvailable == existing.IsAvailable;
+
+            if (nothingChanged)
             {
-                return NotFound();
+                TempData["Info"] = "لم يتم تعديل أي شيء";
+                SessionMsg(Helper.Msg, "تنبيه","لا يوجد تغييرات" );
+                return RedirectToAction(nameof(Index));
             }
 
-            if (ModelState.IsValid)
+            // 3) Validate ModelState
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    // Handle image upload if a new file is provided
-                    if (chairs.ImageFile != null && chairs.ImageFile.Length > 0)
-                    {
-                        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(chairs.ImageFile.FileName)}";
-                        var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chairs");
-                        Directory.CreateDirectory(uploadsDir);
-                        var filePath = Path.Combine(uploadsDir, fileName);
-
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await chairs.ImageFile.CopyToAsync(stream);
-                        }
-
-                        chairs.ImageUrl = $"/uploads/chairs/{fileName}";
-                    }
-
-                    _context.UpdateOne(chairs);
-
-                    TempData["Success"] = "Chair updated successfully";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ChairsExists(chairs.Id))
-                    {
-                        return NotFound();
-                    }
-                    throw;
-                }
+                // ensure Edit.cshtml exists under Areas/Admin/Views/ChairsManager/
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage);
+                SessionMsg(Helper.Error, "خطأ", string.Join("; ", errors));
+                return View(chairs);
             }
 
-            // If we got here, something is wrong - collect errors
-            var errors = ModelState.Values
-                .SelectMany(v => v.Errors)
-                .Select(e => e.ErrorMessage)
-                .ToList();
+            // 4) Merge and handle upload
+            existing.Name = chairs.Name;
+            existing.Description = chairs.Description;
+            existing.Price = chairs.Price;
+            existing.IsAvailable = chairs.IsAvailable;
 
-            TempData["Error"] = errors;
+            if (chairs.ImageFile?.Length > 0)
+            {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(chairs.ImageFile.FileName)}";
+                var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chairs");
+                Directory.CreateDirectory(uploadsDir);
+
+                using var stream = new FileStream(Path.Combine(uploadsDir, fileName), FileMode.Create);
+                await chairs.ImageFile.CopyToAsync(stream);
+                existing.ImageUrl = $"/uploads/chairs/{fileName}";
+            }
+
+            // 5) Save and redirect
+            _context.UpdateOne(existing);
+            TempData["Success"] = "Chair updated successfully";
             return RedirectToAction(nameof(Index));
         }
+
+
 
 
         // GET: Chairs/Delete/5

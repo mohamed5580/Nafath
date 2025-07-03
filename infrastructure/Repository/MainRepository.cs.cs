@@ -41,7 +41,7 @@ namespace Infrastructure.IRepository
 
             _context.Set<T>().Add(entity);
             _context.SaveChanges();
-
+           
             SessionMsg(Helper.Success, ResourceWeb.lbSaveMsg, ResourceWeb.lbSaveMsg);
         }
 
@@ -104,19 +104,16 @@ namespace Infrastructure.IRepository
             throw new NotImplementedException();
         }
 
-        public T FindById(int id)
-        {
-            if (id <= 0)
-                throw new ArgumentException("ID must be greater than zero.", nameof(id));
-
-            return _context.Set<T>().Find(id)
-                   ?? throw new KeyNotFoundException($"Entity with ID {id} not found.");
-        }
-
         public T FindById(int? ID)
         {
-            throw new NotImplementedException();
+            if (ID <= 0)
+                throw new ArgumentException("ID must be greater than zero.", nameof(ID));
+
+            return _context.Set<T>().Find(ID)
+                   ?? throw new KeyNotFoundException($"Entity with ID {ID} not found.");
         }
+
+        
 
         public async Task<T> FindByIdAsync(int id)
         {

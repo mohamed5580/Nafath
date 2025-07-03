@@ -68,7 +68,10 @@
                                                         break;
                                                 }
                                            </td>
-                                           <td><img src="@Helper.PathImageuser/@user.ImageUser" class="img-bordered img-circle img-circle"
+                                        <td>
+                                            <img src="@( !string.IsNullOrEmpty(user.ImageUser)
+                                                            ? Url.Content($"{Helper.PathImageuser}/{user.ImageUser}")
+                                                            : Url.Content($"{Helper.PathImageuser}/user1.png") )" class="img-bordered img-circle img-circle"
                                            style="width:50px; height:50px"></td>
                                        
                                        <td>@user.Email</td>

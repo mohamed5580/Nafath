@@ -23,6 +23,7 @@
 
 }
 
+
 <div class="wrapper">
     <!--Content-Header-->
     <div class="content-header">
@@ -159,9 +160,7 @@
 </div>
 
 
-
-
-  <!-- CREATE MODAL -->
+ <!-- CREATE MODAL -->
 <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog card card-success card-outline">
         <div class="modal-content">
@@ -234,72 +233,91 @@
 
 
 <!-- EDIT MODALS -->
-@if (Model != null)
+@foreach (var chair in Model)
 {
-    foreach (var chair in Model)
-    {
-        <div class="modal fade" id="editModal-@chair.Id" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog card card-success card-outline">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Chair</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="Id" value="@chair.Id" />
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>Name</label>
-                                <input name="Name" class="form-control" value="@chair.Name" />
-                                <span class="text-danger" data-valmsg-for="Name"></span>
-                            </div>
-                            <div class="form-group">
-                                <label>Description</label>
-                                <input name="Description" class="form-control" value="@chair.Description" />
-                                <span class="text-danger" data-valmsg-for="Description"></span>
-                            </div>
-                            <div class="form-group">
-                                <label>Price</label>
-                                <input name="Price" class="form-control" value="@chair.Price" />
-                                <span class="text-danger" data-valmsg-for="Price"></span>
-                            </div>
-                            <div class="form-group">
-                                <label>Current Image</label>
-                                <div class="mb-4 d-flex justify-content-center">
-                                    <img id="editImage-@chair.Id" src="@chair.ImageUrl" 
-                                         style="width:300px;" />
-                                </div>
-                                <label>Upload New Image (Optional)</label>
-                                <div class="d-flex justify-content-center">
-                                    <div class="btn btn-primary btn-rounded">
-                                        <label class="form-label text-white m-1"
-                                               for="editFile-@chair.Id">Choose file</label>
-                                        <input name="ImageFile" type="file" class="form-control d-none"
-                                               id="editFile-@chair.Id"
-                                               onchange="displaySelectedImage(event, 'editImage-@chair.Id')" />
-                                    </div>
-                                </div>
-                                <span class="text-danger" data-valmsg-for="ImageFile"></span>
-                            </div>
-                            <div class="form-check mt-2">
-                                <input type="hidden" name="IsAvailable" value="false" />
-                                <input name="IsAvailable" type="checkbox" class="form-check-input"
-                                       value="true" id="isAvail-@chair.Id"
-                                       @(chair.IsAvailable ? "checked" : "") />
-                                <label class="form-check-label" for="isAvail-@chair.Id">
-                                    Available
-                                </label>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </form>
+    <div class="modal fade" id="editModal-@chair.Id" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog card card-success card-outline">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Chair</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <form asp-area="Admin"
+                asp-controller="ChairsManager"
+                asp-action="Edit"
+                asp-route-id="@chair.Id"      @* <-- add this *@
+                method="post"
+                enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id"       value="@chair.Id" />
+            <input type="hidden" name="ImageUrl" value="@chair.ImageUrl" />
+
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Name</label>
+                <input name="Name" class="form-control" value="@chair.Name" />
+                <span class="text-danger" data-valmsg-for="Name"></span>
+              </div>
+
+              <div class="form-group">
+                <label>Description</label>
+                <input name="Description" class="form-control" value="@chair.Description" />
+                <span class="text-danger" data-valmsg-for="Description"></span>
+              </div>
+
+              <div class="form-group">
+                <label>Price</label>
+                <input name="Price" type="number" step="0.01" class="form-control"
+                       value="@chair.Price" />
+                <span class="text-danger" data-valmsg-for="Price"></span>
+              </div>
+
+              <div class="form-group">
+                <label>Current Image</label>
+                <div class="mb-4 text-center">
+                  <img id="editImage-@chair.Id"
+                       src="@chair.ImageUrl"
+                       style="max-width:300px;" />
                 </div>
+                <div class="text-center">
+                  <label class="btn btn-primary">
+                    Choose file
+                    <input name="ImageFile"
+                           type="file"
+                           hidden
+                           onchange="displaySelectedImage(event,'editImage-@chair.Id')" />
+                  </label>
+                </div>
+                <span class="text-danger" data-valmsg-for="ImageFile"></span>
+              </div>
+
+             <div class="form-check mb-3">
+              <!-- hidden=false first -->
+              <input type="hidden" name="IsAvailable" value="false" />
+
+              <!-- then the checkbox=true -->
+              <input name="IsAvailable"
+                     type="checkbox"
+                     class="form-check-input"
+                     id="isAvailableCheck-@chair.Id"
+                     value="true"
+                     @(chair.IsAvailable ? "checked" : "") />
+
+              <label class="form-check-label" for="isAvailableCheck-@chair.Id">
+                Available
+              </label>
             </div>
+
+            </div>
+
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+          </form>
         </div>
-    }
+      </div>
+    </div>
 }
 <!-- VIEW MODAL -->
 @if (Model != null)
