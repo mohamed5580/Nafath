@@ -12,3 +12,5 @@ if (!localStorage.getItem("done")) {
     document.querySelector(".loader").style = `display:none;`
 
 }
+
+

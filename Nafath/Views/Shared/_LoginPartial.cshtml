@@ -7,25 +7,20 @@
 @if (SignInManager.IsSignedIn(User))
 {
 
-    <div class="d-flex align-items-center justify-content-center mt-3">
+    <a id="manage" class="nav-link " asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
 
-        <a id="manage" class="nav-link " asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-
-        <form id="logoutForm" class="d-flex align-items-center justify-content-center mt-3" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <a class="btn border mr-2" asp-area="Identity" asp-page="/Account/Manage/Index">Profile</a>
-            <button id="logout" type="submit" class="btn border ">Logout</button>
-        </form>
-    </div>
-
-
+    <form id="logoutForm" class="d-block  mt-3" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+        <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Profile</a>
+        <li><hr class="dropdown-divider"></li>
+        <button id="logout" type="submit" class="dropdown-item">Logout</button>
+    </form>
 
 }
 else
 {
-    <div class="d-flex align-items-center justify-content-center mt-3">
-        <a class="btn border mr-2" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
 
-        <a class="btn border " id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </div>
+    <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">Register</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login">Login</a></li>
 }
 

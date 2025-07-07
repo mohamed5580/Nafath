@@ -37,7 +37,8 @@ namespace Infrastructure.IRepository
         public void AddOne(T entity)
         {
             if (entity == null)
-                throw new ArgumentNullException(nameof(entity), "Entity cannot be null.");
+                SessionMsg(Helper.Error, "خطأ", "الرجاء ملء جميع الحقول المطلوبة");
+
 
             _context.Set<T>().Add(entity);
             _context.SaveChanges();

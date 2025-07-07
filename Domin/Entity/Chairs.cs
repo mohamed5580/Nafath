@@ -10,10 +10,11 @@ namespace Domin.Entity
         [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(50)]
+        [Required(ErrorMessage = "Name is required.")]
+        [StringLength(100, ErrorMessage = "Name can be at most 100 characters.")]
         public string Name { get; set; }
 
-        [Required, MaxLength(50)]
+        [Required, StringLength(500, ErrorMessage = "Description can be at most 500 characters.")]
         public string Description { get; set; }
 
         [NotMapped]
@@ -27,7 +28,8 @@ namespace Domin.Entity
         [Display(Name = "Available")]
         public bool IsAvailable { get; set; } = true;
 
-        [Required]
+        [Required(ErrorMessage = "Price is required.")]
+        [Range(0.01, 100000, ErrorMessage = "Price must be positive.")]
         public decimal? Price { get; set; }
 
     }

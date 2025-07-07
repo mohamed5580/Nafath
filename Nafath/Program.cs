@@ -33,13 +33,16 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+
 // ... rest of the code
 builder.Services.AddTransient(typeof(IRepository<>), typeof(MainRepository<>));
+
+
 
 // 3) MVC + Razor Pages
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-builder.Services.AddTransient<IEmailSender, Nafath.Services.EmailSender>();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 
 var app = builder.Build();
@@ -54,6 +57,8 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+
 
 // 5) Middleware
 app.UseHttpsRedirection();
@@ -84,18 +89,26 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(uploadsPath),
     RequestPath = "/user-images"
 });
-// Required to
-app.MapControllerRoute(
-  name: "areas",
-  pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"); 
-app.MapControllerRoute(
-    name: "areas",
-    pattern: "{area:exists}/{controller=Accounts}/{action=Login}/{id?}");
-app.MapControllerRoute(
-  name: "default",
-  pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.MapAreaControllerRoute(
+    name: "accounts",
+    areaName: "Accounts",
+    pattern: "Accounts/{controller=Accounts}/{action=Login}/{id?}");
+
+
+// Admin area route
+app.MapAreaControllerRoute(
+    name: "admin",
+    areaName: "Admin",
+    pattern: "Admin/{controller=Home}/{action=Index}/{id?}");
+
+// Default MVC route
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 
 app.Run();
-    
+
+
+

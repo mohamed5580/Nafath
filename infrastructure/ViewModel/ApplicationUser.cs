@@ -37,8 +37,7 @@ namespace Infrastructure.Models
         /// Used only for uploading; EF will ignore this
         /// </summary>
         [NotMapped]
-        public IFormFile? AvatarFile { get; set; }
-
+        public string? ImageUser { get; set; }
         // — your other profile fields —
 
         [MaxLength(50)]

@@ -1,45 +1,56 @@
 ﻿using Domin.Entity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Domin.Entity;
-using Infrastructure.Models;
-using Domin.Resource;
-using System;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.ViewModel
 {
     public class RegisterViewModel
     {
-        public List<VwUser> Users { get; set; }
-        public NewRegister NewRegister { get; set; }
-        public List<IdentityRole> Roles { get; set; }
-        public ChangePasswordViewModel ChangePassword { get; set; }
+        [BindNever]
+        public List<IdentityRole> Roles { get; set; } = new();
+
+        [BindNever]
+        public List<VwUser> Users { get; set; } = new();
+
+        public NewRegister NewRegister { get; set; } = new();
+
+        [BindNever]
+        public ChangePasswordViewModel ChangePassword { get; set; } = new();
     }
+
     public class NewRegister
     {
-        public string Id { get; set; }
-        [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "RegisterName")]
-        [MaxLength(20, ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "MaxLength")]
-        [MinLength(3, ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "MinLength")]
-        public string? Name { get; set; }
-        [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "RoleName")]
-        public string? RoleName { get; set; }
-        [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "RegisterEmail")]
-        [EmailAddress(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "RegisterEmailError")]
-        public string? Email { get; set; }
-        public string? ImageUser { get; set; }
-        public bool ActiveUser { get; set; } = true;
-        [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "Password")]
-        [MaxLength(20, ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "MaxLength")]
-        [MinLength(5, ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "MinLengthPassword")]
-        public string? Password { get; set; }
-        [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "ComparePassword")]
-        [Compare("Password", ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "ComparePassword")]
-        public string? ComparePassword { get; set; }
+        public string? Id { get; set; }
 
+        [Required]
+        [MaxLength(20)]
+        [MinLength(3)]
+        public string? FullName { get; set; }
+
+        [Required]
+        public string? RoleName { get; set; }
+
+        [Required, EmailAddress]
+        public string? Email { get; set; }
+
+        // this is the **upload**:
+        public IFormFile? ImageFile { get; set; }
+
+        // this is the saved file name:
+        public string? ImageUser { get; set; }
+
+        // **must** be non‑nullable bool for asp-for="ActiveUser"
+        public bool ActiveUser { get; set; } = true;
+
+        [Required, MinLength(5), MaxLength(20)]
+        public string? Password { get; set; }
+
+        [Required, Compare("Password")]
+        public string? ComparePassword { get; set; }
     }
+
+   
 }

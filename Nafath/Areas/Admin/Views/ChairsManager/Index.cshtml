@@ -21,7 +21,6 @@
 }
 
 
-}
 
 
 <div class="wrapper">
@@ -81,6 +80,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+
                                 @foreach (var item in Model)
                                 {
                                     <tr>
@@ -168,63 +168,60 @@
                 <h5 class="modal-title">New Chair</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-area="Admin" asp-controller="ChairsManager" asp-action="Create" method="post" enctype="multipart/form-data">
+            <form asp-area="Admin" asp-controller="ChairsManager" asp-action="Create" method="post" enctype="multipart/form-data" id="createChairForm">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Name</label>
-                        <input name="Name" class="form-control" />
+                        <input name="Name" class="form-control" required minlength="2" maxlength="100" />
                         <span data-valmsg-for="Name" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
+                   <div class="form-group">
                         <label>Description</label>
-                        <input name="Description" class="form-control" />
+                        <textarea name="Description" class="form-control" required minlength="5" maxlength="500" rows="4"></textarea>
                         <span data-valmsg-for="Description" class="text-danger"></span>
                     </div>
+
                     <div class="form-group">
                         <label>Price</label>
-                        <input name="Price" class="form-control" />
+                        <input name="Price" class="form-control" type="number" min="0" step="0.01" required />
                         <span data-valmsg-for="Price" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label>Image</label>
                         <div class="mb-4 d-flex justify-content-center">
-                            <img id="selectedImage" src="https://mdbootstrap.com/img/Photos/Others/placeholder.jpg"
-                                    alt="example placeholder" style="width: 300px;" />
+                            <img id="createPreview" src="https://mdbootstrap.com/img/Photos/Others/placeholder.jpg"
+                                 alt="image preview" style="width: 300px;" />
                         </div>
                         <div class="d-flex justify-content-center">
-                            <div data-mdb-ripple-init class="btn btn-primary btn-rounded">
-                                <label class="form-label text-white m-1" for="customFile1">Choose file</label>
-
-                            
-                                <input name="ImageFile" type="file" class="form-control d-none" id="customFile1" onchange="displaySelectedImage(event, 'selectedImage')" />
+                            <div class="btn btn-primary btn-rounded">
+                                <label class="form-label text-white m-1" for="createImage">Choose file</label>
+                                <input name="ImageFile" type="file" class="form-control d-none"
+                                       id="createImage" onchange="previewImage(event, 'createPreview')" accept="image/*" required />
                             </div>
                         </div>
-                        <span data-valmsg-for="ImageFile" class="text-danger"></span>
                     </div>
-                <div class="form-check mb-3">
-                    <!-- أولاً الـcheckbox -->
-                    <input 
-                      type="checkbox" 
-                      name="IsAvailable" 
-                      value="true"
-                      class="form-check-input" 
-                      id="isAvailableCheck" />
-
-                    <label 
-                      class="form-check-label" 
-                      for="isAvailableCheck">
-                      Available
-                    </label>
-
-                    <!-- ثم الـhidden -->
-                    <input type="hidden" name="IsAvailable" value="false" />
-                </div>
-
+                    <div class="form-check mb-3">
+                        <input 
+                            type="checkbox" 
+                            name="IsAvailable" 
+                            value="true"
+                            class="form-check-input" 
+                            id="isAvailableCheck" />
+                        <label 
+                            class="form-check-label" 
+                            for="isAvailableCheck">
+                            Available
+                        </label>
+                        <input type="hidden" name="IsAvailable" value="false" />
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Create</button>
                 </div>
             </form>
+
+           
 
         </div>
     </div>
@@ -242,79 +239,71 @@
             <h5 class="modal-title">Edit Chair</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
+                <form asp-area="Admin" asp-controller="ChairsManager" asp-action="Edit"
+                        asp-route-id="@chair.Id" method="post" enctype="multipart/form-data" id="editChairForm-@chair.Id">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@chair.Id" />
+                    <input type="hidden" name="ImageUrl" value="@chair.ImageUrl" />
 
-          <form asp-area="Admin"
-                asp-controller="ChairsManager"
-                asp-action="Edit"
-                asp-route-id="@chair.Id"      @* <-- add this *@
-                method="post"
-                enctype="multipart/form-data">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="Id"       value="@chair.Id" />
-            <input type="hidden" name="ImageUrl" value="@chair.ImageUrl" />
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input name="Name" class="form-control" value="@chair.Name" required minlength="2" maxlength="100" />
+                            <span class="text-danger" data-valmsg-for="Name"></span>
+                        </div>
 
-            <div class="modal-body">
-              <div class="form-group">
-                <label>Name</label>
-                <input name="Name" class="form-control" value="@chair.Name" />
-                <span class="text-danger" data-valmsg-for="Name"></span>
-              </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <input name="Description" class="form-control" value="@chair.Description" required minlength="5" maxlength="500" />
+                            <span class="text-danger" data-valmsg-for="Description"></span>
+                        </div>
 
-              <div class="form-group">
-                <label>Description</label>
-                <input name="Description" class="form-control" value="@chair.Description" />
-                <span class="text-danger" data-valmsg-for="Description"></span>
-              </div>
+                        <div class="form-group">
+                            <label>Price</label>
+                            <input name="Price" type="number" step="0.01" class="form-control"
+                                    value="@chair.Price" min="0" required />
+                            <span class="text-danger" data-valmsg-for="Price"></span>
+                        </div>
 
-              <div class="form-group">
-                <label>Price</label>
-                <input name="Price" type="number" step="0.01" class="form-control"
-                       value="@chair.Price" />
-                <span class="text-danger" data-valmsg-for="Price"></span>
-              </div>
+                        <div class="form-group">
+                            <label>Current Image</label>
+                            <div class="mb-4 text-center">
+                                <img id="editPreview-@chair.Id" src="@chair.ImageUrl"
+                                        style="max-width:300px;" />
+                            </div>
+                            <div class="text-center">
+                                <label class="btn btn-primary">
+                                    Choose new image
+                                    <input name="ImageFile" type="file" hidden 
+                                            onchange="previewImage(event, 'editPreview-@chair.Id')" accept="image/*" />
+                                </label>
+                            </div>
+                        </div>
 
-              <div class="form-group">
-                <label>Current Image</label>
-                <div class="mb-4 text-center">
-                  <img id="editImage-@chair.Id"
-                       src="@chair.ImageUrl"
-                       style="max-width:300px;" />
-                </div>
-                <div class="text-center">
-                  <label class="btn btn-primary">
-                    Choose file
-                    <input name="ImageFile"
-                           type="file"
-                           hidden
-                           onchange="displaySelectedImage(event,'editImage-@chair.Id')" />
-                  </label>
-                </div>
-                <span class="text-danger" data-valmsg-for="ImageFile"></span>
-              </div>
+                        <div class="form-check mb-3">
+                            <input 
+                                type="checkbox" 
+                                name="IsAvailable" 
+                                value="true"
+                                class="form-check-input" 
+                                id="isAvailableCheck-@chair.Id" @(chair.IsAvailable ? "checked" : "") />
+                            <label 
+                                class="form-check-label" 
+                                for="isAvailableCheck-@chair.Id">
+                                Available
+                            </label>
+                            <input type="hidden" name="IsAvailable" value="false" />
+                        </div>
+                    </div>
+        
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
 
-             <div class="form-check mb-3">
-              <!-- hidden=false first -->
-              <input type="hidden" name="IsAvailable" value="false" />
 
-              <!-- then the checkbox=true -->
-              <input name="IsAvailable"
-                     type="checkbox"
-                     class="form-check-input"
-                     id="isAvailableCheck-@chair.Id"
-                     value="true"
-                     @(chair.IsAvailable ? "checked" : "") />
 
-              <label class="form-check-label" for="isAvailableCheck-@chair.Id">
-                Available
-              </label>
-            </div>
-
-            </div>
-
-            <div class="modal-footer">
-              <button type="submit" class="btn btn-primary">Save changes</button>
-            </div>
-          </form>
+         
         </div>
       </div>
     </div>
@@ -355,7 +344,117 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-   
+    <script src="~/assets/js/app.js"></script>
+    <script src="~/Modules/Roles.js"></script>
+    <script>
+        // Unified image preview function
+        function previewImage(event, previewId) {
+            const preview = document.getElementById(previewId);
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Reset create form
+        function resetCreateForm() {
+            const form = document.querySelector('#createModal form');
+            if (form) {
+                form.reset();
+                document.getElementById('createPreview').src =
+                    'https://mdbootstrap.com/img/Photos/Others/placeholder.jpg';
+            }
+        }
+
+        // Client-side validation for the create form
+        document.getElementById('createChairForm').addEventListener('submit', function (e) {
+            let valid = true;
+            const name = this.elements['Name'];
+            const description = this.elements['Description'];
+            const price = this.elements['Price'];
+            const image = this.elements['ImageFile'];
+
+            // Name validation
+            if (!name.value.trim() || name.value.length < 2 || name.value.length > 100) {
+                valid = false;
+                name.classList.add('is-invalid');
+            } else {
+                name.classList.remove('is-invalid');
+            }
+
+            // Description validation
+            if (!description.value.trim() || description.value.length < 5 || description.value.length > 500) {
+                valid = false;
+                description.classList.add('is-invalid');
+            } else {
+                description.classList.remove('is-invalid');
+            }
+
+            // Price validation
+            if (!price.value || isNaN(price.value) || Number(price.value) < 0) {
+                valid = false;
+                price.classList.add('is-invalid');
+            } else {
+                price.classList.remove('is-invalid');
+            }
+
+            // Image validation
+            if (!image.value) {
+                valid = false;
+                image.classList.add('is-invalid');
+            } else {
+                image.classList.remove('is-invalid');
+            }
+
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+    
+        // Client-side validation for the edit form
+        document.querySelectorAll('[id^="editChairForm-"]').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                let valid = true;
+                const name = this.elements['Name'];
+                const description = this.elements['Description'];
+                const price = this.elements['Price'];
+
+                // Name validation
+                if (!name.value.trim() || name.value.length < 2 || name.value.length > 100) {
+                    valid = false;
+                    name.classList.add('is-invalid');
+                } else {
+                    name.classList.remove('is-invalid');
+                }
+
+                // Description validation
+                if (!description.value.trim() || description.value.length < 5 || description.value.length > 500) {
+                    valid = false;
+                    description.classList.add('is-invalid');
+                } else {
+                    description.classList.remove('is-invalid');
+                }
+
+                // Price validation
+                if (!price.value || isNaN(price.value) || Number(price.value) < 0) {
+                    valid = false;
+                    price.classList.add('is-invalid');
+                } else {
+                    price.classList.remove('is-invalid');
+                }
+
+                if (!valid) {
+                    e.preventDefault();
+                }
+            });
+        });
+             
+                
+    </script>
     <script>
         function resetCreateForm() { var form = document.querySelector('#createModal form'); if (form) form.reset(); }
 
@@ -374,69 +473,68 @@
             }
         }
 
-              jQuery(document).ready(function () {
-          ImgUpload();
+                jQuery(document).ready(function () {
+            ImgUpload();
         });
 
         function ImgUpload() {
-          var imgWrap = "";
-          var imgArray = [];
+            var imgWrap = "";
+            var imgArray = [];
 
-          $('.upload__inputfile').each(function () {
+            $('.upload__inputfile').each(function () {
             $(this).on('change', function (e) {
-              imgWrap = $(this).closest('.upload__box').find('.upload__img-wrap');
-              var maxLength = $(this).attr('data-max_length');
+                imgWrap = $(this).closest('.upload__box').find('.upload__img-wrap');
+                var maxLength = $(this).attr('data-max_length');
 
-              var files = e.target.files;
-              var filesArr = Array.prototype.slice.call(files);
-              var iterator = 0;
-              filesArr.forEach(function (f, index) {
+                var files = e.target.files;
+                var filesArr = Array.prototype.slice.call(files);
+                var iterator = 0;
+                filesArr.forEach(function (f, index) {
 
                 if (!f.type.match('image.*')) {
-                  return;
+                    return;
                 }
 
                 if (imgArray.length > maxLength) {
-                  return false
+                    return false
                 } else {
-                  var len = 0;
-                  for (var i = 0; i < imgArray.length; i++) {
+                    var len = 0;
+                    for (var i = 0; i < imgArray.length; i++) {
                     if (imgArray[i] !== undefined) {
-                      len++;
+                        len++;
                     }
-                  }
-                  if (len > maxLength) {
+                    }
+                    if (len > maxLength) {
                     return false;
-                  } else {
+                    } else {
                     imgArray.push(f);
 
                     var reader = new FileReader();
                     reader.onload = function (e) {
-                      var html = "<div class='upload__img-box'><div style='background-image: url(" + e.target.result + ")' data-number='" + $(".upload__img-close").length + "' data-file='" + f.name + "' class='img-bg'><div class='upload__img-close'></div></div></div>";
-                      imgWrap.append(html);
-                      iterator++;
+                        var html = "<div class='upload__img-box'><div style='background-image: url(" + e.target.result + ")' data-number='" + $(".upload__img-close").length + "' data-file='" + f.name + "' class='img-bg'><div class='upload__img-close'></div></div></div>";
+                        imgWrap.append(html);
+                        iterator++;
                     }
                     reader.readAsDataURL(f);
-                  }
+                    }
                 }
-              });
+                });
             });
-          });
+            });
 
-          $('body').on('click', ".upload__img-close", function (e) {
+            $('body').on('click', ".upload__img-close", function (e) {
             var file = $(this).parent().data("file");
             for (var i = 0; i < imgArray.length; i++) {
-              if (imgArray[i].name === file) {
+                if (imgArray[i].name === file) {
                 imgArray.splice(i, 1);
                 break;
-              }
+                }
             }
             $(this).parent().parent().remove();
-          });
+            });
         }
     </script>
-    <script src="~/assets/js/app.js"></script>
-  @if (!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))
+    @if (!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))
     {
         if (Context.Session.GetString(Helper.MsgType) == Helper.Success)
         {
@@ -456,9 +554,9 @@
             <script>
 
                 Swal.fire({
-                       title: '@Context.Session.GetString(Helper.Title)',
-                       text: '@Html.Raw(@Context.Session.GetString(Helper.Msg))',
-                       confirmButtonText: '@ResourceWeb.lbOk',
+                        title: '@Context.Session.GetString(Helper.Title)',
+                        text: '@Html.Raw(@Context.Session.GetString(Helper.Msg))',
+                        confirmButtonText: '@ResourceWeb.lbOk',
                     icon: 'error'
                 });
             </script>
@@ -466,7 +564,6 @@
         Context.Session.SetString(Helper.MsgType, "");
     }
 
-    <script src="~/Modules/Roles.js"></script>
 
     <script>
 

@@ -246,14 +246,9 @@
                                         <p>@ResourceWeb.lbRegisters</p>
                                     </a>
                                 </li>
+                           
                                 <li class="nav-item">
-                                    <a href="/Admin/Categories/Categories" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@ResourceWeb.lbCategories</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Admin/ChairsManager" class="nav-link">
+                                    <a asp-area="Admin" asp-controller="ChairsManager" asp-action="Index" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@ResourceWeb.lbChair</p>
                                     </a>

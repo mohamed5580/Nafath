@@ -27,16 +27,17 @@ namespace Nafath.Controllers
 
         // GET: Chairs
         // GET: Admin/ChairsManager
-        public IActionResult Index(int page = 1, int pageSize = 12)
+        public IActionResult Index(int page = 1, int pageSize = 1000)
         {
             int totalItems;
-            var pagedChairs = _context.GetPaged(page, pageSize, out totalItems);
+            var pagedChairs = _context.GetPaged(page, pageSize, out totalItems)
+                              .Where(c => c != null)  // Filter out null items
+                              .ToList();
 
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
             return View(pagedChairs);
-
         }
 
         // GET: Chairs/Details/5
@@ -57,24 +58,24 @@ namespace Nafath.Controllers
         }
 
         // GET: Admin/ChairsManager/Create
+        // GET: Admin/ChairsManager/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Admin/ChairsManager/Create
-        [HttpPost, ValidateAntiForgeryToken]
+        // CREATE
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Chairs chairs)
         {
             if (!ModelState.IsValid)
             {
-                // If validation failed, re-display form with errors
-                SessionMsg(Helper.Error, "خطأ", "لا يمكن ادخال قيم فارغة");
-                // If not valid, return the same view. The user will see the validation errors.
-                return RedirectToAction(nameof(Index));
+                SessionMsg(Helper.Error, "خطأ", "الرجاء ملء جميع الحقول المطلوبة");
+                return View(chairs);
             }
 
-            // Handle file upload if provided
+            // File upload handling
             if (chairs.ImageFile != null && chairs.ImageFile.Length > 0)
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(chairs.ImageFile.FileName)}";
@@ -87,32 +88,14 @@ namespace Nafath.Controllers
 
                 chairs.ImageUrl = $"/uploads/chairs/{fileName}";
             }
-            if (chairs.Id == null || chairs.Name == string.Empty || chairs.Price == null || chairs.Description == string.Empty)
-            {
-                SessionMsg(Helper.Error, "خطأ", "لا يمكن ادخال قيم فارغة");
-                // If not valid, return the same view. The user will see the validation errors.
 
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-
-
-
-                _context.AddOne(chairs);
-
-                TempData["Success"] = "Chair added successfully.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            SessionMsg(Helper.Error, "خطأ", "لا يمكن ادخال قيم فارغة");
-
+            _context.AddOne(chairs);
+            SessionMsg(Helper.Success, "تم", "تم إضافة الكرسي بنجاح");
             return RedirectToAction(nameof(Index));
-
         }
 
 
-       
+
         // GET: Chairs/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -138,29 +121,25 @@ namespace Nafath.Controllers
         {
             if (id != chairs.Id) return NotFound();
 
-            // 1) Load existing
             var existing = _context.FindById(id);
             if (existing == null) return NotFound();
 
-            // 2) Check for no‑op:
-            var nothingChanged =
-                chairs.ImageFile == null &&
-                chairs.Name == existing.Name &&
-                chairs.Description == existing.Description &&
-                chairs.Price == existing.Price &&
-                chairs.IsAvailable == existing.IsAvailable;
+            // Check for changes
+            var changesExist =
+                chairs.ImageFile != null ||
+                chairs.Name != existing.Name ||
+                chairs.Description != existing.Description ||
+                chairs.Price != existing.Price ||
+                chairs.IsAvailable != existing.IsAvailable;
 
-            if (nothingChanged)
+            if (!changesExist)
             {
-                TempData["Info"] = "لم يتم تعديل أي شيء";
-                SessionMsg(Helper.Msg, "تنبيه","لا يوجد تغييرات" );
+                SessionMsg(Helper.Msg, "تنبيه", "لا يوجد تغييرات");
                 return RedirectToAction(nameof(Index));
             }
 
-            // 3) Validate ModelState
             if (!ModelState.IsValid)
             {
-                // ensure Edit.cshtml exists under Areas/Admin/Views/ChairsManager/
                 var errors = ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage);
@@ -168,28 +147,40 @@ namespace Nafath.Controllers
                 return View(chairs);
             }
 
-            // 4) Merge and handle upload
+            // Update properties
             existing.Name = chairs.Name;
             existing.Description = chairs.Description;
             existing.Price = chairs.Price;
             existing.IsAvailable = chairs.IsAvailable;
 
+            // Handle new image
             if (chairs.ImageFile?.Length > 0)
             {
+                // Delete old image if exists
+                if (!string.IsNullOrEmpty(existing.ImageUrl))
+                {
+                    var oldFilePath = Path.Combine(_env.WebRootPath, existing.ImageUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Delete(oldFilePath);
+                    }
+                }
+
+                // Save new image
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(chairs.ImageFile.FileName)}";
                 var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chairs");
-                Directory.CreateDirectory(uploadsDir);
+                var filePath = Path.Combine(uploadsDir, fileName);
 
-                using var stream = new FileStream(Path.Combine(uploadsDir, fileName), FileMode.Create);
+                using var stream = new FileStream(filePath, FileMode.Create);
                 await chairs.ImageFile.CopyToAsync(stream);
                 existing.ImageUrl = $"/uploads/chairs/{fileName}";
             }
 
-            // 5) Save and redirect
             _context.UpdateOne(existing);
-            TempData["Success"] = "Chair updated successfully";
+            SessionMsg(Helper.Success, "تم", "تم تحديث الكرسي بنجاح");
             return RedirectToAction(nameof(Index));
         }
+
 
 
 
@@ -215,19 +206,27 @@ namespace Nafath.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id)
         {
-            if (id == null)
+            if (id == null) return NotFound();
+
+            var chair = await _context.FindByIdasync(id.Value);
+            if (chair != null)
             {
-                return NotFound();
+                // Delete associated image
+                if (!string.IsNullOrEmpty(chair.ImageUrl))
+                {
+                    var filePath = Path.Combine(_env.WebRootPath, chair.ImageUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+                _context.DeleteOne(chair);
             }
 
-            var chairs = await _context.FindByIdasync(id.Value); // Correct method to find the entity by ID
-            if (chairs != null)
-            {
-                _context.DeleteOne(chairs); // Delete the entity
-            }
-
+            SessionMsg(Helper.Success, "تم", "تم حذف الكرسي بنجاح");
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool ChairsExists(int id)
         {

@@ -10,8 +10,8 @@ namespace Infrastructure.ViewModel
 {
     public class LoginViewModel
     {
-        [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "RegisterEmail")]
-        public string Eamil { get; set; }
+        [Required, EmailAddress]
+        public string Email { get; set; }
 
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "Password")]
         public string Password { get; set; }

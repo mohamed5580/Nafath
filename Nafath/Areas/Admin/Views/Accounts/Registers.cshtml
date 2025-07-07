@@ -115,9 +115,9 @@
                         <div class="form-group">
                             <input type="text" hidden class="form-control" asp-for="NewRegister.Id" id="userId" />
                             <input type="text" hidden class="form-control" asp-for="NewRegister.ImageUser" id="imgeHide" />
-                            <label asp-for="NewRegister.Name" class="control-lable">@ResourceWeb.lbNameUser</label>
-                            <input type="text" class="form-control" asp-for="NewRegister.Name" id="userName" />
-                            <span asp-validation-for="NewRegister.Name" class="text-danger"></span>
+                            <label asp-for="NewRegister.FullName" class="control-lable">@ResourceWeb.lbNameUser</label>
+                        <input type="text" class="form-control" asp-for="NewRegister.FullName" id="userName" />
+                        <span asp-validation-for="NewRegister.FullName" class="text-danger"></span>
                         </div>
                          <div class="form-group">
                             <label asp-for="NewRegister.Email" class="control-lable">@ResourceWeb.lbEmailUser</label>
@@ -130,7 +130,7 @@
                         </div>
                          <div class="form-group">
                             <label asp-for="NewRegister.ImageUser" class="control-lable">@ResourceWeb.lbImageUser</label>
-                            <input type="file" class="form-control" asp-for="NewRegister.ImageUser" id="userImage" />
+                            <input type="file" class="form-control" asp-for="NewRegister.ImageFile" />
                             <span asp-validation-for="NewRegister.ImageUser" class="text-danger"></span>
                         </div>
                         <div class="form-group">
@@ -143,7 +143,9 @@
                         </div>
                         <div class="form-group">
                             <label asp-for="NewRegister.ActiveUser" class="control-lable">@ResourceWeb.lbActiveUser</label>
-                            <input type="checkbox" class="form-control" asp-for="NewRegister.ActiveUser" id="userActive" />
+                            <input type="checkbox" asp-for="NewRegister.ActiveUser" class="form-check-input" />
+                            <span asp-validation-for="NewRegister.ActiveUser" class="text-danger"></span>
+
                         </div>
                         <div class="form-group" id="grPassword">
                             <label asp-for="NewRegister.Password" class="control-lable">@ResourceWeb.lbPassword</label>
