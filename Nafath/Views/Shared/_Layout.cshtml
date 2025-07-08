@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
 
 <head>
@@ -10,7 +13,7 @@
     <meta name="keywords" content="add to cart, add to cart javascript, localstorage add to cart, ecommerce shopping javascript, shooping cart demo">
     <meta name="author" content="Rajamanickam">
 
-
+   
 
 	<title>Nafath </title>
 
@@ -29,11 +32,11 @@
     <link href="~/Nafas/assets/vendor/aos/aos.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="~/Nafas/assets/css/backend-plugin.min.css">
-    <link rel="stylesheet" href="~/Nafas/assets/css/backend.css?v=1.0.0">
-    <link rel="stylesheet" href="~/Nafas/assets/vendor/@@fortawesome/fontawesome-free/css/all.min.css">
-    <link rel="stylesheet" href="~/Nafas/assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css">
-    <link rel="stylesheet" href="~/Nafas/assets/vendor/remixicon/fonts/remixicon.css">
+    <link rel="stylesheet" href="~/Nafas//assets/css/backend-plugin.min.css">
+    <link rel="stylesheet" href="~/Nafas//assets/css/backend.css?v=1.0.0">
+    <link rel="stylesheet" href="~/Nafas//assets/vendor/@@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/Nafas//assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css">
+    <link rel="stylesheet" href="~/Nafas//assets/vendor/remixicon/fonts/remixicon.css">
     <!-- Main CSS File -->
     <link href="~/Nafas/assets/css/style.css" rel="stylesheet">
 
@@ -281,7 +284,27 @@
     <script src="~/Nafas/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
     <script src="~/Nafas/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
     <script src="~/Nafas/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <!-- BEFORE you ever include cart.js: -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+                integrity="sha384‑…"
+                crossorigin="anonymous"></script>
 
+        <script src="~/Nafas/assets/js/cart.js"></script>
+    }
+    else
+    {
+        <script>
+            $(function () {
+                const $tbody = $('.cart-items');
+                function render() {
+                    $tbody.html('<tr><td colspan="5" class="text-center">Your cart is empty</td></tr>');
+                }
+                render();
+            });
+        </script>
+    }
     <!-- Main JS File -->
     <script src="~/Nafas/assets/js/main.js"></script>
     @await RenderSectionAsync("Scripts", required: false)

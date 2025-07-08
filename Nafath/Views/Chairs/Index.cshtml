@@ -148,6 +148,16 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
+            <script>
+                // Listen for *any* modal being fully hidden
+                $(document).on('hidden.bs.modal', function () {
+                  // Remove the backdrop element(s)
+                  $('.modal-backdrop').remove();
+                  // Remove the class that prevents page scrolling
+                  $('body').removeClass('modal-open');
+                });
+            </script>
+
         </div>
     </div>
 }
@@ -194,20 +204,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    @if (SignInManager.IsSignedIn(User))
-    {
-        <script src="~/Nafas/assets/js/cart.js"></script>
-    }
-    else
-    {
-        <script>
-            $(function () {
-                const $tbody = $('.cart-items');
-                function render() {
-                    $tbody.html('<tr><td colspan="5" class="text-center">Your cart is empty</td></tr>');
-                }
-                render();
-            });
-        </script>
-    }
+  
 }
