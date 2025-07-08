@@ -7,20 +7,22 @@
 @if (SignInManager.IsSignedIn(User))
 {
 
-    <a id="manage" class="nav-link " asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+    <a id="manage" class="nav-link align-items-center" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"> @UserManager.GetUserName(User)! مرحبا</a>
 
-    <form id="logoutForm" class="d-block  mt-3" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-        <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Profile</a>
+    <form id="logoutForm" class="d-block  mt-3 align-items-center" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+        <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">الملف الشخصي</a>
         <li><hr class="dropdown-divider"></li>
-        <button id="logout" type="submit" class="dropdown-item">Logout</button>
+        <button id="logout" type="submit" class="dropdown-item">تسجيل الخروج</button>
     </form>
 
 }
 else
 {
+    <div class="align-items-center text-center">
+        <li><a class="dropdown-item  " asp-area="Identity" asp-page="/Account/Register">تسجيل</a></li>
+        <li><hr class="dropdown-divider  "></li>
+        <li><a class="dropdown-item " asp-area="Identity" asp-page="/Account/Login">تسجيل الدخول</a></li>
 
-    <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">Register</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login">Login</a></li>
-}
+    </div>
+ }
 

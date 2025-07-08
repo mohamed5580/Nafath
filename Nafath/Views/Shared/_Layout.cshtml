@@ -1,314 +1,290 @@
-﻿@inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
-<!doctype html>
-<html lang="en" >
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
 <head>
-
-	<meta charset="utf-8" />
-
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="theme-color" content="linear-gradient(to bottom, #61daff, #656bff)">
-	<meta name="description" content="We will simple add to cart using javascript localstorage">
-	<meta name="keywords" content="add to cart, add to cart javascript, localstorage add to cart, ecommerce shopping javascript, shooping cart demo">
-	<meta name="author" content="Rajamanickam">
-	<link rel="stylesheet" href="~/assets/css/backend-plugin.min.css">
-	<link rel="stylesheet" href="~/assets/css/backend.css?v=1.0.0">
-	<link rel="stylesheet" href="~/assets/vendor/@@fortawesome/fontawesome-free/css/all.min.css">
-	<link rel="stylesheet" href="~/assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css">
-	<link rel="stylesheet" href="~/assets/vendor/remixicon/fonts/remixicon.css">
-
-
-	<link rel="icon" type="image/x-icon" href="~/Nafath/images/image_no_background.png">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.0/css/all.min.css" rel="stylesheet">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-	<!-- Bootstrap CSS -->
-	<link href="~/Nafath/css/bootstrap.min.css" rel="stylesheet">
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-	<link href="~/Nafath/css/tiny-slider.css" rel="stylesheet">
-	<link href="~/Nafath/css/style.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="linear-gradient(to bottom, #61daff, #656bff)">
+    <meta name="description" content="We will simple add to cart using javascript localstorage">
+    <meta name="keywords" content="add to cart, add to cart javascript, localstorage add to cart, ecommerce shopping javascript, shooping cart demo">
+    <meta name="author" content="Rajamanickam">
+    <link rel="stylesheet" href="~/assets/css/backend-plugin.min.css">
+    <link rel="stylesheet" href="~/assets/css/backend.css?v=1.0.0">
+    <link rel="stylesheet" href="~/assets/vendor/@@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css">
+    <link rel="stylesheet" href="~/assets/vendor/remixicon/fonts/remixicon.css">
 
 
 	<title>Nafath </title>
+
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="~/Nafath/images/Nafas.ico">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="~/Nafas/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/Nafas/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/Nafas/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="~/Nafas/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="~/Nafas/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Main CSS File -->
+    <link href="~/Nafas/assets/css/main.css" rel="stylesheet">
 </head>
 
-<body>
-	<partial name="_Notifications" />
+<body class="index-page">
 
-	<!-- Start Header/Navigation -->
-	<nav lang="ar" dir="rtl" class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="شريط التنقل في نفاذ" >
+    <header id="header" class="header d-flex align-items-center sticky-top">
+        <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
-		<div class="container">
-			<a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand"> <img class="logo" src="~/Nafath/images/image_no_background_100x100.png" alt="" >  نفاذ<span>.</span></a>
+            <a href="index.html" class="logo d-flex ">
+                <img src="~/Nafath/images/logoo.png" alt="">
+                <h1 class="sitename">نفاذ</h1>
+            </a>
 
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="تبديل التنقل">
-				<span class="navbar-toggler-icon"></span>
-			</button>
+            <nav id="navmenu" class="navmenu">
+                <ul>
+                    <li class="nav-item active">
+                        <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link ">الرئيسية</a>
+                    </li>
 
-			<div class="collapse navbar-collapse " id="navbarsFurni">
-				<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+                    <li>
+                        <a asp-area="" asp-controller="Chairs" asp-action="Index"
+                           class="nav-link">المتجر</a>
+                    </li>
 
-					<li class="nav-item active">
-						<a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link ">الرئيسية</a>
-					</li>
+                    <li><a class="nav-link" href="about.html">من نحن</a></li>
+                    <li class=""><a class="nav-link" href="services.html">الخدمات</a></li>
+                    <li><a class="nav-link" href="blog.html">المدونة</a></li>
+                    <li><a class="nav-link" href="contact.html">اتصل بنا</a></li>
+                    <li class="dropdown">
+                        <a href="#"><span>المزيد</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                        <ul>
+                            <li><a href="#">رابط 1</a></li>
+                            <li class="dropdown">
+                                <a href="#"><span>قائمة فرعية</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                                <ul>
+                                    <li><a href="#">عنصر فرعي 1</a></li>
+                                    <li><a href="#">عنصر فرعي 2</a></li>
+                                    <li><a href="#">عنصر فرعي 3</a></li>
+                                    <li><a href="#">عنصر فرعي 4</a></li>
+                                    <li><a href="#">عنصر فرعي 5</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#">رابط 2</a></li>
+                            <li><a href="#">رابط 3</a></li>
+                            <li><a href="#">رابط 4</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#contact">اتصل بنا</a></li>
+                </ul>
+                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+               
+            </nav>
 
-					<li>
-						<a asp-area="" asp-controller="Chairs" asp-action="Index"
-						   class="nav-link">المتجر</a>
-					</li>
+          @*   <a class="btn-getstarted" href="index.html#about">ابدأ الآن</a>
+ *@
 
-					<li><a class="nav-link" href="about.html">من نحن</a></li>
-					<li class=""><a class="nav-link" href="services.html">الخدمات</a></li>
-					<li><a class="nav-link" href="blog.html">المدونة</a></li>
-					<li><a class="nav-link" href="contact.html">اتصل بنا</a></li>
-				</ul>
-				<div class="dropdown nav-item">
-					
-					<a class="btn btn-primary dropdown-toggle border-0 " type="button" data-bs-toggle="dropdown" ><img src="~/Nafath/images/user.svg" ></a>
+            <ul class="navbar-nav flex-row align-items-center me-auto">
+                <!-- User Icon Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle fs-4"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <!-- هنا ضع خيارات المستخدم أو partial login -->
+                        <partial name="_LoginPartial" />
+                    </ul>
+                </li>
 
-					<ul class="dropdown-menu dropdown-menu-center">
-						<partial name="_LoginPartial" />
-					</ul>
-				</div>
-				<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0  " >
-				
-					<li type="button" data-toggle="modal" data-target="#staticBackdrop">
-						<a class="btn btn-primary"><img src="~/Nafath/images/cart.svg"></a>
-					</li>
-			
-					<!-- Modal -->
-					<!-- CART MODAL -->
-					<div  class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1"
-						 aria-labelledby="staticBackdropLabel" aria-hidden="true">
-						<div class="modal-dialog modal-dialog-centered modal-lg">
-							<div class="modal-content">
-								<div class="modal-header ltr" >
-									<h5 class="modal-title" id="staticBackdropLabel" style="color:#6a6a6a"> سلة المشتريات </h5>
-									<button type="button" class="close rtl" data-dismiss="modal" aria-label="Close" style="margin-right:auto;margin-left:0">
-										<span aria-hidden="true" >&times;</span>
-									</button>
-								</div>
-								<div class="modal-body">
-									<div class="table-responsive">
-										<table class="table table-hover">
-											<thead class="thead-light">
-												<tr style="align-content: center; text-align:center;">
-													<th >المنتج</th>
-													<th>السعر</th>
-													<th>الكمية</th>
-													<th>السعر الكلي</th>
-													<th></th>
-												</tr>
-											</thead>
-											<tbody class="cart-items">
-												<!-- Cart items will be populated here -->
+                <!-- Cart Icon Modal Trigger -->
 
+                <li class="nav-item">
+                    <a class="nav-link position-relative" data-bs-toggle="modal" data-bs-target="#cartModal">
+                        <i class="bi bi-cart3 fs-4"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-badge">0</span>
+                    </a>
+                </li>
+            </ul>
+            <!-- CART MODAL -->
+            <div class="modal fade" id="cartModal"
+                 data-bs-backdrop="false"
+                 tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 id="cartModalLabel">سلة المشتريات</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover text-center">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>المنتج</th>
+                                            <th>السعر</th>
+                                            <th>الكمية</th>
+                                            <th>السعر الكلي</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="cart-items">
+                                        <!-- Cart items will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-end mt-4">
+                                <h4 style="color:#6a6a6a">
+                                    المبلغ الكلي: <span class="total-cart">0.00</span> EGP
+                                </h4>
+                            </div>
+                        </div>
 
-											</tbody>
-										</table>
-									</div>
-									<div class="text-right mt-4">
-										<h4 style="color:#6a6a6a">المبلغ الكرلي: <span class="total-cart ">0.00</span> EGP  </h4>
-									</div>
-								</div>
-								<div  class="modal-footer ml-auto"  style="align-content: flex-start;">
-									<button type="button" class="btn btn-secondary" data-dismiss="modal">متابعة الشراء</button>
-									<button type="button" class="btn bg-danger border-0 clear-cart">تفريغ</button>
-									<button type="button" class="btn btn-primary ">اتمام الشراء</button>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- Modal -->
-					<div class="modal fade" id="exampleModalLong" data-backdrop="static" data-keyboard="false" tabindex="-1"
-						 aria-labelledby="exampleModalLongLabel" aria-hidden="true">
-						<div class="modal-dialog modal-dialog-centered">
-							<div class="modal-content">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									<div class="modal-body">
-										<partial name="_LoginPartial" />
-									</div>
-									<div class="modal-footer">
-										<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-									</div>
-								</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">متابعة الشراء</button>
+                            <button type="button" class="btn btn-danger clear-cart">تفريغ</button>
+                            <button type="button" class="btn btn-primary">اتمام الشراء</button>
+                        </div>
 
-							</div>
-						</div>
-					</div>
+                    </div>
+                </div>
+            </div>
 
-				</ul>
-			</div>
-			
-		</div>
+            <!-- LOGIN MODAL -->
+            <div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
 
-	</nav>
-	
-	
-	@RenderBody()
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="loginModalLabel">تسجيل الدخول</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
 
-	<div class="loading">
-		<div class="loader" id="loading">
-			<ul class="hexagon-container">
-				<li class="hexagon hex_1"></li>
-				<li class="hexagon hex_2"></li>
-				<li class="hexagon hex_3"></li>
-				<li class="hexagon hex_4"></li>
-				<li class="hexagon hex_5"></li>
-				<li class="hexagon hex_6"></li>
-				<li class="hexagon hex_7"></li>
-			</ul>
-		</div>
-	</div>
+                        <div class="modal-body">
+                            <partial name="_LoginPartial" />
+                        </div>
 
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
 
-	<!-- Start Footer Section -->
-	<footer lang="ar" dir="rtl" class="footer-section" style="margin-top:25px">
-		<div class="container relative">
-
-			<div class="sofa-img justify-content-end ">
-				<img src="~/Nafath/images/sofa.png" alt="صورة" class="img-fluid">
-			</div>
-
-			<div class="row " >
-				<div class="col-lg-8">
-					<div class="subscription-form">
-						<h3 class="d-flex align-items-left" style="margin-top:120px">
-							<span class="me-1"><img src="~/Nafath/images/envelope-outline.svg" alt="صورة" class="img-fluid"></span>
-							<span>اشترك في النشرة الإخبارية</span></h3>		
-
-						<form action="#" class="row g-3">
-							<div class="col-auto">
-								<input type="text" class="form-control" placeholder="أدخل اسمك">
-							</div>
-							<div class="col-auto">
-								<input type="email" class="form-control" placeholder="أدخل بريدك الإلكتروني">
-							</div>
-							<div class="col-auto">
-								<button class="btn btn-primary">
-									<span class="fa fa-paper-plane"></span>
-								</button>
-							</div>
-						</form>
-
-					</div>
-				</div>
-			</div>
+                    </div>
+                </div>
+            </div>
 
 
-			<div class="row g-5 mb-5">
-				<div class="col-lg-4">
-					<div class="mb-4 footer-logo-wrap"><a href="#" class="footer-logo">نفاذ<span>.</span></a></div>
-					<p class="mb-4">نحن متخصصون في توفير أفضل الأثاث والتصميمات الداخلية لعملائنا. نسعى لتقديم تجربة تسوق ممتازة وجودة عالية.</p>
+        </div>
+   
+    
+    </header>
 
-					<ul class="list-unstyled custom-social">
-						<li><a href="#"><span class="fa fa-brands fa-facebook-f"></span></a></li>
-						<li><a href="#"><span class="fa fa-brands fa-twitter"></span></a></li>
-						<li><a href="#"><span class="fa fa-brands fa-instagram"></span></a></li>
-						<li><a href="#"><span class="fa fa-brands fa-linkedin"></span></a></li>
-					</ul>
-				</div>
+    @RenderBody()
 
-				<div class="col-lg-8">
-					<div class="row links-wrap">
-						<div class="col-6 col-sm-6 col-md-3">
-							<ul class="list-unstyled">
-								<li><a href="#">من نحن</a></li>
-								<li><a href="#">الخدمات</a></li>
-								<li><a href="#">المدونة</a></li>
-								<li><a href="#">اتصل بنا</a></li>
-							</ul>
-						</div>
+    <footer id="footer" class="footer">
 
-						<div class="col-6 col-sm-6 col-md-3">
-							<ul class="list-unstyled">
-								<li><a href="#">الدعم</a></li>
-								<li><a href="#">قاعدة المعرفة</a></li>
-								<li><a href="#">الدردشة المباشرة</a></li>
-							</ul>
-						</div>
+        <div class="footer-newsletter">
+            <div class="container">
+                <div class="row justify-content-center text-center">
+                    <div class="col-lg-6">
+                        <h4>اشترك في النشرة الإخبارية</h4>
+                        <p>اشترك في نشرتنا الإخبارية وتلق أحدث الأخبار حول منتجاتنا وخدماتنا!</p>
+                        <form action="forms/newsletter.php" method="post" class="php-email-form">
+                            <div class="newsletter-form"><input type="email" name="email" placeholder="البريد الإلكتروني"><input type="submit" value="اشترك"></div>
+                            <div class="loading">جاري التحميل</div>
+                            <div class="error-message"></div>
+                            <div class="sent-message">تم إرسال طلب الاشتراك. شكراً لك!</div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-						<div class="col-6 col-sm-6 col-md-3">
-							<ul class="list-unstyled">
-								<li><a href="#">الوظائف</a></li>
-								<li><a href="#">فريقنا</a></li>
-								<li><a href="#">القيادة</a></li>
-								<li><a href="#">سياسة الخصوصية</a></li>
-							</ul>
-						</div>
+        <div class="container footer-top">
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-6 footer-about">
+                    <a href="index.html" class="d-flex align-items-center">
+                        <span class="sitename">eNno</span>
+                    </a>
+                    <div class="footer-contact pt-3">
+                        <p>شارع آدم 108</p>
+                        <p>نيويورك، NY 535022</p>
+                        <p class="mt-3"><strong>الهاتف:</strong> <span>+1 5589 55488 55</span></p>
+                        <p><strong>البريد الإلكتروني:</strong> <span>info@example.com</span></p>
+                    </div>
+                </div>
 
-						<div class="col-6 col-sm-6 col-md-3">
-							<ul class="list-unstyled">
-								<li><a href="#">كرسي نورديك</a></li>
-								<li><a href="#">كرسي كروزو إيرو</a></li>
-								<li><a href="#">كرسي إرغونوميك</a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
+                <div class="col-lg-2 col-md-3 footer-links">
+                    <h4>روابط مفيدة</h4>
+                    <ul>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">الرئيسية</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">من نحن</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">الخدمات</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">الشروط والأحكام</a></li>
+                    </ul>
+                </div>
 
-			</div>
+                <div class="col-lg-2 col-md-3 footer-links">
+                    <h4>خدماتنا</h4>
+                    <ul>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">تصميم المواقع</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">تطوير المواقع</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">إدارة المنتجات</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">التسويق</a></li>
+                    </ul>
+                </div>
 
-			<div class="border-top copyright">
-				<div class="row pt-4">
-					<div class="col-lg-6">
-						<p class="mb-2 text-center text-lg-start">
-							
-						</p>
-					</div>
+                <div class="col-lg-4 col-md-12">
+                    <h4>تابعنا</h4>
+                    <p>تابعنا على وسائل التواصل الاجتماعي للحصول على آخر التحديثات.</p>
+                    <div class="social-links d-flex">
+                        <a href=""><i class="bi bi-twitter-x"></i></a>
+                        <a href=""><i class="bi bi-facebook"></i></a>
+                        <a href=""><i class="bi bi-instagram"></i></a>
+                        <a href=""><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
 
-					<div class="col-lg-6 text-center text-lg-end">
-						<ul class="list-unstyled d-inline-flex ms-auto">
-							<li class="me-4"><a href="#">الشروط والأحكام</a></li>
-							<li><a href="#">سياسة الخصوصية</a></li>
-						</ul>
-					</div>
+            </div>
+        </div>
 
-				</div>
-			</div>
+        <div class="container copyright text-center mt-4">
+            <p>© <span>حقوق النشر</span> <strong class="px-1 sitename">eNno</strong> <span>جميع الحقوق محفوظة</span></p>
+            <div class="credits">
+                تم التصميم بواسطة <a href="https://bootstrapmade.com/">BootstrapMade</a> التوزيع بواسطة <a href="https://themewagon.com">ThemeWagon</a>
+            </div>
+        </div>
 
-		</div>
-	</footer>
-	<!-- End Footer Section -->
-	<script src="https://code.jquery.com/jquery-3.6.3.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-	<script src="~/Nafath/js/bootstrap.bundle.min.js"></script>
-	<script src="~/Nafath/js/tiny-slider.js"></script>
-	<script src="~/Nafath/js/custom.js"></script>
-	<script src="~/assets/js/backend-bundle.min.js"></script>
+    </footer>
 
-	<!-- Table Treeview JavaScript -->
-	<script src="~/assets/js/table-treeview.js"></script>
+    <!-- Scroll Top -->
+    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-	<!-- Chart Custom JavaScript -->
-	<script src="~/assets/js/customizer.js"></script>
+    <!-- Preloader -->
+    <div id="preloader"></div>
 
-	<!-- Chart Custom JavaScript -->
-	<script async src="~/assets/js/chart-custom.js"></script>
+    <!-- Vendor JS Files -->
+    <script src="~/Nafas/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Nafas/assets/vendor/php-email-form/validate.js"></script>
+    <script src="~/Nafas/assets/vendor/aos/aos.js"></script>
+    <script src="~/Nafas/assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="~/Nafas/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="~/Nafas/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+    <script src="~/Nafas/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="~/Nafas/assets/vendor/swiper/swiper-bundle.min.js"></script>
 
-	<!-- app JavaScript -->
-	<script src="~/assets/js/app.js"></script>
-	<script src="~/assets/script.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-	<script src="~/Nafath/nav.js"></script>
+    <!-- Main JS File -->
+    <script src="~/Nafas/assets/js/main.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 
-
-
-
-	@await RenderSectionAsync("Scripts", required: false)
 </body>
 
 </html>
-
-
-

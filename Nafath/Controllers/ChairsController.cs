@@ -18,6 +18,8 @@ namespace Nafath.Controllers
         }
 
         // GET: Chairs
+
+
         public IActionResult Index(int page = 1, int pageSize = 12)
         {
             int totalItems;
