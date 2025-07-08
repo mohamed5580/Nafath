@@ -28,7 +28,12 @@ namespace Infrastructure.Data
                 entity.HasNoKey();
                 entity.ToView("VwUsers");
             });
-
+            builder.Entity<Chairs>(entity =>
+            {
+                entity.Property(c => c.Description)
+                      .HasMaxLength(500)
+                      .IsRequired();
+            });
 
         }
 

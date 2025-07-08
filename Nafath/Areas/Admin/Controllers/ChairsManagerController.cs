@@ -71,8 +71,25 @@ namespace Nafath.Controllers
         {
             if (!ModelState.IsValid)
             {
-                SessionMsg(Helper.Error, "خطأ", "الرجاء ملء جميع الحقول المطلوبة");
-                return View(chairs);
+                // Re‑load the full list (page 1, 1000 items) so Index.cshtml can render the table
+                int totalItems;
+                var allChairs = _context
+                    .GetPaged(1, 1000, out totalItems)
+                    .ToList();
+
+                // Push your validation errors into ViewBag so Index.cshtml’s alert shows them
+                ViewBag.EditErrors = ModelState.Values
+                                        .SelectMany(v => v.Errors)
+                                        .Select(e => e.ErrorMessage)
+                                        .ToList();
+                var str = ModelState.Values
+                                        .SelectMany(v => v.Errors)
+                                        .Select(e => e.ErrorMessage)
+                                        .ToList();
+                SessionMsg(Helper.Success, "خطا", str.ToString());
+
+                // Return the Index view with the full list
+                return View("Index", allChairs);
             }
 
             // File upload handling
@@ -96,87 +113,82 @@ namespace Nafath.Controllers
 
 
 
-        // GET: Chairs/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        public IActionResult Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var chairs = _context.FindById(id);
-            if (chairs == null)
-            {
-                return NotFound();
-            }
-            return View(chairs);
+            var chair = _context.FindById(id.Value);
+            if (chair == null) return NotFound();
+
+            return View(chair);
         }
 
-        // POST: Chairs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Admin/ChairsManager/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [FromForm] Chairs chairs)
+        public async Task<IActionResult> Edit(int id, Chairs chairs, IFormFile? ImageFile)
         {
-            if (id != chairs.Id) return NotFound();
+            if (id != chairs.Id)
+                return NotFound();
 
             var existing = _context.FindById(id);
-            if (existing == null) return NotFound();
-
-            // Check for changes
-            var changesExist =
-                chairs.ImageFile != null ||
-                chairs.Name != existing.Name ||
-                chairs.Description != existing.Description ||
-                chairs.Price != existing.Price ||
-                chairs.IsAvailable != existing.IsAvailable;
-
-            if (!changesExist)
-            {
-                SessionMsg(Helper.Msg, "تنبيه", "لا يوجد تغييرات");
-                return RedirectToAction(nameof(Index));
-            }
+            if (existing == null)
+                return NotFound();
 
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Values
+                int totalItems;
+                var allChairs = _context.GetPaged(1, 1000, out totalItems).ToList();
+
+                ViewBag.EditErrors = ModelState.Values
                     .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage);
-                SessionMsg(Helper.Error, "خطأ", string.Join("; ", errors));
-                return View(chairs);
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                SessionMsg(Helper.Error, "خطأ", string.Join(" | ", ViewBag.EditErrors));
+
+                chairs.ImageUrl = existing.ImageUrl;
+
+                return View("Index", allChairs);
             }
 
-            // Update properties
+            // Update fields
             existing.Name = chairs.Name;
             existing.Description = chairs.Description;
             existing.Price = chairs.Price;
             existing.IsAvailable = chairs.IsAvailable;
 
-            // Handle new image
-            if (chairs.ImageFile?.Length > 0)
+            if (ImageFile != null && ImageFile.Length > 0)
             {
-                // Delete old image if exists
-                if (!string.IsNullOrEmpty(existing.ImageUrl))
+                var oldFile = Path.Combine(_env.WebRootPath, "uploads", "chairs", Path.GetFileName(existing.ImageUrl ?? ""));
+                if (System.IO.File.Exists(oldFile))
                 {
-                    var oldFilePath = Path.Combine(_env.WebRootPath, existing.ImageUrl.TrimStart('/'));
-                    if (System.IO.File.Exists(oldFilePath))
-                    {
-                        System.IO.File.Delete(oldFilePath);
-                    }
+                    System.IO.File.Delete(oldFile);
                 }
 
-                // Save new image
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(chairs.ImageFile.FileName)}";
+                var newFileName = $"{Guid.NewGuid()}{Path.GetExtension(ImageFile.FileName)}";
                 var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chairs");
-                var filePath = Path.Combine(uploadsDir, fileName);
+                Directory.CreateDirectory(uploadsDir);
+                var newFilePath = Path.Combine(uploadsDir, newFileName);
 
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await chairs.ImageFile.CopyToAsync(stream);
-                existing.ImageUrl = $"/uploads/chairs/{fileName}";
+                using var stream = new FileStream(newFilePath, FileMode.Create);
+                await ImageFile.CopyToAsync(stream);
+
+                existing.ImageUrl = $"/uploads/chairs/{newFileName}";
             }
 
-            _context.UpdateOne(existing);
+            try
+            {
+                _context.UpdateOne(existing);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (_context.FindById(id) == null)
+                    return NotFound();
+                throw;
+            }
+
             SessionMsg(Helper.Success, "تم", "تم تحديث الكرسي بنجاح");
             return RedirectToAction(nameof(Index));
         }
@@ -202,7 +214,7 @@ namespace Nafath.Controllers
             return View(chairs);
         }
 
-        // POST: Chairs/Delete/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id)
         {
@@ -211,21 +223,23 @@ namespace Nafath.Controllers
             var chair = await _context.FindByIdasync(id.Value);
             if (chair != null)
             {
-                // Delete associated image
-                if (!string.IsNullOrEmpty(chair.ImageUrl))
+                // build correct physical path to the image
+                var fileName = Path.GetFileName(chair.ImageUrl);
+                var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chairs");
+                var filePath = Path.Combine(uploadsDir, fileName);
+
+                if (System.IO.File.Exists(filePath))
                 {
-                    var filePath = Path.Combine(_env.WebRootPath, chair.ImageUrl.TrimStart('/'));
-                    if (System.IO.File.Exists(filePath))
-                    {
-                        System.IO.File.Delete(filePath);
-                    }
+                    System.IO.File.Delete(filePath);
                 }
+
                 _context.DeleteOne(chair);
             }
 
             SessionMsg(Helper.Success, "تم", "تم حذف الكرسي بنجاح");
             return RedirectToAction(nameof(Index));
         }
+
 
 
         private bool ChairsExists(int id)

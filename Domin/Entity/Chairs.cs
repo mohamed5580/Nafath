@@ -30,7 +30,7 @@ namespace Domin.Entity
 
         [Required(ErrorMessage = "Price is required.")]
         [Range(0.01, 100000, ErrorMessage = "Price must be positive.")]
-        public decimal? Price { get; set; }
+        public   decimal? Price { get; set; }
 
     }
 

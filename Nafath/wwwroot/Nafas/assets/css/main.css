@@ -230,11 +230,12 @@ h6 {
 # Global Header
 --------------------------------------------------------------*/
 .header {
-  color: var(--default-color);
-  background-color: var(--background-color);
-  padding: 15px 0;
-  transition: all 0.5s;
-  z-index: 997;
+    color: var(--default-color);
+    background-color: var(--background-color);
+    padding: 15px 0;
+    transition: all 0.5s;
+    z-index: 997;
+    direction: rtl;
 }
 
 .header .logo {
@@ -248,6 +249,8 @@ h6 {
 
 .header .logo h1 {
   font-size: 30px;
+  text-align:center;
+  align-content:center;
   margin: 0;
   font-weight: 700;
   color: var(--heading-color);
@@ -531,15 +534,22 @@ h6 {
 # Global Footer
 --------------------------------------------------------------*/
 .footer {
-  color: var(--default-color);
-  background-color: var(--background-color);
-  font-size: 14px;
-  position: relative;
+    margin-top:50px;
+    color: var(--default-color);
+    background-color: var(--background-color);
+    font-size: 14px;
+    position: relative;
+    direction: rtl;
+    align-content: start;
+    align-items: start;
+    text-align: right;
 }
 
 .footer .footer-newsletter {
   background-color: color-mix(in srgb, var(--default-color), transparent 97%);
   padding: 50px 0;
+
+
 }
 
 .footer .footer-newsletter h4 {
@@ -873,7 +883,7 @@ section,
 --------------------------------------------------------------*/
 .hero {
   width: 100%;
-  min-height: 70vh;
+  min-height: 20vh;
   position: relative;
   padding: 120px 0 60px 0;
   display: flex;
@@ -1755,3 +1765,8 @@ section,
   /* Add your styles here */
 }
 
+
+.iconNav{
+    margin-left:100px;
+    
+}
