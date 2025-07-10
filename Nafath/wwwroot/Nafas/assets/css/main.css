@@ -353,7 +353,7 @@ h6 {
     display: block;
     position: absolute;
     visibility: hidden;
-    left: 14px;
+    right: 14px;
     top: 130%;
     opacity: 0;
     transition: 0.3s;
@@ -364,6 +364,8 @@ h6 {
 
   .navmenu .dropdown ul li {
     min-width: 200px;
+    border:1px;
+    border-bottom:0.5px;
   }
 
   .navmenu .dropdown ul a {
@@ -808,6 +810,7 @@ h6 {
   color: color-mix(in srgb, var(--default-color), transparent 70%);
 }
 
+
 /*--------------------------------------------------------------
 # Global Sections
 --------------------------------------------------------------*/
@@ -818,7 +821,12 @@ section,
   padding: 60px 0;
   scroll-margin-top: 100px;
   overflow: clip;
+  direction:rtl;
+  text-align:right;;
 }
+
+
+
 
 @media (max-width: 1199px) {
 
@@ -1770,3 +1778,5 @@ section,
     margin-left:100px;
     
 }
+
+  

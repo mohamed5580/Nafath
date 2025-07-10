@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -21,7 +20,6 @@ namespace Domin.Entity
         [Display(Name = "Upload Image")]
         public IFormFile ImageFile { get; set; }
 
-        // هذا هو العمود الحقيقي في الـ DB
         [Display(Name = "Image URL")]
         public string? ImageUrl { get; set; }
 
@@ -30,8 +28,8 @@ namespace Domin.Entity
 
         [Required(ErrorMessage = "Price is required.")]
         [Range(0.01, 100000, ErrorMessage = "Price must be positive.")]
-        public   decimal? Price { get; set; }
+        public decimal? Price { get; set; }
 
+        public ICollection<OrderItem> OrderItems { get; set; }
     }
-
 }

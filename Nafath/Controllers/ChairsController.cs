@@ -1,25 +1,27 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Domin.Entity;
+﻿using Domin.Entity;
+using Domin.Resource;
 using Infrastructure.IRepository.Base;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Nafath.Controllers
 {
     public class ChairsController : Controller
     {
+        #region Declaration
         private readonly IRepository<Chairs> _context;
 
         private readonly IWebHostEnvironment _env;
-
+        #endregion
+        #region Constructor
         public ChairsController(IRepository<Chairs> context, IWebHostEnvironment env)
         {
             _context = context;
             _env = env;
         }
-
+        #endregion
+        #region Method
         // GET: Chairs
-
-
         public IActionResult Index(int page = 1, int pageSize = 12)
         {
             int totalItems;
@@ -191,5 +193,19 @@ namespace Nafath.Controllers
             // Use FindById or FindAll to check existence
             return _context.FindById(id) != null;
         }
+        [HttpPost]
+        public IActionResult AddToCart(int id, string name, decimal price, string imageUrl)
+        {
+            SessionMsg(Helper.Success, "تم بنجاح", ResourceWeb.lbSave);
+
+            return RedirectToAction("Index");
+        }
+        private void SessionMsg(string MsgType, string Title, string Msg)
+        {
+            HttpContext.Session.SetString(Helper.MsgType, MsgType);
+            HttpContext.Session.SetString(Helper.Title, Title);
+            HttpContext.Session.SetString(Helper.Msg, Msg);
+        }
+        #endregion
     }
 }

@@ -19,10 +19,10 @@ namespace Domin.Entity
             theMsg.IsBodyHtml = true;
 
             var smtpClint = new SmtpClient("smtp-mail.outlook.com")
-            { 
-               EnableSsl = true ,
-               Credentials = new NetworkCredential(fMail, fPassword), 
-               Port= 587
+            {
+                EnableSsl = true,
+                Credentials = new NetworkCredential(fMail, fPassword),
+                Port = 587
             };
 
             smtpClint.Send(theMsg);

@@ -13,26 +13,6 @@
 
 <partial name="_Notifications" />
 
-<!-- Start Hero Section -->
-<div class="hero">
-    <div class="container">
-        <div class="row justify-content-between">
-            <div class="col-lg-5">
-                <div class="intro-excerpt">
-                    <h1>Shop</h1>
-                </div>
-            </div>
-            <div class="col-lg-2 text-right">
-                <!-- Cart button -->
-                <button class="btn btn-outline-info position-relative" data-bs-toggle="modal" data-bs-target="#cartModal">
-                    <i class="bi bi-cart"></i> Cart
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- End Hero Section -->
-
 <div class="container m">
     <div class="content-page">
         <div class="container-fluid bg b-radius">
@@ -40,8 +20,14 @@
             <div class="row mb-4">
                 <div lang="ar" dir="rtl" class="col-lg-12 d-flex align-items-center justify-content-between">
                     <div class="pt-5">
-                        <h1 class="mb-1">كراسي المكتب</h1>
+                        <h1 class="intro-excerpt mb-1">كراسي المكتب</h1>
                         <p class="mb-0">أثاث مكتبي مميز: من الكراسي المريحة</p>
+                    </div>
+                    <div class="col-lg-2 text-right">
+                        <!-- Cart button -->
+                        <button class="btn btn-outline-info position-relative" data-bs-toggle="modal" data-bs-target="#cartModal">
+                            <i class="bi bi-cart"></i> Cart
+                        </button>
                     </div>
                 </div>
             </div>
@@ -69,9 +55,6 @@
                                 </a>
                             </div>
                         }
-
-
-
                     </div>
 
                     <!-- Pagination -->
@@ -91,8 +74,6 @@
                             </li>
                         </ul>
                     </nav>
-
-
                 </div>
             </div>
         </div>
@@ -102,14 +83,13 @@
 <!-- VIEW MODALS -->
 @foreach (var chair in Model)
 {
-    <div  class="modal fade" id="viewModal-@chair.Id" tabindex="-1" aria-labelledby="viewModalLabel-@chair.Id" aria-hidden="true">
+    <div class="modal fade" id="viewModal-@chair.Id" tabindex="-1" data-bs-backdrop="false" aria-labelledby="viewModalLabel-@chair.Id" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header ">
                     <h5 class="modal-title ms-auto" id="viewModalLabel-@chair.Id">شاشة العرض</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
                 <div class="modal-body">
                     <div class="row text-right p-3">
                         <div class="col-md-6">
@@ -123,13 +103,14 @@
 
                             @if (SignInManager.IsSignedIn(User))
                             {
+                                
                                 <button type="button"
                                         data-name="@chair.Name"
                                         data-price="@chair.Price"
                                         data-imageurl="@chair.ImageUrl"
                                         data-id="@chair.Id"
                                         class="btn btn-primary add-to-cart">
-                                    Add to cart
+                                    اضافة الي سلة المشتريات
                                 </button>
                             }
                             else
@@ -138,7 +119,7 @@
                                    asp-page="/Account/Login"
                                    asp-route-returnUrl="@Context.Request.Path"
                                    class="btn btn-primary">
-                                    Login to add cart
+                                    سجل اولا
                                 </a>
                             }
                         </div>
@@ -202,7 +183,30 @@
     </div>
 </div>
 
+
+
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-  
+    <!-- make sure you’ve included toastr.css & toastr.js already -->
+   
+
+    <script>
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const name = btn.dataset.name;
+            // (you’d kick off your AJAX add-to-cart here…)
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Added!',
+              text: `تمت اضافة ${name} .الي العربة  `,
+              timer: 2000,
+              showConfirmButton: false
+            });
+          });
+        });
+    </script>
+   
+
 }

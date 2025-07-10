@@ -1,6 +1,6 @@
-﻿@inject SignInManager<ApplicationUser> SignInManager
+﻿
+@inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 
@@ -20,26 +20,27 @@
 
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="~/Nafas/images/Nafas.ico">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
+       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet"integrity="sha384-ENjdO4Dr2bkBIFxQpeoA6VjtqW1WfCjKk+6TzS3mI5jI4Q5XVJ0Q5a0Q5a0Q5a0Q" crossorigin="anonymous"/>
     <!-- Vendor CSS Files -->
     <link href="~/Nafas/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/aos/aos.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="~/Nafas//assets/css/backend-plugin.min.css">
-    <link rel="stylesheet" href="~/Nafas//assets/css/backend.css?v=1.0.0">
-    <link rel="stylesheet" href="~/Nafas//assets/vendor/@@fortawesome/fontawesome-free/css/all.min.css">
-    <link rel="stylesheet" href="~/Nafas//assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css">
-    <link rel="stylesheet" href="~/Nafas//assets/vendor/remixicon/fonts/remixicon.css">
+    <link rel="stylesheet" href="~/Nafas/assets/css/backend-plugin.min.css">
+    <link rel="stylesheet" href="~/Nafas/assets/css/backend.css?v=1.0.0">
+    <link rel="stylesheet" href="~/Nafas/assets/vendor/@@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/Nafas/assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css">
+    <link rel="stylesheet" href="~/Nafas/assets/vendor/remixicon/fonts/remixicon.css">
     <!-- Main CSS File -->
     <link href="~/Nafas/assets/css/style.css" rel="stylesheet">
-
+  
     <link href="~/Nafas/assets/css/main.css" rel="stylesheet">
 </head>
 
@@ -50,7 +51,6 @@
 
             <a asp-area ="" asp-controller="Home" asp-action="Index" class="logo d-flex ">
                 <img src="~/Nafas/assets/images/logoo.png" alt="">
-                <h1 class="sitename">نفاذ</h1>
             </a>
 
             <nav id="navmenu" class="navmenu">
@@ -59,11 +59,25 @@
                         <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link ">الرئيسية</a>
                     </li>
 
-                    <li>
-                        <a asp-area="" asp-controller="Chairs" asp-action="Index"
-                           class="nav-link">المتجر</a>
+              
+                     <li class="dropdown">
+                        <a href="#"><span>المتجر</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                        <ul>
+                            <li><a asp-area="" asp-controller="Chairs" asp-action="Index">كراسي مكتب</a></li>
+                            <li><a href="#">مكاتب</a></li>
+                            <li><a href="#">قطع غيار</a></li>
+                       @*   <li class="dropdown">
+                                <a href="#"><span>قائمة فرعية</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                                <ul>
+                                    <li><a href="#">عنصر فرعي 1</a></li>
+                                    <li><a href="#">عنصر فرعي 2</a></li>
+                                    <li><a href="#">عنصر فرعي 3</a></li>
+                                    <li><a href="#">عنصر فرعي 4</a></li>
+                                    <li><a href="#">عنصر فرعي 5</a></li>
+                                </ul>
+                            </li> *@
+                        </ul>
                     </li>
-
                     <li><a class="nav-link" href="about.html">من نحن</a></li>
                     <li class=""><a class="nav-link" href="services.html">الخدمات</a></li>
                     <li><a class="nav-link" href="blog.html">المدونة</a></li>
@@ -93,19 +107,19 @@
                
             </nav>
 
-          @*   <a class="btn-getstarted" href="index.html#about">ابدأ الآن</a>
- *@
+     
             <!-- CART MODAL -->
-            <div class="modal fade" id="cartModal"
+            <div class="modal fade " id="cartModal"
                  data-bs-backdrop="false"
-                 tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
+                 tabindex="1" aria-labelledby="cartModalLabel" aria-hidden="false" >
+                <div class="modal-dialog modal-dialog-centered modal-lg" >
                     <div class="modal-content">
+
                         <div class="modal-header">
-                            <h5 id="cartModalLabel">سلة المشتريات</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <h5 id="cartModalLabel"class="ms-auto">سلة المشتريات</h5>
                         </div>
-                        <div class="modal-body">
+                        <div class="modal-body" >
                             <div class="table-responsive">
                                 <table class="table table-hover text-center">
                                     <thead class="thead-light">
@@ -132,7 +146,7 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">متابعة الشراء</button>
                             <button type="button" class="btn btn-danger clear-cart">تفريغ</button>
-                            <button type="button" class="btn btn-primary">اتمام الشراء</button>
+                            <button type="button" class="btn btn-primary complete-order">اتمام الشراء</button>
                         </div>
 
                     </div>
@@ -171,7 +185,24 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                    data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-circle fs-4"></i>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var currentUser = await UserManager.GetUserAsync(User);
+                        var imgUrl = string.IsNullOrEmpty(currentUser.AvatarUrl)
+                            ? "~/assets/images/user/11.png"
+                            : currentUser.AvatarUrl;
+
+                        <img src="@(Url.Content(imgUrl))"
+                                alt="Profile"
+                                class="rounded-circle"
+                                style="width:50px;height:50px;" />
+                    }
+                    else
+                    {
+                        <i class="bi bi-person-circle fs-4"></i>
+                    }
+
+                   
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                     <!-- هنا ضع خيارات المستخدم أو partial login -->
@@ -215,7 +246,7 @@
             <div class="row gy-4">
                 <div class="col-lg-4 col-md-6 footer-about">
                     <a asp-area="" asp-controller="Home" asp-action="Index" class="logo d-flex ">
-                        <img src="~/Nafath/images/logoo.png" class="w-25" alt="">
+                        <img src="~/Nafas/assets/images/logoo.png" class="w-25" alt="">
                         <h1 class="sitename">نفاذ</h1>
                     </a>
                     <div class="footer-contact pt-3">
@@ -274,7 +305,19 @@
 
     <!-- Preloader -->
     <div id="preloader"></div>
+    <!-- Bootstrap JS (requires Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz5vG6srpKbZ1jgCK9XOnW5Z6QtdfQIjG5E74rN5QZK/EHQJ1VjHLj2w8P" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-QFhZmnv1AePj3trwKgQm+7vX/6yD+XwNm+1j5z5Q5a0Q5a0Q5a0Q5a0Q5a0Q5a0Q" crossorigin="anonymous" ></script>
 
+    <script>
+    const cartModal = document.getElementById('cartModal');
+    cartModal.addEventListener('show.bs.modal', () => {
+        document.querySelector('.main-content').classList.add('blurred');
+    });
+    cartModal.addEventListener('hidden.bs.modal', () => {
+        document.querySelector('.main-content').classList.remove('blurred');
+    });
+    </script>
     <!-- Vendor JS Files -->
     <script src="~/Nafas/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/Nafas/assets/vendor/php-email-form/validate.js"></script>
@@ -291,7 +334,15 @@
                 integrity="sha384‑…"
                 crossorigin="anonymous"></script>
 
+        <!-- 1. SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+        <!-- 2. jQuery -->
+        <!-- 3. cart.js (واحد فقط!) -->
         <script src="~/Nafas/assets/js/cart.js"></script>
+
+        <!-- 5. main.js -->
+        <script src="~/Nafas/assets/js/main.js"></script>
+
     }
     else
     {
@@ -305,8 +356,11 @@
             });
         </script>
     }
+
     <!-- Main JS File -->
     <script src="~/Nafas/assets/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>

@@ -12,6 +12,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Nafath.Controllers
 {
+
     [Area("Admin")]
     public class ChairsManagerController : Controller
     {

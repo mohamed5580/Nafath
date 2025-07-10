@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Nafath.Services;
 using System;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 

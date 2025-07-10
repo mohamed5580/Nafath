@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
+using static NuGet.Packaging.PackagingConstants;
 
 namespace Infrastructure.Data
 {
@@ -34,11 +35,22 @@ namespace Infrastructure.Data
                       .HasMaxLength(500)
                       .IsRequired();
             });
+            // ضمن نفس override OnModelCreating:
+            builder.Entity<Chairs>()
+                .Property(c => c.Price)
+                .HasColumnType("decimal(18,2)");
+
+            // سعر الوحدة في الـ OrderItem
+            builder.Entity<OrderItem>()
+                .Property(oi => oi.UnitPrice)
+                .HasColumnType("decimal(18,2)");
 
         }
 
         public DbSet<Chairs> Chairs { get; set; }
         public DbSet<VwUser> VwUsers { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
     }
 }
