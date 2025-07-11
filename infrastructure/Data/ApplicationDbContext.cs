@@ -40,10 +40,42 @@ namespace Infrastructure.Data
                 .Property(c => c.Price)
                 .HasColumnType("decimal(18,2)");
 
-            // سعر الوحدة في الـ OrderItem
-            builder.Entity<OrderItem>()
-                .Property(oi => oi.UnitPrice)
-                .HasColumnType("decimal(18,2)");
+            builder.Entity<OrderItem>(oi =>
+            {
+                // ربط صحيح لـ Product
+                oi.HasOne(oi => oi.Product)
+                  .WithMany(p => p.OrderItems)
+                  .HasForeignKey(oi => oi.ProductId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+                // ربط صحيح لـ Order
+                oi.HasOne(oi => oi.Order)
+                  .WithMany(o => o.OrderItems)
+                  .HasForeignKey(oi => oi.OrderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+                oi.Property(oi => oi.UnitPrice).HasColumnType("decimal(18,2)");
+            });
+
+
+
+            builder.Entity<ProductType>(b =>
+            {
+                b.Property(pt => pt.Name)
+                 .IsRequired()
+                 .HasMaxLength(100);
+            });
+
+            builder.Entity<Product>(b =>
+            {
+                b.Property(p => p.Name);
+                b.Property(p => p.Price)
+                .HasPrecision(18, 2);
+                // لا تكتب b.Property(p => p.ProductTypes)
+                b.HasOne(p => p.ProductType)
+                 .WithMany(pt => pt.Products)
+                 .HasForeignKey(p => p.ProductTypeId);
+            });
 
         }
 
@@ -51,6 +83,9 @@ namespace Infrastructure.Data
         public DbSet<VwUser> VwUsers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
-
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductType> ProductTypes { get; set; }
+   
     }
+
 }

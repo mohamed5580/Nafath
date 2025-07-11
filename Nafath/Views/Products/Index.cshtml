@@ -1,0 +1,213 @@
+﻿@model IEnumerable<Domin.Entity.Product>
+@using Domin.Entity
+@using Domin.Resource
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = ResourceWeb.lbStore; // تأكد من وجود lbStore في الموارد
+    var currentTypeId = ViewBag.TypeFilterId as int?;
+    var types = ViewBag.ProductTypes as IEnumerable<ProductType>
+                ?? Enumerable.Empty<ProductType>();
+    var currentPage = ViewBag.CurrentPage as int? ?? 1;
+    var totalPages = ViewBag.TotalPages as int? ?? 1;
+}
+
+<partial name="_Notifications" />
+
+<div class="container m">
+    <div class="content-page">
+        <div class="container-fluid bg b-radius">
+
+            <!-- HEADER -->
+            <div class="row mb-4">
+                <div lang="ar" dir="rtl" class="col-lg-12 d-flex align-items-center justify-content-between">
+                    <div class="pt-5">
+                        <h1 class="intro-excerpt mb-1">@ResourceWeb.lbStore</h1>
+                        <p class="mb-0">@ResourceWeb.lbStoreSubtitle</p>
+                    </div>
+                    <div class="col-lg-2 text-right">
+                        <button class="btn btn-outline-info position-relative"
+                                data-bs-toggle="modal"
+                                data-bs-target="#cartModal">
+                            <i class="bi bi-cart"></i>
+                            @ResourceWeb.lbCart
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <hr />
+
+            <!-- FILTER BY TYPE -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link @(currentTypeId == null ? "active" : "")"
+                               asp-controller="Products"
+                               asp-action="Index">
+                                @ResourceWeb.lbAllTypes
+                            </a>
+                        </li>
+                        @foreach (var t in types)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(currentTypeId == t.Id ? "active" : "")"
+                                   asp-controller="Products"
+                                   asp-action="Index"
+                                   asp-route-typeId="@t.Id">
+                                    @t.Name
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PRODUCT GRID -->
+            <div class="untree_co-section product-section before-footer-section">
+                <div class="container">
+                    <div class="row">
+                        @foreach (var product in Model)
+                        {
+                            <div class="col-12 col-md-4 col-lg-3 mb-5">
+                                <a class="product-item"href="#"data-bs-toggle="modal"data-bs-target="#viewModal-@product.Id">
+                                    <input type="hidden" name="Id" value="@product.Id" />
+                                    <img src="@product.ImageUrl"
+                                         alt="@product.Name"
+                                         class="img-fluid product-thumbnail" />
+                                    <h3 class="product-title">@product.Name</h3>
+                                    <strong class="product-price">@product.Price EGP</strong>
+                                    <span class="icon-cross">
+                                        <svg style="width:26px; height:26px; margin-top:5px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
+                                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                            <g id="SVGRepo_iconCarrier">
+                                                <path d="M12 20H16M12 20H8M12 20V16M12 16H5C4.44772 16 4 15.5523 4 15V6C4 5.44771 4.44772 5 5 5H19C19.5523 5 20 5.44772 20 6M12 16H19C19.5523 16 20 15.5523 20 15V10" stroke="#ffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </g>
+                                        </svg>
+                                    </span>
+                                </a>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center w-100">
+                            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                <a class="page-link"
+                                   asp-controller="Products"
+                                   asp-action="Index"
+                                   asp-route-typeId="@(currentTypeId)"
+                                   asp-route-page="@(currentPage - 1)"
+                                   asp-route-pageSize="12">
+                                    @ResourceWeb.lbPrevious
+                                </a>
+                            </li>
+                            @for (int i = 1; i <= totalPages; i++)
+                            {
+                                <li class="page-item @(i == currentPage ? "active" : "")">
+                                    <a class="page-link"
+                                       asp-controller="Products"
+                                       asp-action="Index"
+                                       asp-route-typeId="@(currentTypeId)"
+                                       asp-route-page="@i"
+                                       asp-route-pageSize="12">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                <a class="page-link"
+                                   asp-controller="Products"
+                                   asp-action="Index"
+                                   asp-route-typeId="@(currentTypeId)"
+                                   asp-route-page="@(currentPage + 1)"
+                                   asp-route-pageSize="12">
+                                    @ResourceWeb.lbNext
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- VIEW MODALS (unchanged) -->
+@foreach (var product in Model)
+{
+    <div class="modal fade" id="viewModal-@product.Id" tabindex="-1" data-bs-backdrop="false" aria-labelledby="viewModalLabel-@product.Id" aria-hidden="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@ResourceWeb.lbProductDetails</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row text-right p-3">
+                        <div class="col-md-6">
+                            <img src="@product.ImageUrl" class="img-fluid" />
+                        </div>
+                        <div class="col-md-6 rtl">
+                            <h3>@product.Name</h3>
+                            <p class="product-price">@product.Price EGP <strong>:@ResourceWeb.lbPrice</strong></p>
+                            <p><strong>@ResourceWeb.lbAvailable:</strong> @(product.IsAvailable? ResourceWeb.lbYes: ResourceWeb.lbNo)</p>
+                            <p>@product.Description</p>
+
+                            @if (SignInManager.IsSignedIn(User))
+                            {
+                                <button type="button"
+                                        data-name="@product.Name"
+                                        data-price="@product.Price"
+                                        data-imageurl="@product.ImageUrl"
+                                        data-id="@product.Id"
+                                        class="btn btn-primary add-to-cart">
+                                    @ResourceWeb.lbAddToCart
+                                </button>
+                            }
+                            else
+                            {
+                                <a asp-area="Identity"
+                                   asp-page="/Account/Login"
+                                   asp-route-returnUrl="@Context.Request.Path"
+                                   class="btn btn-primary">
+                                    @ResourceWeb.lbLoginFirst
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@ResourceWeb.lbClose</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- CART MODAL (unchanged) -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+    <!-- ... -->
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const name = btn.dataset.name;
+                Swal.fire({
+                    icon: 'success',
+                    title: '@ResourceWeb.lbAdded',
+                    text: `تمت اضافة ${name} .`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            });
+        });
+    </script>
+}

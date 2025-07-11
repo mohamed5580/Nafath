@@ -1,19 +1,13 @@
 ﻿using Domin.Entity;
 using Domin.Resource;
-using Elfie.Serialization;
 using Infrastructure.Data;
-using Infrastructure.Models;
 using Infrastructure.Models;
 using Infrastructure.Models.ViewModel;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace Nafath.Areas.Admin.Controllers
 {

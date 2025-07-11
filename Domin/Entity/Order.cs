@@ -15,8 +15,9 @@ namespace Domin.Entity
         [Required]
         public string UserId { get; set; }
 
-        // مجموعة العناصر داخل الطلب
-        public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
+        // يجب إضافة هذا السطر:
+        public List<OrderItem> OrderItems { get; set; } = new();
+
     }
 
 }

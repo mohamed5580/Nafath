@@ -51,5 +51,13 @@
             Registers,
             Categories
         }
+
+        public enum ProductsType
+        {
+            Chairs,
+            Offices,
+            Spareparts
+        }
+       
     }
 }

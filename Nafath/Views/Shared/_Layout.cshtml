@@ -1,4 +1,13 @@
-﻿
+﻿@using Domin.Entity
+
+@inject Infrastructure.IRepository.Base.IRepository<ProductType> TypeRepo
+
+@{
+     // هنا تجيب الأنواع مباشرة
+    var productTypes = await TypeRepo.FindAllasync();
+    var product = ViewBag.ProductTypes as IEnumerable<Domin.Entity.ProductType>;
+}
+
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 <!DOCTYPE html>
@@ -19,7 +28,7 @@
 
 
     <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="~/Nafas/images/Nafas.ico">
+    <link rel="icon" type="image/x-icon" href="~/Nafas/assets/images/logoo.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -53,31 +62,32 @@
                 <img src="~/Nafas/assets/images/logoo.png" alt="">
             </a>
 
-            <nav id="navmenu" class="navmenu">
+            <nav id="navmenu" class="collapse navbar-collapse  navmenu">
                 <ul>
                     <li class="nav-item active">
                         <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link ">الرئيسية</a>
                     </li>
 
               
-                     <li class="dropdown">
-                        <a href="#"><span>المتجر</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                    <li class="dropdown">
+                        <a href="#">
+                        <span>المتجر</span>
+                        <i class="bi bi-chevron-down toggle-dropdown"></i>
+                        </a>
                         <ul>
-                            <li><a asp-area="" asp-controller="Chairs" asp-action="Index">كراسي مكتب</a></li>
-                            <li><a href="#">مكاتب</a></li>
-                            <li><a href="#">قطع غيار</a></li>
-                       @*   <li class="dropdown">
-                                <a href="#"><span>قائمة فرعية</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                                <ul>
-                                    <li><a href="#">عنصر فرعي 1</a></li>
-                                    <li><a href="#">عنصر فرعي 2</a></li>
-                                    <li><a href="#">عنصر فرعي 3</a></li>
-                                    <li><a href="#">عنصر فرعي 4</a></li>
-                                    <li><a href="#">عنصر فرعي 5</a></li>
-                                </ul>
-                            </li> *@
+                            @foreach(var type in productTypes)
+                            {
+                                <li>
+                                    <a asp-controller="Products"
+                                        asp-action="Index"
+                                        asp-route-typeId="@type.Id">
+                                        @type.Name
+                                    </a>
+                                </li>
+                            }
                         </ul>
                     </li>
+
                     <li><a class="nav-link" href="about.html">من نحن</a></li>
                     <li class=""><a class="nav-link" href="services.html">الخدمات</a></li>
                     <li><a class="nav-link" href="blog.html">المدونة</a></li>

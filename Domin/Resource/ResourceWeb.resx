@@ -123,6 +123,9 @@
   <data name="lbActiveUser" xml:space="preserve">
     <value>تفعيل المستخدم</value>
   </data>
+  <data name="lbAddNew" xml:space="preserve">
+    <value>اضف منتج</value>
+  </data>
   <data name="lbAddNewCategory" xml:space="preserve">
     <value>اضف مجموعة فئات جديدة</value>
   </data>
@@ -162,23 +165,41 @@
   <data name="lbChair" xml:space="preserve">
     <value>كراسي المكتب</value>
   </data>
+  <data name="lbClose" xml:space="preserve">
+    <value>الغاء</value>
+  </data>
   <data name="lbComparePassword" xml:space="preserve">
     <value>اعد كلمة المرور</value>
   </data>
   <data name="lbconfirmButtonText" xml:space="preserve">
     <value>نعم ، احذفها</value>
   </data>
+  <data name="lbConfirmDeleteType" xml:space="preserve">
+    <value>هل انت متأكد من انك تريد حذف</value>
+  </data>
+  <data name="lbCreate" xml:space="preserve">
+    <value>اضف منتج</value>
+  </data>
   <data name="lbDate" xml:space="preserve">
     <value>التاريخ</value>
   </data>
+  <data name="lbDelete" xml:space="preserve">
+    <value>حذف</value>
+  </data>
   <data name="lbDeleteMsg" xml:space="preserve">
     <value>تم الحذف بنجاح</value>
+  </data>
+  <data name="lbDeleteType" xml:space="preserve">
+    <value>حذف المنتج</value>
   </data>
   <data name="lbDescription" xml:space="preserve">
     <value>وصف الفئة</value>
   </data>
   <data name="lbEdit" xml:space="preserve">
     <value>تعديل</value>
+  </data>
+  <data name="lbEditType" xml:space="preserve">
+    <value>تعديل المنتج</value>
   </data>
   <data name="lbEmailUser" xml:space="preserve">
     <value>البريد الالكترونى</value>
@@ -237,6 +258,9 @@
   <data name="lbMsgUpdateCategory" xml:space="preserve">
     <value>تم تعديل الفئة بنجاح</value>
   </data>
+  <data name="lbName" xml:space="preserve">
+    <value>اسم المنتج</value>
+  </data>
   <data name="lbNameCategory" xml:space="preserve">
     <value>اسم الفئة</value>
   </data>
@@ -275,6 +299,12 @@
   </data>
   <data name="lbPassword" xml:space="preserve">
     <value>كلمة المرور</value>
+  </data>
+  <data name="lbProduct" xml:space="preserve">
+    <value>المنتجات</value>
+  </data>
+  <data name="lbProductsCount" xml:space="preserve">
+    <value>عدد المنتجات</value>
   </data>
   <data name="lbRegisters" xml:space="preserve">
     <value>المستخدمين</value>
@@ -315,6 +345,9 @@
   <data name="lbTitleMsgDelete" xml:space="preserve">
     <value>هل انتا متأكد ؟</value>
   </data>
+  <data name="lbTypeDetails" xml:space="preserve">
+    <value>التفاصيل</value>
+  </data>
   <data name="lbUpdate" xml:space="preserve">
     <value>تم التعديل</value>
   </data>
@@ -333,4 +366,124 @@
   <data name="lbUserName" xml:space="preserve">
     <value>المستخدم</value>
   </data>
+    <!-- View titles and labels -->
+  <data name="lbHomePage" xml:space="preserve">
+    <value>الصفحة الرئيسية</value>
+  </data>
+  <data name="lbAddNew" xml:space="preserve">
+    <value>إضافة جديد</value>
+  </data>
+  <data name="lbCreate" xml:space="preserve">
+    <value>إنشاء</value>
+  </data>
+  <data name="lbSaveM" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
+  <data name="lbEdit" xml:space="preserve">
+    <value>تعديل</value>
+  </data>
+  <data name="lbDetails" xml:space="preserve">
+    <value>عرض التفاصيل</value>
+  </data>
+  <data name="lbNewProduct" xml:space="preserve">
+    <value>منتج جديد</value>
+  </data>
+  <data name="lbNewType" xml:space="preserve">
+    <value>نوع جديد</value>
+  </data>
+  <data name="lbName" xml:space="preserve">
+    <value>الاسم</value>
+  </data>
+  <data name="lbProductType" xml:space="preserve">
+    <value>نوع المنتج</value>
+  </data>
+  <data name="lbDescription" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="lbPrice" xml:space="preserve">
+    <value>السعر</value>
+  </data>
+  <data name="lbImage" xml:space="preserve">
+    <value>الصورة</value>
+  </data>
+  <data name="lbAvailable" xml:space="preserve">
+    <value>متوفر</value>
+  </data>
+  <data name="lbYes" xml:space="preserve">
+    <value>نعم</value>
+  </data>
+  <data name="lbNo" xml:space="preserve">
+    <value>لا</value>
+  </data>
+  <data name="lbProductDetails" xml:space="preserve">
+    <value>تفاصيل المنتج</value>
+  </data>
+  <data name="lbTypeDetails" xml:space="preserve">
+    <value>تفاصيل النوع</value>
+  </data>
+  <data name="lbDeleteProduct" xml:space="preserve">
+    <value>حذف المنتج</value>
+  </data>
+  <data name="lbDeleteType" xml:space="preserve">
+    <value>حذف النوع</value>
+  </data>
+  <data name="lbConfirmDeleteProduct" xml:space="preserve">
+    <value>هل أنت متأكد من حذف المنتج</value>
+  </data>
+  <data name="lbConfirmDeleteType" xml:space="preserve">
+    <value>هل أنت متأكد من حذف النوع</value>
+  </data>
+
+  <data name="lbCurrentImage" xml:space="preserve">
+  <value>الصورة الحالية</value>
+</data>
+<data name="lbChooseNewImage" xml:space="preserve">
+  <value>اختر صورة جديدة (اختياري)</value>
+</data>
+<data name="lbEditProduct" xml:space="preserve">
+  <value>تعديل المنتج</value>
+</data>
+<data name="lbProductsList" xml:space="preserve">
+  <value>قائمة المنتجات</value>
+</data>
+<data name="lbManageProducts" xml:space="preserve">
+  <value>إدارة المنتجات</value>
+</data>
+<data name="lbActions" xml:space="preserve">
+  <value>الإجراءات</value>
+</data>
+<data name="lbSelectType" xml:space="preserve">
+  <value>اختر النوع</value>
+</data>
+<data name="lbProducts" xml:space="preserve">
+  <value>الانواع </value>
+</data>
+<data name="lbStore" xml:space="preserve">
+  <value>المتجر</value>
+</data>
+  <data name="lbAdded" xml:space="preserve">
+    <value>تمّت الإضافة</value>
+  </data>
+  <data name="lbAddToCart" xml:space="preserve">
+    <value>أضف إلى السلة</value>
+  </data>
+  <data name="lbAllTypes" xml:space="preserve">
+    <value>جميع الأنواع</value>
+  </data>
+  <data name="lbCart" xml:space="preserve">
+    <value>السلة</value>
+  </data>
+  <data name="lbLoginFirst" xml:space="preserve">
+    <value>يرجى تسجيل الدخول أولاً</value>
+  </data>
+  <data name="lbNext" xml:space="preserve">
+    <value>التالي</value>
+  </data>
+  <data name="lbPrevious" xml:space="preserve">
+    <value>السابق</value>
+  </data>
+  <data name="lbStoreSubtitle" xml:space="preserve">
+    <value>تسوّق الأنواع المتاحة</value>
+  </data>
+
 </root>

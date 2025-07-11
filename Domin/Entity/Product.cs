@@ -4,13 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domin.Entity
 {
-    public class Chairs
+    public class Product
     {
         [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(100, ErrorMessage = "Name can be at most 100 characters.")]
+
         public string Name { get; set; }
 
         [Required, StringLength(500, ErrorMessage = "Description can be at most 500 characters.")]
@@ -29,6 +30,9 @@ namespace Domin.Entity
         [Required(ErrorMessage = "Price is required.")]
         [Range(0.01, 100000, ErrorMessage = "Price must be positive.")]
         public decimal? Price { get; set; }
-
+        [Required]
+        public int ProductTypeId { get; set; }
+        public ProductType? ProductType { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

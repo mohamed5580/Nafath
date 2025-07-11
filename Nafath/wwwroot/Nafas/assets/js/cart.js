@@ -88,6 +88,7 @@ $(document).ready(function () {
             cartItems.forEach(function (item) {
                 itemsHtml += `
 <tr lang="en" dir="ltr">
+    <input type="hidden" name="Id" value="${item.id}" />
   <td>
     <div class="d-flex align-items-center">
       <h6 class="mb-0">${item.name}</h6>
@@ -171,10 +172,11 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 // 1) نجمع بيانات السلة
                 const items = shoppingCart.listCart().map(i => ({
-                    chairId: i.id,
+                    productId: i.id,    // ← هنا
                     quantity: i.count,
                     unitPrice: i.price
                 }));
+
 
                 // 2) نرسل بيانات الطلب
                 $.ajax({

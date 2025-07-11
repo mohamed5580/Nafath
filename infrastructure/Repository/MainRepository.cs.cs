@@ -87,23 +87,9 @@ namespace Infrastructure.IRepository
             return await _context.Set<T>().ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> FindAllAsync(params string[] includes)
-        {
-            IQueryable<T> query = _context.Set<T>();
-            foreach (var include in includes)
-                query = query.Include(include);
-            return await query.ToListAsync();
-        }
+     
 
-        public Task<IEnumerable<T>> FindAllasync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<T>> FindAllasync(params string[] agers)
-        {
-            throw new NotImplementedException();
-        }
+       
 
         public T FindById(int? ID)
         {
@@ -165,6 +151,84 @@ namespace Infrastructure.IRepository
     
       
 
+       
+
+        public IEnumerable<T> GetPaged(int pageNumber, int pageSize, out int totalItems)
+        {
+            var query = _context.Set<T>();
+            totalItems = query.Count();
+            return query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        }
+        public async Task<(IEnumerable<T> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize)
+        {
+            var query = _context.Set<T>().AsQueryable();
+            var total = await query.CountAsync();
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            return (items, total);
+        }
+
+        public T SelectOne(
+     Expression<Func<T, bool>> predicate,
+     params Expression<Func<T, object>>[] includes
+ )
+        {
+            IQueryable<T> query = _context.Set<T>();
+            foreach (var inc in includes)
+                query = query.Include(inc);
+            return query.FirstOrDefault(predicate);
+        }
+
+        public async Task<T> SelectOneAsync(
+            Expression<Func<T, bool>> predicate,
+            params Expression<Func<T, object>>[] includes
+        )
+        {
+            IQueryable<T> query = _context.Set<T>();
+            foreach (var inc in includes)
+                query = query.Include(inc);
+            return await query.FirstOrDefaultAsync(predicate);
+        }
+
+        public async Task<IEnumerable<T>> FindAllasync()
+        {
+            return await _context.Set<T>().ToListAsync();
+        }
+
+
+        public async Task<IEnumerable<T>> FindAllasync(params string[] includes)
+        {
+            IQueryable<T> query = _context.Set<T>();
+            foreach (var include in includes)
+                query = query.Include(include);
+            return await query.ToListAsync();
+        }
+
+        public async Task AddOneAsync(T entity)
+        {
+            _context.Set<T>().Add(entity);
+            await _context.SaveChangesAsync();
+            SessionMsg(Helper.Success, ResourceWeb.lbUpdate, ResourceWeb.lbUpdateMsgRole);
+
+        }
+
+        public async Task UpdateOneAsync(T entity)
+        {
+            _context.Set<T>().Update(entity);
+            await _context.SaveChangesAsync();
+            SessionMsg(Helper.Success, ResourceWeb.lbUpdate, ResourceWeb.lbUpdateMsgRole);
+
+        }
+
+        public async Task DeleteOneAsync(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+            await _context.SaveChangesAsync();
+            SessionMsg(Helper.Success, ResourceWeb.lbUpdate, ResourceWeb.lbUpdateMsgRole);
+
+        }
         // Session helper using IHttpContextAccessor
         private void SessionMsg(string msgType, string title, string msg)
         {
@@ -177,11 +241,37 @@ namespace Infrastructure.IRepository
             }
         }
 
-        public IEnumerable<T> GetPaged(int pageNumber, int pageSize, out int totalItems)
+        public IEnumerable<T> FindByCondition(Expression<Func<T, bool>> predicate)
         {
-            var query = _context.Set<T>();
-            totalItems = query.Count();
-            return query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            return _context.Set<T>().Where(predicate).ToList();
+        }
+
+        public async Task<IEnumerable<T>> FindByConditionAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>().Where(predicate).ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>> FindByTypeIdAsync(int typeId, params string[] includes)
+        {
+            if (typeof(T) != typeof(Product))
+                throw new InvalidOperationException("This method can only be used with Product.");
+
+            IQueryable<Product> query = _context.Products;
+
+            foreach (var include in includes)
+                query = query.Include(include);
+
+            var products = await query.Where(p => p.ProductTypeId == typeId).ToListAsync();
+
+            return products.Cast<T>(); 
+        }
+
+        public IQueryable<T> Query(params string[] includes)
+        {
+            IQueryable<T> q = _context.Set<T>();
+            foreach (var inc in includes)
+                q = q.Include(inc);
+            return q;
         }
     }
 }

@@ -8,37 +8,43 @@ namespace Nafath.Controllers
 {
 
     [Area("Admin")]
-    public class ChairsManagerController : Controller
+    public class ProductTypeManagerController : Controller
     {
         #region Declaration
-        private readonly IRepository<Chairs> _context;
+        private readonly IRepository<ProductType> _context;
 
         private readonly IWebHostEnvironment _env;
         #endregion
         #region Constructor
-        public ChairsManagerController(IRepository<Chairs> context, IWebHostEnvironment env)
+
+        public ProductTypeManagerController(IRepository<ProductType> context, IWebHostEnvironment env)
         {
             _context = context;
             _env = env;
         }
         #endregion
         #region Method
-        // GET: Chairs
-        // GET: Admin/ChairsManager
-        public IActionResult Index(int page = 1, int pageSize = 1000)
+
+        public async Task<IActionResult> ByType(int id)
         {
-            int totalItems;
-            var pagedChairs = _context.GetPaged(page, pageSize, out totalItems)
-                              .Where(c => c != null)  // Filter out null items
-                              .ToList();
-
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
-
-            return View(pagedChairs);
+            var types = await _context.FindAllasync("Products");
+            var type = types.FirstOrDefault(t => t.Id == id);
+            if (type == null) return NotFound();
+            
+            return View(type);
         }
 
-        // GET: Chairs/Details/5
+        // GET: ProductType
+        // GET: Admin/ProductTypeManager
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 1000)
+        {
+            var (items, total) = await _context.GetPagedAsync(page, pageSize);
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(total / (double)pageSize);
+            return View(items);
+        }
+
+        // GET: ProductType/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,17 +52,17 @@ namespace Nafath.Controllers
                 return NotFound();
             }
 
-            var chairs = await _context.FindByIdasync(id.Value);
-            if (chairs == null)
+            var ProductType = await _context.FindByIdasync(id.Value);
+            if (ProductType == null)
             {
                 return NotFound();
             }
 
-            return View(chairs);
+            return View(ProductType);
         }
 
-        // GET: Admin/ChairsManager/Create
-        // GET: Admin/ChairsManager/Create
+        // GET: Admin/ProductTypeManager/Create
+        // GET: Admin/ProductTypeManager/Create
         public IActionResult Create()
         {
             return View();
@@ -65,13 +71,13 @@ namespace Nafath.Controllers
         // CREATE
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Chairs chairs)
+        public async Task<IActionResult> Create(ProductType ProductType)
         {
             if (!ModelState.IsValid)
             {
                 // Re‑load the full list (page 1, 1000 items) so Index.cshtml can render the table
                 int totalItems;
-                var allChairs = _context
+                var allProductType = _context
                     .GetPaged(1, 1000, out totalItems)
                     .ToList();
 
@@ -87,24 +93,11 @@ namespace Nafath.Controllers
                 SessionMsg(Helper.Success, "خطا", str.ToString());
 
                 // Return the Index view with the full list
-                return View("Index", allChairs);
+                return View("Index", allProductType);
             }
 
-            // File upload handling
-            if (chairs.ImageFile != null && chairs.ImageFile.Length > 0)
-            {
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(chairs.ImageFile.FileName)}";
-                var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chairs");
-                Directory.CreateDirectory(uploadsDir);
 
-                var filePath = Path.Combine(uploadsDir, fileName);
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await chairs.ImageFile.CopyToAsync(stream);
-
-                chairs.ImageUrl = $"/uploads/chairs/{fileName}";
-            }
-
-            _context.AddOne(chairs);
+            _context.AddOne(ProductType);
             SessionMsg(Helper.Success, "تم", "تم إضافة الكرسي بنجاح");
             return RedirectToAction(nameof(Index));
         }
@@ -120,12 +113,12 @@ namespace Nafath.Controllers
             return View(chair);
         }
 
-        // POST: Admin/ChairsManager/Edit/5
+        // POST: Admin/ProductTypeManager/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Chairs chairs, IFormFile? ImageFile)
+        public async Task<IActionResult> Edit(int id, ProductType ProductType, IFormFile? ImageFile)
         {
-            if (id != chairs.Id)
+            if (id != ProductType.Id)
                 return NotFound();
 
             var existing = _context.FindById(id);
@@ -135,7 +128,7 @@ namespace Nafath.Controllers
             if (!ModelState.IsValid)
             {
                 int totalItems;
-                var allChairs = _context.GetPaged(1, 1000, out totalItems).ToList();
+                var allProductType = _context.GetPaged(1, 1000, out totalItems).ToList();
 
                 ViewBag.EditErrors = ModelState.Values
                     .SelectMany(v => v.Errors)
@@ -144,35 +137,13 @@ namespace Nafath.Controllers
 
                 SessionMsg(Helper.Error, "خطأ", string.Join(" | ", ViewBag.EditErrors));
 
-                chairs.ImageUrl = existing.ImageUrl;
-
-                return View("Index", allChairs);
+                return View("Index", allProductType);
             }
 
             // Update fields
-            existing.Name = chairs.Name;
-            existing.Description = chairs.Description;
-            existing.Price = chairs.Price;
-            existing.IsAvailable = chairs.IsAvailable;
-
-            if (ImageFile != null && ImageFile.Length > 0)
-            {
-                var oldFile = Path.Combine(_env.WebRootPath, "uploads", "chairs", Path.GetFileName(existing.ImageUrl ?? ""));
-                if (System.IO.File.Exists(oldFile))
-                {
-                    System.IO.File.Delete(oldFile);
-                }
-
-                var newFileName = $"{Guid.NewGuid()}{Path.GetExtension(ImageFile.FileName)}";
-                var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chairs");
-                Directory.CreateDirectory(uploadsDir);
-                var newFilePath = Path.Combine(uploadsDir, newFileName);
-
-                using var stream = new FileStream(newFilePath, FileMode.Create);
-                await ImageFile.CopyToAsync(stream);
-
-                existing.ImageUrl = $"/uploads/chairs/{newFileName}";
-            }
+            existing.Name = ProductType.Name;
+           
+    
 
             try
             {
@@ -189,7 +160,7 @@ namespace Nafath.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Chairs/Delete/5
+        // GET: ProductType/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -197,13 +168,13 @@ namespace Nafath.Controllers
                 return NotFound();
             }
 
-            var chairs = await _context.FindByIdasync(id.Value);
-            if (chairs == null)
+            var ProductType = await _context.FindByIdasync(id.Value);
+            if (ProductType == null)
             {
                 return NotFound();
             }
 
-            return View(chairs);
+            return View(ProductType);
         }
 
         [HttpPost]
@@ -215,16 +186,6 @@ namespace Nafath.Controllers
             var chair = await _context.FindByIdasync(id.Value);
             if (chair != null)
             {
-                // build correct physical path to the image
-                var fileName = Path.GetFileName(chair.ImageUrl);
-                var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chairs");
-                var filePath = Path.Combine(uploadsDir, fileName);
-
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
-
                 _context.DeleteOne(chair);
             }
 
@@ -232,7 +193,7 @@ namespace Nafath.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ChairsExists(int id)
+        private bool ProductTypeExists(int id)
         {
             // Use FindById or FindAll to check existence
             return _context.FindById(id) != null;
@@ -243,6 +204,7 @@ namespace Nafath.Controllers
             HttpContext.Session.SetString(Helper.Title, Title);
             HttpContext.Session.SetString(Helper.Msg, Msg);
         }
+
         #endregion
     }
 }

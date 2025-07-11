@@ -1,0 +1,198 @@
+﻿@model IEnumerable<Domin.Entity.ProductType>
+@using Domin.Resource
+@inject IWebHostEnvironment Env
+
+@{
+    ViewData["Title"] = "قائمة أنواع المنتجات";
+}
+
+<partial name="_Notifications" />
+
+@if (ViewBag.EditErrors != null)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var msg in ViewBag.EditErrors)
+            {
+                <li>@msg</li>
+            }
+        </ul>
+    </div>
+}
+
+<div class="wrapper">
+    <!-- Content-Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">قائمة أنواع المنتجات</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/Admin/Home/Index">@ResourceWeb.lbHomePage</a></li>
+                        <li class="breadcrumb-item active">إدارة أنواع المنتجات</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Content-Header -->
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h3 class="card-title mb-0">قائمة أنواع المنتجات</h3>
+                        <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#createModal" onclick="resetCreateForm()">
+                            <i class="las la-plus me-2"></i>@ResourceWeb.lbAddNew
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover">
+                            <thead class="bg-white text-uppercase">
+                                <tr>
+                                    <th>@Html.DisplayNameFor(m => m.First().Name)</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var type in Model)
+                                {
+                                    <tr>
+                                        <td>@type.Name</td>
+                                        <td>
+                                            <button class="badge bg-success text-white border-0" data-bs-toggle="modal" data-bs-target="#editModal-@type.Id">
+                                                @ResourceWeb.lbEdit
+                                            </button>
+                                            |
+                                            <button class="badge bg-info text-white" data-bs-toggle="modal" data-bs-target="#viewModal-@type.Id">
+                                                @ResourceWeb.lbDetails
+                                            </button>
+                                            |
+                                            <button class="badge bg-danger text-white" data-bs-toggle="modal" data-bs-target="#deleteModal-@type.Id">
+                                                @ResourceWeb.lbDelete
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Delete Modal -->
+                                    <div class="modal fade" id="deleteModal-@type.Id" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content border-danger">
+                                                <div class="modal-header bg-danger text-white">
+                                                    <h5 class="modal-title">@ResourceWeb.lbDeleteType</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <form asp-area="Admin" asp-controller="ProductTypeManager" asp-action="DeleteConfirmed" asp-route-id="@type.Id" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <div class="modal-body">
+                                                        <p>@ResourceWeb.lbConfirmDeleteType <strong>@type.Name</strong>?</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@ResourceWeb.lbcancelButtonText</button>
+                                                        <button type="submit" class="btn btn-danger">@ResourceWeb.lbDelete</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@ResourceWeb.lbNewType</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-area="Admin" asp-controller="ProductTypeManager" asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mx-3 my-2"></div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>@ResourceWeb.lbName</label>
+                        <input name="Name" class="form-control" required minlength="2" maxlength="100" />
+                        <span data-valmsg-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">@ResourceWeb.lbCreate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit & View Modals -->
+@foreach (var type in Model)
+{
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal-@type.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@ResourceWeb.lbEditType</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form asp-area="Admin" asp-controller="ProductTypeManager" asp-action="Edit" asp-route-id="@type.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body">
+                        <input type="hidden" name="Id" value="@type.Id" />
+                        <div class="form-group">
+                            <label>@ResourceWeb.lbName</label>
+                            <input name="Name" value="@type.Name" class="form-control" required minlength="2" maxlength="100" />
+                            <span data-valmsg-for="Name" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">@ResourceWeb.lbSave</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Modal -->
+    <div class="modal fade" id="viewModal-@type.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@ResourceWeb.lbTypeDetails</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">@ResourceWeb.lbName</dt>
+                        <dd class="col-sm-8">@type.Name</dd>
+                        <dt class="col-sm-4">@ResourceWeb.lbProductsCount</dt>
+                        <dd class="col-sm-8">@type.Products?.Count() ?? 0</dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@ResourceWeb.lbClose</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function resetCreateForm() {
+            var form = document.querySelector('#createModal form');
+            if (form) form.reset();
+        }
+    </script>
+}
