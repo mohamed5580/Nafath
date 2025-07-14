@@ -2,6 +2,7 @@
 using Domin.Resource;
 using Infrastructure.Data;
 using Infrastructure.IRepository.Base;
+using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -85,11 +86,7 @@ namespace Infrastructure.IRepository
         public async Task<IEnumerable<T>> FindAllAsync()
         {
             return await _context.Set<T>().ToListAsync();
-        }
-
-     
-
-       
+       }
 
         public T FindById(int? ID)
         {
@@ -273,5 +270,31 @@ namespace Infrastructure.IRepository
                 q = q.Include(inc);
             return q;
         }
+        public async Task<int> CountAsync()
+        => await _context.Set<T>().CountAsync();
+
+        public async Task<IEnumerable<T>> GetPaginatedAsync(
+            int page,
+            int pageSize,
+            Func<IQueryable<T>, IQueryable<T>> include = null
+        )
+        {
+            IQueryable<T> query = _context.Set<T>();
+
+            if (include != null)
+                query = include(query);
+
+            return await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public Task<bool> DoCheckout(CheckoutViewModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+     
     }
 }

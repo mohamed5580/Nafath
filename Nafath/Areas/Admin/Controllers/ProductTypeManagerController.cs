@@ -148,6 +148,8 @@ namespace Nafath.Controllers
             try
             {
                 _context.UpdateOne(existing);
+                SessionMsg(Helper.Success, "تم", "تم تحديث الكرسي بنجاح");
+
             }
             catch (DbUpdateConcurrencyException)
             {

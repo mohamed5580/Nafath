@@ -1,0 +1,84 @@
+﻿@model CheckoutViewModel
+@using Newtonsoft.Json
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<h2>Checkout</h2>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Card wrapper -->
+            <div class="card shadow-sm rounded-2">
+                <div class="card-header text-white bg-info">
+                    <h5 class="mb-0">إتمام الطلب</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Checkout Form -->
+                    <form id="checkoutForm"
+                          asp-controller="Order"
+                          asp-action="Checkout"
+                          method="post">
+                        @Html.AntiForgeryToken()
+
+                        <!-- إضافة معامل ItemsJson -->
+                        <input type="hidden" name="ItemsJson" id="ItemsJson" />
+
+                   
+
+                        <div class="row g-3">
+                            <!-- Name -->
+                            <div class="col-md-6">
+                                <label asp-for="Name" class="form-label">الاسم*</label>
+                                <input asp-for="Name" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label">البريد الإلكتروني*</label>
+                                <input asp-for="Email" type="email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                            <!-- Mobile -->
+                            <div class="col-md-6">
+                                <label asp-for="MobileNumber" class="form-label">رقم الجوال*</label>
+                                <input asp-for="MobileNumber" type="tel" class="form-control" />
+                                <span asp-validation-for="MobileNumber" class="text-danger small"></span>
+                            </div>
+                            <!-- Payment Method -->
+                            <div class="col-md-6">
+                                <label asp-for="PaymentMethod" class="form-label">طريقة الدفع*</label>
+                                <select asp-for="PaymentMethod" class="form-select">
+                                    <option value="">اختر طريقة الدفع</option>
+                                    <option value="COD">الدفع عند الاستلام</option>
+                                    <option value="CreditCard">بطاقة ائتمان</option>
+                                    <option value="PayPal">PayPal</option>
+                                </select>
+                                <span asp-validation-for="PaymentMethod" class="text-danger small"></span>
+                            </div>
+                            <!-- Address -->
+                            <div class="col-12">
+                                <label asp-for="Address" class="form-label">العنوان الكامل*</label>
+                                <textarea asp-for="Address" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="Address" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-info px-4 complete-order" id="submitBtn">
+                                التالي
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /Card wrapper -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @* 1) Unobtrusive validation *@
+    await Html.RenderPartialAsync("_ValidationScriptsPartial")
+
+}

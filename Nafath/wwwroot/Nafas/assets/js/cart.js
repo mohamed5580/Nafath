@@ -150,10 +150,13 @@ $(document).ready(function () {
         shoppingCart.removeItemById($(this).data('id'));
         updateCartDisplay();
     });
-    $('.clear-cart').click(function () {
-        shoppingCart.clearCart();
-        updateCartDisplay();
+    $(document).on('click', '.clear-cart', function (e) {
+        e.preventDefault();               // stop any default link/navigation behavior
+        shoppingCart.clearCart();         // empty your in‑memory & localStorage cart
+        updateCartDisplay();              // redraw the modal contents
     });
+
+
 
     $('#logoutForm').on('submit', function () {
         shoppingCart.clearCart();
@@ -177,35 +180,13 @@ $(document).ready(function () {
                     unitPrice: i.price
                 }));
 
+                $('#ItemsJson').val(JSON.stringify(items));
 
+                // 2. إرسال الفورم كاملاً (ليس عبر Ajax)
+                $('#checkoutForm').submit();
                 // 2) نرسل بيانات الطلب
-                $.ajax({
-                    url: '/Admin/Order/Checkout',      // تأكد أن هذا المسار صحيح في مشروعك
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ items }),
-                    success: function (res) {
-                        // 3) عند النجاح ننظّف السلة ونغلق المودال
-                        shoppingCart.clearCart();
-                        updateCartDisplay();
-                        $('#cartModal').modal('hide');
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم إتمام الشراء!',
-                            text: 'رقم الطلب: ' + res.orderId,
-                            timer: 3000,
-                            showConfirmButton: false
-                        });
-                    },
-                    error: function (xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'حدث خطأ',
-                            text: xhr.responseText
-                        });
-                    }
-                });
+                localStorage.removeItem('shoppingCart');
+                localStorage.removeItem('cart');
             }
         });
     });

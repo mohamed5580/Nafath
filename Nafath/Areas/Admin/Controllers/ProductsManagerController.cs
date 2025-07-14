@@ -1,4 +1,5 @@
 ﻿using Domin.Entity;
+using Domin.Resource;
 using Infrastructure.IRepository.Base;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Mvc;
@@ -158,6 +159,7 @@ namespace Nafath.Areas.Admin.Controllers
             try
             {
                 await _repo.UpdateOneAsync(product);
+               
             }
             catch (DbUpdateConcurrencyException)
             {

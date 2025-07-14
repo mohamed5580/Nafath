@@ -195,4 +195,35 @@
             if (form) form.reset();
         }
     </script>
+
+      @if (!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))
+    {
+        if (Context.Session.GetString(Helper.MsgType) == Helper.Success)
+        {
+            <script>
+
+                Swal.fire({
+                        title: '@Context.Session.GetString(Helper.Title)',
+                        text: '@Html.Raw(@Context.Session.GetString(Helper.Msg))',
+                        confirmButtonText: '@ResourceWeb.lbOk',
+                    icon: 'success'
+                });
+            </script>
+
+        }
+        else
+        {
+            <script>
+
+                Swal.fire({
+                        title: '@Context.Session.GetString(Helper.Title)',
+                        text: '@Html.Raw(@Context.Session.GetString(Helper.Msg))',
+                        confirmButtonText: '@ResourceWeb.lbOk',
+                    icon: 'error'
+                });
+            </script>
+        }
+        Context.Session.SetString(Helper.MsgType, "");
+    }
+
 }

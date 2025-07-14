@@ -1779,4 +1779,205 @@ section,
     
 }
 
-  
+
+/* Start Offer_Help page */
+.Offer_Help {
+    display: flex;
+}
+
+.Offer_Help .Required {
+    display: block;
+    width: 250px;
+    height: 900px;
+    background-color: var(--section-background);
+    padding: 40px 15px;
+    gap: 40px;
+    background: #FFFFFF;
+    border-radius: 10px;
+}
+
+.Offer_Help .Required .Requir {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 36px;
+}
+
+.Offer_Help .Required .Requir span {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 36px;
+    color: var(--secondary2-color);
+}
+
+.Offer_Help .search {
+display: flex;
+flex-direction: column;
+width: fit-content;
+box-sizing: border-box;
+margin-bottom: 40px;
+margin-top: 40px;
+}
+
+.Offer_Help .search h5 {
+margin-bottom: 10px;
+display: inline-block;
+align-self: flex-start;
+overflow-wrap: break-word;
+font-family: 'Poppins';
+font-weight: 500;
+font-size: 16px;
+line-height: 1.5;
+color: var(--grey-15, var(--secondary2-color));
+}
+
+.Offer_Help .search .form-control {
+border-radius: 8px;
+border: 1px solid var(--white-95, #F1F1F3);
+background: var(--white-99, #FCFCFD);
+padding: 3px 19px;
+width: fit-content;
+box-sizing: border-box;
+}
+
+.Offer_Help .category {
+margin-bottom: 25px;
+}
+
+.Offer_Help .category h5 {
+margin-bottom: 10px;
+display: inline-block;
+align-self: flex-start;
+overflow-wrap: break-word;
+font-family: 'Poppins';
+font-weight: 500;
+font-size: 16px;
+line-height: 1.5;
+color: var(--grey-15, var(--secondary2-color));
+}
+
+.Offer_Help .category .Check_boxs {
+display: block;
+}
+
+.Offer_Help .category .Check_boxs .form-check {
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: row;
+    align-self: flex-start;
+    width: fit-content;
+    box-sizing: border-box;
+}
+
+    .Offer_Help .category .Check_boxs .form-check .form-check-input {
+        border-radius: 4px;
+        border: 1px solid var(--white-95, #F1F1F3);
+        /* background-color: var(--white-97, #F7F7F8); */
+        margin-right: 8px;
+        width: 24px;
+        height: 24px;
+    }
+
+    .Offer_Help .category .Check_boxs .form-check .form-check-label {
+        margin: 3px 0;
+        display: inline-block;
+        font-family: 'Poppins';
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--grey-40, var(--secondary3-color));
+    }
+
+.Offer_Help .Categorys {
+    border-radius: 10px;
+    background: var(--absolute-white, #FFFFFF);
+    display: flex;
+    flex-direction: column;
+    padding: 40px 43.5px 262px 43.5px;
+    width: 813px;
+    box-sizing: border-box;
+    margin-left: 30px;
+}
+
+.Offer_Help .Categorys .box {
+    border-radius: 8px;
+    border: 1px solid #F1F1F3;
+    background: #FCFCFD;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 0 14px 19px;
+    width: fit-content;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.Offer_Help .Categorys .box p {
+    font-family: 'Poppins';
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--main-color);
+}
+
+.Offer_Help .Categorys .box .text {
+    margin-bottom: 10px;
+    display: inline-block;
+    align-self: flex-start;
+    overflow-wrap: break-word;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--secondary2-color);
+}
+
+.Offer_Help .Categorys .box .Add {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-self: flex-start;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.Offer_Help .Categorys .box .price {
+    margin: 4px 7.5px 4px 0;
+    display: inline-block;
+    width: 85.5px;
+    overflow-wrap: break-word;
+    font-family: 'Poppins';
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #000000;
+}
+
+.Offer_Help .Categorys .box .btn_add {
+    display: block;
+    width: 100px;
+    padding: 4px 9.8px;
+    margin-right: 15px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    background: var(--main-color);
+    font-family: revert;
+    font-weight: 600;
+    font-size: 10px;
+    color: var(--section-background);
+}
+
+.Offer_Help .Categorys .box .btn_add:hover {
+    background-color: var(--secondary-color);
+    color: var(--main-color);
+    border: 1px solid var(--main-color);
+}
+
+.Offer_Help .Categorys .box .Add .btnAR {
+    display: flex;
+}
+.dir{
+    direction:rtl
+}

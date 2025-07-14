@@ -55,9 +55,12 @@ namespace Infrastructure.Data
                   .OnDelete(DeleteBehavior.Cascade);
 
                 oi.Property(oi => oi.UnitPrice).HasColumnType("decimal(18,2)");
+                oi.Property(x => x.TotalPrice)
+                  .HasPrecision(18, 2)
+                  .HasComputedColumnSql("[Quantity] * [UnitPrice]", stored: true);
+
             });
-
-
+         
 
             builder.Entity<ProductType>(b =>
             {

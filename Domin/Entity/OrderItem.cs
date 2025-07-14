@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domin.Entity
 {
@@ -13,13 +14,15 @@ namespace Domin.Entity
         public int OrderId { get; set; }
         public Order Order { get; set; }      // مفرد وليس Orders
 
-       // مفرد وليس Products
-
         [Required, Range(1, int.MaxValue)]
         public int Quantity { get; set; }
 
         [Required]
         public decimal UnitPrice { get; set; }
+        // EF needs a setter or backing field…
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public decimal TotalPrice { get; private set; }
+
     }
 
 }

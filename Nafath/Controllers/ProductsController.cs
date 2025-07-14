@@ -175,40 +175,40 @@ namespace Nafath.Controllers
             return View(products);
         }
 
-        // GET: products/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
+            // GET: products/Delete/5
+            public async Task<IActionResult> Delete(int? id)
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                var products = await _productRepo.FindByIdasync(id.Value);
+                if (products == null)
+                {
+                    return NotFound();
+                }
+
+                return View(products);
             }
 
-            var products = await _productRepo.FindByIdasync(id.Value);
-            if (products == null)
+            // POST: products/Delete/5
+            [ValidateAntiForgeryToken]
+            public async Task<IActionResult> DeleteConfirmed(int? id)
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                var products = await _productRepo.FindByIdasync(id.Value); // Correct method to find the entity by ID
+                if (products != null)
+                {
+                    _productRepo.DeleteOne(products); // Delete the entity
+                }
+
+                return RedirectToAction(nameof(Index));
             }
-
-            return View(products);
-        }
-
-        // POST: products/Delete/5
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var products = await _productRepo.FindByIdasync(id.Value); // Correct method to find the entity by ID
-            if (products != null)
-            {
-                _productRepo.DeleteOne(products); // Delete the entity
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
 
         private bool productsExists(int id)
         {

@@ -1,4 +1,5 @@
 ﻿using Domin.Entity;
+using Infrastructure.ViewModel;
 using System.Linq.Expressions;
 
 namespace Infrastructure.IRepository.Base
@@ -41,5 +42,13 @@ namespace Infrastructure.IRepository.Base
 
         Task<IEnumerable<T>> FindByTypeIdAsync(int typeId, params string[] includes);
         Task<IEnumerable<T>> FindByConditionAsync(Expression<Func<T, bool>> predicate);
+        Task<bool> DoCheckout(CheckoutViewModel model);
+
+        Task<int> CountAsync();
+        Task<IEnumerable<T>> GetPaginatedAsync(
+            int page,
+            int pageSize,
+            Func<IQueryable<T>, IQueryable<T>> include = null
+        );
     }
 }

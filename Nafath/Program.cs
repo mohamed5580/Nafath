@@ -16,7 +16,11 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Add Connection String and DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(
+        connectionString,
+        sql => sql.MigrationsAssembly("Nafath")    // <- now migrations go here
+    )
+);
 
 // 2. Add Identity Services
 // Identity
