@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices.JavaScript;
+using System.Security.Claims;
 
 namespace Infrastructure.IRepository
 {
@@ -295,6 +297,80 @@ namespace Infrastructure.IRepository
             throw new NotImplementedException();
         }
 
-     
+        public async Task AddRangeAsync(IEnumerable<T> entities)
+        {
+            await _context.Set<T>().AddRangeAsync(entities);
+        }
+
+        public async Task SaveAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
+        }
+
+        public async Task<(IEnumerable<T> Items, int TotalCount)> GetMyOrdersAsync(
+    int pageNumber,
+    int pageSize)
+        {
+            if (typeof(T) != typeof(Order))
+                throw new InvalidOperationException("This method only applies to Order entities.");
+
+            var httpUser = _httpContextAccessor.HttpContext?.User
+                           ?? throw new InvalidOperationException("No user context.");
+            var userId = httpUser.FindFirstValue(ClaimTypes.NameIdentifier)
+                         ?? throw new InvalidOperationException("User not authenticated.");
+
+            // build the query against Order
+            var query = _context.Set<Order>()
+                .Where(o => o.UserId == userId)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .OrderByDescending(o => o.OrderDate);
+
+            var total = await query.CountAsync();
+
+            // pull a List<Order>
+            var orderList = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // cast it to IEnumerable<T> and return
+            var items = orderList.Cast<T>();
+            return (items, total);
+        }
+
+        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>().Where(predicate).CountAsync();
+        }
+
+        public async Task<IEnumerable<T>> GetPaginatedAsync(int page, int pageSize,
+            Expression<Func<T, bool>> predicate,
+            params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _context.Set<T>().Where(predicate);
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query
+                .OrderByDescending(o => EF.Property<DateTime>(o, "OrderDate"))
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task DeleteRangeAsync(IEnumerable<T> entities)
+        {
+            _context.RemoveRange(entities);
+            await _context.SaveChangesAsync();
+        }
     }
 }

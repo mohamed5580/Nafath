@@ -13,5 +13,16 @@ namespace Infrastructure.ViewModel
 
         public List<OrderItemDetailDto> Items { get; set; }
     }
+    public class OrderItemUpdateDto
+    {
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
+    }
+
+    public class UpdateOrderViewModel
+    {
+        public int OrderId { get; set; }
+        public List<OrderItemUpdateDto> Items { get; set; }
+    }
 
 }

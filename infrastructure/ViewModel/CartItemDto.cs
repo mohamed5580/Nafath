@@ -16,4 +16,9 @@ namespace Infrastructure.ViewModel
     {
         public List<CartItemDto> Items { get; set; }
     }
+    public class UpdateOrderRequest
+    {
+        public int OrderId { get; set; }
+        public List<CartItemDto> Items { get; set; } = new();
+    }
 }

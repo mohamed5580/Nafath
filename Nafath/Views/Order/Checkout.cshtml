@@ -15,16 +15,16 @@
                 </div>
                 <div class="card-body">
                     <!-- Checkout Form -->
+                    <!-- Checkout Form -->
                     <form id="checkoutForm"
                           asp-controller="Order"
                           asp-action="Checkout"
                           method="post">
                         @Html.AntiForgeryToken()
-
-                        <!-- إضافة معامل ItemsJson -->
                         <input type="hidden" name="ItemsJson" id="ItemsJson" />
+                        <input type="hidden" asp-for="OrderStatus" value="Pending" />
 
-                   
+
 
                         <div class="row g-3">
                             <!-- Name -->
@@ -65,9 +65,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-info px-4 complete-order" id="submitBtn">
-                                التالي
-                            </button>
+                            <button type="submit" class="btn btn-info">التالي</button>
                         </div>
                     </form>
                 </div>
@@ -78,7 +76,15 @@
 </div>
 
 @section Scripts {
-    @* 1) Unobtrusive validation *@
+    <script>
+        document
+          .getElementById('checkoutForm')
+          .addEventListener('submit', function() {
+            const cart = /* however you store it—e.g. */
+                         JSON.parse(localStorage.getItem('cart') || '[]');
+            document.getElementById('ItemsJson').value = JSON.stringify(cart);
+          });
+    </script>
     await Html.RenderPartialAsync("_ValidationScriptsPartial")
 
 }

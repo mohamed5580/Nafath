@@ -13,7 +13,7 @@
         $('#success').on('click', function () {
             Swal.fire({                
                 icon: 'success',
-                title: 'Your work has been saved',
+                title: 'العمليه تمت بنجاح',
                 showConfirmButton: false,                
             })
         });

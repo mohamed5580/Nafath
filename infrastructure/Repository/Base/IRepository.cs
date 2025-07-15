@@ -1,5 +1,6 @@
 ﻿using Domin.Entity;
 using Infrastructure.ViewModel;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Linq.Expressions;
 
 namespace Infrastructure.IRepository.Base
@@ -50,5 +51,24 @@ namespace Infrastructure.IRepository.Base
             int pageSize,
             Func<IQueryable<T>, IQueryable<T>> include = null
         );
+        // 1) إضافة دالة لإضافة مجموعة دفعة واحدة
+        Task AddRangeAsync(IEnumerable<T> entities);
+
+        // 2) دالة صريحة لحفظ التغييرات (Unit of Work)
+        Task SaveAsync();
+
+        // 3) (اختياري) فتح معاملة على مستوى الـ Repository/Context
+        Task<IDbContextTransaction> BeginTransactionAsync();
+        Task<(IEnumerable<T> Items, int TotalCount)> GetMyOrdersAsync(
+        int pageNumber,
+        int pageSize);
+
+        Task<int> CountAsync(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<T>> GetPaginatedAsync(int page, int pageSize,
+            Expression<Func<T, bool>> predicate,
+            params Expression<Func<T, object>>[] includes);
+
+        Task DeleteRangeAsync(IEnumerable<T> entities);
+
     }
 }

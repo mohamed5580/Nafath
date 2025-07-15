@@ -190,6 +190,22 @@ $(document).ready(function () {
             }
         });
     });
+    $(document).on('click', '.remove-order', function (e) {
+        e.preventDefault();
+
+        Swal.fire({
+            title: 'هل لتا متاكد من انك تريد الحذف؟',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'نعم، أكمل الحذف',
+            cancelButtonText: 'لا، رجوع'
+        }).then((result) => {
+            if (result.isConfirmed) {
+          
+
+            }
+        });
+    });
 
 
     updateCartDisplay();

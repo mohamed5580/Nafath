@@ -18,7 +18,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         connectionString,
-        sql => sql.MigrationsAssembly("Nafath")    // <- now migrations go here
+        sql => sql.MigrationsAssembly("Infrastructure")  
+        // <- now migrations go here
     )
 );
 

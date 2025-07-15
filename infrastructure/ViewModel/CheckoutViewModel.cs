@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -27,5 +28,8 @@ namespace Infrastructure.ViewModel
         public string? PaymentMethod { get; set; }
 
         public List<CartItemDto> Items { get; set; } = new List<CartItemDto>();
+        [Required]
+        [StringLength(500, ErrorMessage = "OrderStatus can be at most 500 characters.")]
+        public string OrderStatus { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Domin.Entity;             // Order, OrderItem
 using Domin.Resource;
+using Infrastructure.Data;
 using Infrastructure.IRepository.Base;
 using Infrastructure.Models;
 using Infrastructure.ViewModel;
@@ -17,18 +18,20 @@ public class OrderManageController : Controller
     private readonly IRepository<OrderItem> _orderItemRepo;
     private readonly IRepository<Product> _productRepo;
     private readonly UserManager<ApplicationUser> _userManager;
-
+    private readonly ApplicationDbContext _dbContext;
     public OrderManageController(
+        ApplicationDbContext dbContext,
         IRepository<Order> orderRepo,
         IRepository<OrderItem> orderItemRepo,
         IRepository<Product> productRepo,
         UserManager<ApplicationUser> userManager)
-        {
-            _orderRepo = orderRepo;
-            _orderItemRepo = orderItemRepo;
-            _productRepo = productRepo;
-            _userManager = userManager;
-        }
+    {
+        _dbContext = dbContext;
+        _orderRepo = orderRepo;
+        _orderItemRepo = orderItemRepo;
+        _productRepo = productRepo;
+        _userManager = userManager;
+    }
     public async Task<IActionResult> Index(int page = 1)
     {
         const int pageSize = 20;
@@ -68,6 +71,9 @@ public class OrderManageController : Controller
         return View(vmList);
     }
 
+
+
+
     [HttpGet]
     public async Task<IActionResult> Checkout()
     {
@@ -91,51 +97,115 @@ public class OrderManageController : Controller
     {
         if (!ModelState.IsValid)
             return View(model);
-
-        // 1) فكّ ترميز الأصناف من الـ JSON
         model.Items = JsonConvert
             .DeserializeObject<List<CartItemDto>>(ItemsJson)
             ?? new List<CartItemDto>();
-
         if (!model.Items.Any())
         {
             ModelState.AddModelError("", "السلة فارغة.");
             return View(model);
         }
 
-        // 2) أنشئ الـ Order
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var order = new Order
-        {
-            UserId = userId,
-            OrderDate = DateTime.Now
-        };
-        await _orderRepo.AddOneAsync(order);
+        // 1) افتح معاملة
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
 
-        // 3) أنشئ كل OrderItem
-        foreach (var ci in model.Items)
+        try
         {
-            var product = await _productRepo.FindByIdasync(ci.ProductId);
-            if (product == null)
+            // 2) أنشئ الطلب
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var order = new Order { UserId = userId, OrderDate = DateTime.Now };
+            await _orderRepo.AddOneAsync(order);   // لا تقم بSaveChanges هنا إن أمكن
+
+            // 3) أضف بنود الطلب دفعة واحدة
+            var items = new List<OrderItem>();
+            foreach (var ci in model.Items)
             {
-                ModelState.AddModelError("", $"المنتج {ci.ProductId} غير موجود.");
-                return View(model);
+                var product = await _productRepo.FindByIdasync(ci.ProductId);
+                if (product == null)
+                    throw new Exception($"المنتج {ci.ProductId} غير موجود.");
+
+                items.Add(new OrderItem
+                {
+                    OrderId = order.Id,
+                    ProductId = ci.ProductId,
+                    Quantity = ci.Quantity,
+                    UnitPrice = ci.UnitPrice    // استخدم القيمة الافتراضية إذا كانت null
+                });
             }
+            await _orderItemRepo.AddRangeAsync(items);  // أو loop مع AddOneAsync بدون SaveChanges داخلها
 
-            var item = new OrderItem
-            {
-                OrderId = order.Id,
-                ProductId = ci.ProductId,
-                Quantity = ci.Quantity,
-                UnitPrice = ci.UnitPrice
-            };
-            await _orderItemRepo.AddOneAsync(item);
+            // 4) حفظ التغييرات مرة واحدة
+            await _dbContext.SaveChangesAsync();
+
+            // 5) اكتمال المعاملة
+            await transaction.CommitAsync();
+
+            return RedirectToAction("Confirmation", new { id = order.Id });
         }
-
-        // 4) كل إضافة باستخدام AddOneAsync تحقّق SaveChanges داخليًا
-        return RedirectToAction("Confirmation", new { id = order.Id });
+        catch
+        {
+            // في حال خطأ، تراجع عن كل ما سبق
+            await transaction.RollbackAsync();
+            ModelState.AddModelError("", "حدث خطأ أثناء إنشاء الطلب. حاول مرة أخرى.");
+            return View(model);
+        }
     }
 
+
+    // GET: order/Edit/5
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var orderItem = _orderItemRepo.FindById(id);
+        if (orderItem == null)
+        {
+            return NotFound();
+        }
+        return View(orderItem);
+    }
+
+    // POST: order/Edit/5
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, OrderItem order)
+    {
+        if (id != order.Id)
+        {
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                _orderItemRepo.UpdateOne(order);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!orderExists(order.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
+        }
+        return View(order);
+    }
+    private bool orderExists(int id)
+    {
+        // Use FindById or FindAll to check existence
+        return _orderRepo.FindById(id) != null;
+    }
     public IActionResult Confirmation(int id)
     {
         TempData["SuccessOrderId"] = id;
@@ -179,6 +249,74 @@ public class OrderManageController : Controller
         return View(vm);
     }
 
+    // GET: products/Delete/5
+    public async Task<IActionResult> DeleteOrderItem(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var orderItems = await _orderItemRepo.FindByIdasync(id.Value);
+        if (orderItems == null)
+        {
+            return NotFound();
+        }
+
+        return View(orderItems);
+    }
+
+    // POST: products/Delete/5
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteOrderItemConfirmed(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var orderItems = await _orderItemRepo.FindByIdasync(id.Value); // Correct method to find the entity by ID
+        if (orderItems != null)
+        {
+            _orderItemRepo.DeleteOne(orderItems); // Delete the entity
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+    // GET: products/Delete/5
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var order = await _orderRepo.FindByIdasync(id.Value);
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        return View(order);
+    }
+
+    // POST: products/Delete/5
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var orders = await _orderRepo.FindByIdasync(id.Value); // Correct method to find the entity by ID
+        if (orders != null)
+        {
+            _orderRepo.DeleteOne(orders); // Delete the entity
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
 
     private void SessionMsg(string MsgType, string Title, string Msg)
     {

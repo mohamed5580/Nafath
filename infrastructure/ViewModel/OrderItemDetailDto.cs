@@ -14,5 +14,6 @@ namespace Infrastructure.ViewModel
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal TotalPrice => Quantity * UnitPrice;
+        public string OrderStatus { get; set; } = "قيد المراجعه"; // القيمة الافتراضية
     }
 }
