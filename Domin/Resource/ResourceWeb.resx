@@ -124,7 +124,7 @@
     <value>تفعيل المستخدم</value>
   </data>
   <data name="lbAddNew" xml:space="preserve">
-    <value>اضف منتج</value>
+    <value>إضافة جديد</value>
   </data>
   <data name="lbAddNewCategory" xml:space="preserve">
     <value>اضف مجموعة فئات جديدة</value>
@@ -175,10 +175,10 @@
     <value>نعم ، احذفها</value>
   </data>
   <data name="lbConfirmDeleteType" xml:space="preserve">
-    <value>هل انت متأكد من انك تريد حذف</value>
+    <value>هل أنت متأكد من حذف النوع</value>
   </data>
   <data name="lbCreate" xml:space="preserve">
-    <value>اضف منتج</value>
+    <value>إنشاء</value>
   </data>
   <data name="lbDate" xml:space="preserve">
     <value>التاريخ</value>
@@ -190,10 +190,10 @@
     <value>تم الحذف بنجاح</value>
   </data>
   <data name="lbDeleteType" xml:space="preserve">
-    <value>حذف المنتج</value>
+    <value>حذف النوع</value>
   </data>
   <data name="lbDescription" xml:space="preserve">
-    <value>وصف الفئة</value>
+    <value>الوصف</value>
   </data>
   <data name="lbEdit" xml:space="preserve">
     <value>تعديل</value>
@@ -259,7 +259,7 @@
     <value>تم تعديل الفئة بنجاح</value>
   </data>
   <data name="lbName" xml:space="preserve">
-    <value>اسم المنتج</value>
+    <value>الاسم</value>
   </data>
   <data name="lbNameCategory" xml:space="preserve">
     <value>اسم الفئة</value>
@@ -296,9 +296,6 @@
   </data>
   <data name="lbOk" xml:space="preserve">
     <value>حسناً</value>
-  </data>
-  <data name="lbPassword" xml:space="preserve">
-    <value>كلمة المرور</value>
   </data>
   <data name="lbProduct" xml:space="preserve">
     <value>المنتجات</value>
@@ -346,7 +343,7 @@
     <value>هل انتا متأكد ؟</value>
   </data>
   <data name="lbTypeDetails" xml:space="preserve">
-    <value>التفاصيل</value>
+    <value>تفاصيل النوع</value>
   </data>
   <data name="lbUpdate" xml:space="preserve">
     <value>تم التعديل</value>
@@ -366,21 +363,8 @@
   <data name="lbUserName" xml:space="preserve">
     <value>المستخدم</value>
   </data>
-    <!-- View titles and labels -->
-  <data name="lbHomePage" xml:space="preserve">
-    <value>الصفحة الرئيسية</value>
-  </data>
-  <data name="lbAddNew" xml:space="preserve">
-    <value>إضافة جديد</value>
-  </data>
-  <data name="lbCreate" xml:space="preserve">
-    <value>إنشاء</value>
-  </data>
   <data name="lbSaveM" xml:space="preserve">
     <value>حفظ</value>
-  </data>
-  <data name="lbEdit" xml:space="preserve">
-    <value>تعديل</value>
   </data>
   <data name="lbDetails" xml:space="preserve">
     <value>عرض التفاصيل</value>
@@ -391,14 +375,8 @@
   <data name="lbNewType" xml:space="preserve">
     <value>نوع جديد</value>
   </data>
-  <data name="lbName" xml:space="preserve">
-    <value>الاسم</value>
-  </data>
   <data name="lbProductType" xml:space="preserve">
     <value>نوع المنتج</value>
-  </data>
-  <data name="lbDescription" xml:space="preserve">
-    <value>الوصف</value>
   </data>
   <data name="lbPrice" xml:space="preserve">
     <value>السعر</value>
@@ -418,49 +396,39 @@
   <data name="lbProductDetails" xml:space="preserve">
     <value>تفاصيل المنتج</value>
   </data>
-  <data name="lbTypeDetails" xml:space="preserve">
-    <value>تفاصيل النوع</value>
-  </data>
   <data name="lbDeleteProduct" xml:space="preserve">
     <value>حذف المنتج</value>
-  </data>
-  <data name="lbDeleteType" xml:space="preserve">
-    <value>حذف النوع</value>
   </data>
   <data name="lbConfirmDeleteProduct" xml:space="preserve">
     <value>هل أنت متأكد من حذف المنتج</value>
   </data>
-  <data name="lbConfirmDeleteType" xml:space="preserve">
-    <value>هل أنت متأكد من حذف النوع</value>
-  </data>
-
   <data name="lbCurrentImage" xml:space="preserve">
-  <value>الصورة الحالية</value>
-</data>
-<data name="lbChooseNewImage" xml:space="preserve">
-  <value>اختر صورة جديدة (اختياري)</value>
-</data>
-<data name="lbEditProduct" xml:space="preserve">
-  <value>تعديل المنتج</value>
-</data>
-<data name="lbProductsList" xml:space="preserve">
-  <value>قائمة المنتجات</value>
-</data>
-<data name="lbManageProducts" xml:space="preserve">
-  <value>إدارة المنتجات</value>
-</data>
-<data name="lbActions" xml:space="preserve">
-  <value>الإجراءات</value>
-</data>
-<data name="lbSelectType" xml:space="preserve">
-  <value>اختر النوع</value>
-</data>
-<data name="lbProducts" xml:space="preserve">
-  <value>الانواع </value>
-</data>
-<data name="lbStore" xml:space="preserve">
-  <value>المتجر</value>
-</data>
+    <value>الصورة الحالية</value>
+  </data>
+  <data name="lbChooseNewImage" xml:space="preserve">
+    <value>اختر صورة جديدة (اختياري)</value>
+  </data>
+  <data name="lbEditProduct" xml:space="preserve">
+    <value>تعديل المنتج</value>
+  </data>
+  <data name="lbProductsList" xml:space="preserve">
+    <value>قائمة المنتجات</value>
+  </data>
+  <data name="lbManageProducts" xml:space="preserve">
+    <value>إدارة المنتجات</value>
+  </data>
+  <data name="lbActions" xml:space="preserve">
+    <value>الإجراءات</value>
+  </data>
+  <data name="lbSelectType" xml:space="preserve">
+    <value>اختر النوع</value>
+  </data>
+  <data name="lbProducts" xml:space="preserve">
+    <value>الانواع </value>
+  </data>
+  <data name="lbStore" xml:space="preserve">
+    <value>المتجر</value>
+  </data>
   <data name="lbAdded" xml:space="preserve">
     <value>تمّت الإضافة</value>
   </data>
@@ -485,5 +453,61 @@
   <data name="lbStoreSubtitle" xml:space="preserve">
     <value>تسوّق الأنواع المتاحة</value>
   </data>
-
+  <data name="lbOrder" xml:space="preserve">
+    <value>الطلبات</value>
+  </data>
+  <data name="lbPassword" xml:space="preserve">
+    <value>كلمة المرور</value>
+  </data>
+  <data name="lbUnitPrice" xml:space="preserve">
+    <value>سعر الوحدة</value>
+  </data>
+  <data name="lbTotal" xml:space="preserve">
+    <value>الإجمالي</value>
+  </data>
+  <data name="lbView" xml:space="preserve">
+    <value>عرض</value>
+  </data>
+  <data name="lbOrderId" xml:space="preserve">
+    <value>رقم الطلب</value>
+  </data>
+  <data name="lbStatus" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="lbOrderDetails" xml:space="preserve">
+    <value>تفاصيل الطلب</value>
+  </data>
+  <data name="lbConfirmDelete" xml:space="preserve">
+    <value>هل أنت متأكد؟</value>
+  </data>
+  <data name="lbYesDelete" xml:space="preserve">
+    <value>نعم احذف</value>
+  </data>
+  <data name="lbCancel" xml:space="preserve">
+    <value>إلغاء</value>
+  </data>
+  <data name="lbError" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="lbDeleteFailed" xml:space="preserve">
+    <value>فشل الحذف</value>
+  </data>
+  <data name="lbManageOrders" xml:space="preserve">
+    <value>إدارة الطلبات</value>
+  </data>
+  <data name="lbEmail" xml:space="preserve">
+    <value>البريد الإلكتروني</value>
+  </data>
+  <data name="lbOrderDate" xml:space="preserve">
+    <value>تاريخ الطلب</value>
+  </data>
+  <data name="lbQuantity" xml:space="preserve">
+    <value>الكمية</value>
+  </data>
+  <data name="lbPhoneNumberUser" xml:space="preserve">
+    <value>رقم الهاتف</value>
+  </data>
+  <data name="lbAddress" xml:space="preserve">
+    <value>العنوان</value>
+  </data>
 </root>

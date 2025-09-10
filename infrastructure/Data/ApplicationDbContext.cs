@@ -39,6 +39,21 @@ namespace Infrastructure.Data
             builder.Entity<Chairs>()
                 .Property(c => c.Price)
                 .HasColumnType("decimal(18,2)");
+            // ربط Order.UserId بجدول AspNetUsers دون Navigation Property في الـ Domain
+            builder.Entity<Order>(b =>
+            {
+                // نحدد بوضوح أن Order لديه مستخدم واحد عبر الخاصية "User"
+                b.HasOne(o => o.User)
+                 // والمستخدم لديه طلبات كثيرة (لا نحدد خاصية هنا لأنها غير موجودة في ApplicationUser)
+                 .WithMany()
+                 // والمفتاح الأجنبي الذي يربطهما هو "UserId"
+                 .HasForeignKey(o => o.UserId)
+                 // وهو مطلوب
+                 .IsRequired()
+                 // وعند حذف المستخدم، لا تفعل شيئًا (لمنع الحذف المتتالي الذي قد يسبب مشاكل)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
 
             builder.Entity<OrderItem>(oi =>
             {

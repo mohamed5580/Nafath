@@ -1,7 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
-
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Domin.Entity
 {
@@ -13,17 +10,27 @@ namespace Domin.Entity
         [Required]
         public DateTime OrderDate { get; set; } = DateTime.Now;
 
-        // FK to user
         [Required]
         public string UserId { get; set; }
+        public virtual ApplicationUser User { get; set; }
 
-        // يجب إضافة هذا السطر:
+        // ← requires System.Collections.Generic
         public List<OrderItem> OrderItems { get; set; } = new();
 
         [Required]
         [StringLength(50)]
-        public string OrderStatus { get; set; } = "قيد المراجعة"; // Default status
+        public string OrderStatus { get; set; } = "قيد المراجعة";
+
+        [Required(ErrorMessage = "يرجى اختيار طريقة الدفع")]
+        [StringLength(200)]
+        public string? PaymentMethod { get; set; }
+
+        [Required(ErrorMessage = "يرجى ادخال العنوان")]
+        [StringLength(200)]
+        public string? Address { get; set; }
+
+        [Required]
+        public string? MobileNumber { get; set; }
 
     }
-
 }
