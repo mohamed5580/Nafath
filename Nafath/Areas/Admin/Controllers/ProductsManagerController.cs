@@ -25,31 +25,25 @@ namespace Nafath.Areas.Admin.Controllers
             _typeRepo = typeRepo;
             _env = env;
         }
+
         public async Task<IActionResult> ProductsByType(int typeId)
         {
             var products = await _repo.FindByConditionAsync(p => p.ProductTypeId == typeId);
             return View(products);
         }
 
-
-        // GET: Admin/ProductsManager
         public async Task<IActionResult> Index(int page = 1, int pageSize = 20)
         {
             var (items, total) = await _repo.GetPagedAsync(page, pageSize);
-
-            // استخدام typeRepo بدلاً من _context
             var productTypes = await _typeRepo.FindAllasync();
 
             ViewData["ProductTypeId"] = new SelectList(productTypes, "Id", "Name");
-
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling(total / (double)pageSize);
 
             return View(items);
         }
 
-
-        // GET: Admin/ProductsManager/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -60,7 +54,6 @@ namespace Nafath.Areas.Admin.Controllers
             return View(product);
         }
 
-        // GET
         public async Task<IActionResult> Create()
         {
             await PopulateTypesDropDown();
@@ -70,7 +63,6 @@ namespace Nafath.Areas.Admin.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductCreateVm vm)
         {
-            // 1. Если модель не валидна — возвращаем Index с ошибками и нужными данными
             if (!ModelState.IsValid)
             {
                 await PopulateTypesDropDown(vm.ProductTypeId);
@@ -87,7 +79,6 @@ namespace Nafath.Areas.Admin.Controllers
                 return View("Index", items);
             }
 
-            // 2. Маппим VM → Entity
             var product = new Product
             {
                 Name = vm.Name,
@@ -97,7 +88,6 @@ namespace Nafath.Areas.Admin.Controllers
                 IsAvailable = vm.IsAvailable
             };
 
-            // 3. Если пользователь загрузил файл — сохраняем его и ставим URL
             if (vm.ImageFile is { Length: > 0 })
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(vm.ImageFile.FileName)}";
@@ -111,18 +101,12 @@ namespace Nafath.Areas.Admin.Controllers
                 product.ImageUrl = $"/uploads/products/{fileName}";
             }
 
-            // 4. Сохраняем запись
             await _repo.AddOneAsync(product);
             SessionMsg(Helper.Success, "تم", "تم إضافة المنتج بنجاح");
 
-            // 5. Редирект на Index
             return RedirectToAction(nameof(Index));
         }
 
-
-
-
-        // GET: Admin/ProductsManager/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -133,7 +117,6 @@ namespace Nafath.Areas.Admin.Controllers
             return View(product);
         }
 
-        // POST: Admin/ProductsManager/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Product product, IFormFile? ImageFile)
@@ -145,21 +128,22 @@ namespace Nafath.Areas.Admin.Controllers
                 return View(product);
             }
 
-            // تحديث الصورة إن وُجدت
-            if (ImageFile != null)
+            if (ImageFile != null && ImageFile.Length > 0)
             {
-                // (نفس منطق الحفظ أعلاه)
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(ImageFile.FileName)}";
-                var path = Path.Combine(_env.WebRootPath, "uploads", fileName);
-                using var stream = System.IO.File.Create(path);
+                var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "products");
+                Directory.CreateDirectory(uploadsDir);
+
+                var filePath = Path.Combine(uploadsDir, fileName);
+                using var stream = System.IO.File.Create(filePath);
                 await ImageFile.CopyToAsync(stream);
-                product.ImageUrl = "/uploads/" + fileName;
+                product.ImageUrl = $"/uploads/products/{fileName}";
             }
 
             try
             {
                 await _repo.UpdateOneAsync(product);
-               
+                SessionMsg(Helper.Success, "تم", "تم تحديث المنتج بنجاح");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -171,7 +155,6 @@ namespace Nafath.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Admin/ProductsManager/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -180,32 +163,37 @@ namespace Nafath.Areas.Admin.Controllers
             return View(product);
         }
 
-        // POST: Admin/ProductsManager/Delete/5
         [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var product = await _repo.FindByIdasync(id);
             if (product != null)
+            {
+                // Delete image file if exists
+                if (!string.IsNullOrEmpty(product.ImageUrl))
+                {
+                    var filePath = Path.Combine(_env.WebRootPath, product.ImageUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(filePath))
+                        System.IO.File.Delete(filePath);
+                }
                 await _repo.DeleteOneAsync(product);
+            }
 
             return RedirectToAction(nameof(Index));
         }
 
-        /// <summary>
-        /// يحمّل قائمة الأنواع في ViewData["ProductTypeId"] للاستعمال في DropDownList
-        /// </summary>
         private async Task PopulateTypesDropDown(object? selectedType = null)
         {
             var types = await _typeRepo.FindAllasync();
             ViewData["ProductTypeId"] = new SelectList(types, "Id", "Name", selectedType);
         }
+
         private void SessionMsg(string MsgType, string Title, string Msg)
         {
             HttpContext.Session.SetString(Helper.MsgType, MsgType);
             HttpContext.Session.SetString(Helper.Title, Title);
             HttpContext.Session.SetString(Helper.Msg, Msg);
         }
-
     }
 }

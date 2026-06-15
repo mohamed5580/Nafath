@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Infrastructure.Models;
+using Domin.Entity;
 
 
 namespace Nafath.Areas.Identity.Pages.Account

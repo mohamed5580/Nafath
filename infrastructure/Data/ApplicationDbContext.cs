@@ -9,7 +9,7 @@ using static NuGet.Packaging.PackagingConstants;
 
 namespace Infrastructure.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<Domin.Entity.ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }
@@ -22,9 +22,8 @@ namespace Infrastructure.Data
                 .Property(c => c.Name)
                 .IsRequired()
                 .HasMaxLength(50);
-            builder.Entity<NewRole>()
-            .HasKey(nr => nr.RoleId);
-            builder.Entity<VwUser>(entity =>
+   
+            builder.Entity<VwUsers>(entity =>
             {
                 entity.HasNoKey();
                 entity.ToView("VwUsers");
@@ -39,6 +38,25 @@ namespace Infrastructure.Data
             builder.Entity<Chairs>()
                 .Property(c => c.Price)
                 .HasColumnType("decimal(18,2)");
+            // Configure relationship between Order and Identity user
+            builder.Entity<Order>(b =>
+            {
+                // Order.User (Infrastructure.Models.ApplicationUser) -> AspNetUsers.Id
+                b.HasOne(o => o.User)
+                 .WithMany() // no navigation collection on ApplicationUser
+                 .HasForeignKey(o => o.UserId)
+                 .HasPrincipalKey(u => u.Id)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                b.Property(o => o.OrderStatus)
+                 .HasMaxLength(50)
+                 .IsRequired();
+
+                b.Property(o => o.MobileNumber)
+                 .HasMaxLength(50)
+                 .IsRequired();
+            });
+
 
             builder.Entity<OrderItem>(oi =>
             {
@@ -60,21 +78,16 @@ namespace Infrastructure.Data
                   .HasComputedColumnSql("[Quantity] * [UnitPrice]", stored: true);
 
             });
-         
+
 
             builder.Entity<ProductType>(b =>
             {
-                b.Property(pt => pt.Name)
-                 .IsRequired()
-                 .HasMaxLength(100);
+                b.Property(pt => pt.Name).IsRequired().HasMaxLength(100);
             });
 
             builder.Entity<Product>(b =>
             {
-                b.Property(p => p.Name);
-                b.Property(p => p.Price)
-                .HasPrecision(18, 2);
-                // لا تكتب b.Property(p => p.ProductTypes)
+                b.Property(p => p.Price).HasPrecision(18, 2);
                 b.HasOne(p => p.ProductType)
                  .WithMany(pt => pt.Products)
                  .HasForeignKey(p => p.ProductTypeId);
@@ -83,7 +96,7 @@ namespace Infrastructure.Data
         }
 
         public DbSet<Chairs> Chairs { get; set; }
-        public DbSet<VwUser> VwUsers { get; set; }
+        public DbSet<VwUsers> VwUsers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Product> Products { get; set; }

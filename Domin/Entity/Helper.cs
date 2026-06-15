@@ -2,8 +2,8 @@
 {
     public class Helper
     {
-        public const string PathImageuser = "/Images/Users/";
-        public const string PathSaveImageuser = "Images/Users";
+        public const string PathImageuser = "/uploads/Images/Users/";
+        public const string PathSaveImageuser = "uploads/Images/Users";
 
         public const string Success = "success";
         public const string Error = "error";
@@ -58,6 +58,5 @@
             Offices,
             Spareparts
         }
-       
     }
 }

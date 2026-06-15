@@ -15,7 +15,7 @@ using System.Net;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Infrastructure.Models;
-
+using Domin.Entity;
 
 namespace Nafath.Areas.Identity.Pages.Account.Manage
 {
@@ -103,13 +103,9 @@ namespace Nafath.Areas.Identity.Pages.Account.Manage
                 FullName = user.FullName,
                 LastName = user.LastName,
                 UserName = user.UserName,
-                City = user.City,
                 Gender = user.Gender,
                 DateOfBirth = user.DateOfBirth,
-                MaritalStatus = user.MaritalStatus,
                 AgeRange = user.AgeRange,
-                Country = user.Country,
-                State = user.State,
                 Address = user.Address,
                 PhoneNumber = await _userManager.GetPhoneNumberAsync(user)
             };
@@ -179,13 +175,9 @@ namespace Nafath.Areas.Identity.Pages.Account.Manage
             // --- Update other profile fields ---
             user.FullName = Input.FullName;
             user.LastName = Input.LastName;
-            user.City = Input.City;
             user.Gender = Input.Gender;
             user.DateOfBirth = Input.DateOfBirth;
-            user.MaritalStatus = Input.MaritalStatus;
             user.AgeRange = Input.AgeRange;
-            user.Country = Input.Country;
-            user.State = Input.State;
             user.Address = Input.Address;
 
             // Note: UserName is usually not changed this way, but preserving your logic

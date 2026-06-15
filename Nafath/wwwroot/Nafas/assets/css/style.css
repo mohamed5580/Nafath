@@ -4,7 +4,7 @@
 /* Product Grid */
 
 .product-section {
-    padding: 7rem 0;
+    padding: 2rem 0;
   
 }
 
@@ -200,6 +200,12 @@
 }
 .content-page {
     margin-left:auto;
+    text-align :right;
+    direction:rtl;
+    padding:10px
+}
+.categorys {
+    direction: rtl;
 }
 /* Add this for grid layout */
 .product-grid {
@@ -207,6 +213,7 @@
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
     margin-bottom: 2rem;
+    
 }
 
     /* Optional: Remove margin-bottom from .mb-5 if you want to control spacing via grid gap */

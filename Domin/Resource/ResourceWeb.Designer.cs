@@ -70,11 +70,29 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to الإجراءات.
+        /// </summary>
+        public static string lbActions {
+            get {
+                return ResourceManager.GetString("lbActions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to تفعيل المستخدم.
         /// </summary>
         public static string lbActiveUser {
             get {
                 return ResourceManager.GetString("lbActiveUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تمّت الإضافة.
+        /// </summary>
+        public static string lbAdded {
+            get {
+                return ResourceManager.GetString("lbAdded", resourceCulture);
             }
         }
         
@@ -102,6 +120,33 @@ namespace Domin.Resource {
         public static string lbAddNewRole {
             get {
                 return ResourceManager.GetString("lbAddNewRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to العنوان.
+        /// </summary>
+        public static string lbAddress {
+            get {
+                return ResourceManager.GetString("lbAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to أضف إلى السلة.
+        /// </summary>
+        public static string lbAddToCart {
+            get {
+                return ResourceManager.GetString("lbAddToCart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to جميع الأنواع.
+        /// </summary>
+        public static string lbAllTypes {
+            get {
+                return ResourceManager.GetString("lbAllTypes", resourceCulture);
             }
         }
         
@@ -189,9 +234,27 @@ namespace Domin.Resource {
         /// <summary>
         ///   Looks up a localized string similar to إلغاء.
         /// </summary>
+        public static string lbCancel {
+            get {
+                return ResourceManager.GetString("lbCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to الغاء.
+        /// </summary>
         public static string lbcancelButtonText {
             get {
                 return ResourceManager.GetString("lbcancelButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to السلة.
+        /// </summary>
+        public static string lbCart {
+            get {
+                return ResourceManager.GetString("lbCart", resourceCulture);
             }
         }
         
@@ -210,6 +273,15 @@ namespace Domin.Resource {
         public static string lbChair {
             get {
                 return ResourceManager.GetString("lbChair", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to اختر صورة جديدة (اختياري).
+        /// </summary>
+        public static string lbChooseNewImage {
+            get {
+                return ResourceManager.GetString("lbChooseNewImage", resourceCulture);
             }
         }
         
@@ -241,6 +313,15 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to هل أنت متأكد؟.
+        /// </summary>
+        public static string lbConfirmDelete {
+            get {
+                return ResourceManager.GetString("lbConfirmDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to هل أنت متأكد من حذف المنتج.
         /// </summary>
         public static string lbConfirmDeleteProduct {
@@ -268,6 +349,15 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to الصورة الحالية.
+        /// </summary>
+        public static string lbCurrentImage {
+            get {
+                return ResourceManager.GetString("lbCurrentImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to التاريخ.
         /// </summary>
         public static string lbDate {
@@ -282,6 +372,15 @@ namespace Domin.Resource {
         public static string lbDelete {
             get {
                 return ResourceManager.GetString("lbDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to فشل الحذف.
+        /// </summary>
+        public static string lbDeleteFailed {
+            get {
+                return ResourceManager.GetString("lbDeleteFailed", resourceCulture);
             }
         }
         
@@ -342,9 +441,27 @@ namespace Domin.Resource {
         /// <summary>
         ///   Looks up a localized string similar to تعديل المنتج.
         /// </summary>
+        public static string lbEditProduct {
+            get {
+                return ResourceManager.GetString("lbEditProduct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تعديل المنتج.
+        /// </summary>
         public static string lbEditType {
             get {
                 return ResourceManager.GetString("lbEditType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to البريد الإلكتروني.
+        /// </summary>
+        public static string lbEmail {
+            get {
+                return ResourceManager.GetString("lbEmail", resourceCulture);
             }
         }
         
@@ -354,6 +471,15 @@ namespace Domin.Resource {
         public static string lbEmailUser {
             get {
                 return ResourceManager.GetString("lbEmailUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to خطأ.
+        /// </summary>
+        public static string lbError {
+            get {
+                return ResourceManager.GetString("lbError", resourceCulture);
             }
         }
         
@@ -403,6 +529,15 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to يرجى تسجيل الدخول أولاً.
+        /// </summary>
+        public static string lbLoginFirst {
+            get {
+                return ResourceManager.GetString("lbLoginFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ادارة الكتب.
         /// </summary>
         public static string lbManageBook {
@@ -412,11 +547,29 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to إدارة الطلبات.
+        /// </summary>
+        public static string lbManageOrders {
+            get {
+                return ResourceManager.GetString("lbManageOrders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to إدارة الصلحيات لل.
         /// </summary>
         public static string lbManagePermission {
             get {
                 return ResourceManager.GetString("lbManagePermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to إدارة المنتجات.
+        /// </summary>
+        public static string lbManageProducts {
+            get {
+                return ResourceManager.GetString("lbManageProducts", resourceCulture);
             }
         }
         
@@ -583,6 +736,15 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to التالي.
+        /// </summary>
+        public static string lbNext {
+            get {
+                return ResourceManager.GetString("lbNext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to لا.
         /// </summary>
         public static string lbNo {
@@ -673,11 +835,65 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to الطلبات.
+        /// </summary>
+        public static string lbOrder {
+            get {
+                return ResourceManager.GetString("lbOrder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تاريخ الطلب.
+        /// </summary>
+        public static string lbOrderDate {
+            get {
+                return ResourceManager.GetString("lbOrderDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تفاصيل الطلب.
+        /// </summary>
+        public static string lbOrderDetails {
+            get {
+                return ResourceManager.GetString("lbOrderDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to رقم الطلب.
+        /// </summary>
+        public static string lbOrderId {
+            get {
+                return ResourceManager.GetString("lbOrderId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to كلمة المرور.
         /// </summary>
         public static string lbPassword {
             get {
                 return ResourceManager.GetString("lbPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to رقم الهاتف.
+        /// </summary>
+        public static string lbPhoneNumberUser {
+            get {
+                return ResourceManager.GetString("lbPhoneNumberUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to السابق.
+        /// </summary>
+        public static string lbPrevious {
+            get {
+                return ResourceManager.GetString("lbPrevious", resourceCulture);
             }
         }
         
@@ -709,6 +925,15 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to الانواع .
+        /// </summary>
+        public static string lbProducts {
+            get {
+                return ResourceManager.GetString("lbProducts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to عدد المنتجات.
         /// </summary>
         public static string lbProductsCount {
@@ -718,11 +943,29 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to قائمة المنتجات.
+        /// </summary>
+        public static string lbProductsList {
+            get {
+                return ResourceManager.GetString("lbProductsList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to نوع المنتج.
         /// </summary>
         public static string lbProductType {
             get {
                 return ResourceManager.GetString("lbProductType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to الكمية.
+        /// </summary>
+        public static string lbQuantity {
+            get {
+                return ResourceManager.GetString("lbQuantity", resourceCulture);
             }
         }
         
@@ -754,11 +997,20 @@ namespace Domin.Resource {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to حفظ.
+        ///   Looks up a localized string similar to تم الحفظ.
         /// </summary>
         public static string lbSave {
             get {
                 return ResourceManager.GetString("lbSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to حفظ.
+        /// </summary>
+        public static string lbSaveM {
+            get {
+                return ResourceManager.GetString("lbSaveM", resourceCulture);
             }
         }
         
@@ -790,11 +1042,47 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to اختر النوع.
+        /// </summary>
+        public static string lbSelectType {
+            get {
+                return ResourceManager.GetString("lbSelectType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to اختر مجموعة المستخدم.
         /// </summary>
         public static string lbSelectUserRole {
             get {
                 return ResourceManager.GetString("lbSelectUserRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to الحالة.
+        /// </summary>
+        public static string lbStatus {
+            get {
+                return ResourceManager.GetString("lbStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to المتجر.
+        /// </summary>
+        public static string lbStore {
+            get {
+                return ResourceManager.GetString("lbStore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تسوّق الأنواع المتاحة.
+        /// </summary>
+        public static string lbStoreSubtitle {
+            get {
+                return ResourceManager.GetString("lbStoreSubtitle", resourceCulture);
             }
         }
         
@@ -844,11 +1132,29 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to الإجمالي.
+        /// </summary>
+        public static string lbTotal {
+            get {
+                return ResourceManager.GetString("lbTotal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to تفاصيل النوع.
         /// </summary>
         public static string lbTypeDetails {
             get {
                 return ResourceManager.GetString("lbTypeDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to سعر الوحدة.
+        /// </summary>
+        public static string lbUnitPrice {
+            get {
+                return ResourceManager.GetString("lbUnitPrice", resourceCulture);
             }
         }
         
@@ -907,6 +1213,15 @@ namespace Domin.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to عرض.
+        /// </summary>
+        public static string lbView {
+            get {
+                return ResourceManager.GetString("lbView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to نعم.
         /// </summary>
         public static string lbYes {
@@ -914,105 +1229,14 @@ namespace Domin.Resource {
                 return ResourceManager.GetString("lbYes", resourceCulture);
             }
         }
-        public static string lbCurrentImage {
-            get { return ResourceManager.GetString("lbCurrentImage", resourceCulture); }
-        }
-        public static string lbChooseNewImage {
-            get { return ResourceManager.GetString("lbChooseNewImage", resourceCulture); }
-        }
-        public static string lbEditProduct
-        {
-            get { return ResourceManager.GetString("lbEditProduct", resourceCulture); }
-        }
-        public static string lbProductsList
-        {
-            get { return ResourceManager.GetString("lbProductsList", resourceCulture); }
-        }
-        public static string lbManageProducts
-        {
-            get { return ResourceManager.GetString("lbManageProducts", resourceCulture); }
-        }
-        public static string lbActions
-        {
-            get { return ResourceManager.GetString("lbActions", resourceCulture); }
-        }
-        public static string lbSelectType
-        {
-            get { return ResourceManager.GetString("lbSelectType", resourceCulture); }
-        }
-        public static string lbProducts
-        {
-            get
-            {
-                return ResourceManager.GetString("lbProducts", resourceCulture);
-            }
-        }
-        public static string lbStore {
-            get { return ResourceManager.GetString("lbStore", resourceCulture); }
-        }
+        
         /// <summary>
-        ///   Looks up a localized string similar to “أضف إلى السلة”.
+        ///   Looks up a localized string similar to نعم احذف.
         /// </summary>
-        public static string lbAddToCart {
+        public static string lbYesDelete {
             get {
-                return ResourceManager.GetString("lbAddToCart", resourceCulture);
+                return ResourceManager.GetString("lbYesDelete", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to “السلة”.
-        /// </summary>
-        public static string lbCart {
-            get {
-                return ResourceManager.GetString("lbCart", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to “السابق”.
-        /// </summary>
-        public static string lbPrevious {
-            get {
-                return ResourceManager.GetString("lbPrevious", resourceCulture);
-            }
-        }
-       /// <summary>
-        ///   Looks up a localized string similar to “السابق”.
-        /// </summary>
-        public static string lbAdded {
-            get {
-                return ResourceManager.GetString("lbAdded", resourceCulture);
-            }
-        }
-        public static string lbLoginFirst {
-            get {
-                return ResourceManager.GetString("lbLoginFirst", resourceCulture);
-            }
-        }
-
-        public static string lbAllTypes {
-            get {
-                return ResourceManager.GetString("lbAllTypes", resourceCulture);
-            }
-        }
-        public static string lbStoreSubtitle {
-            get {
-                return ResourceManager.GetString("lbStoreSubtitle", resourceCulture);
-            }
-        }
-        public static string lbNext
-        {
-            get
-            {
-                return ResourceManager.GetString("lbNext", resourceCulture);
-            }
-        }public static string lbChooseFile
-        {
-            get {
-                return ResourceManager.GetString("lbChooseFile", resourceCulture);
-            }
-        }
-        // ... وهكذا لباقي المفاتيح ...
-
     }
 }

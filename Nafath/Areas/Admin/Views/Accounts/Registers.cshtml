@@ -69,16 +69,18 @@
                                                 }
                                            </td>
                                         <td>
-                                            <img src="@( !string.IsNullOrEmpty(user.ImageUser)
-                                                            ? Url.Content($"{Helper.PathImageuser}/{user.ImageUser}")
+                                            <img src="@( !string.IsNullOrEmpty(user.AvatarUrl)
+                                                                                                            ? Url.Content($"{Helper.PathImageuser}/{user.AvatarUrl}")
                                                             : Url.Content($"{Helper.PathImageuser}/user1.png") )" class="img-bordered img-circle img-circle"
                                            style="width:50px; height:50px"></td>
                                        
                                        <td>@user.Email</td>
-                                       <td><input type="checkbox" disabled checked="@user.ActiveUser" style="width:35px; height:35px" ></td>
+                                        <td><input type="checkbox" disabled checked="@user.AcceptTerms" style="width:35px; height:35px"></td>
                                        <td>
-                                           <input type="button" class="btn btn-info btn-sm" onclick="Edit('@user.Id', '@user.Name',
-                                            '@user.Email','@user.ImageUser','@user.Role','@user.ActiveUser')" value="@ResourceWeb.lbbtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />|
+                                           <input type="button" class="btn btn-info btn-sm"
+                                                   onclick="Edit('@user.Id', '@user.Name', '@user.Email', '@(user.AvatarUrl ?? "")', '@user.Role', '@user.AcceptTerms')"
+                                                   value="@ResourceWeb.lbbtnEdit"
+                                                   data-bs-toggle="modal" data-bs-target="#exampleModal" />
                                            <input type="button" class="btn btn-danger btn-sm" onclick="Delete('@user.Id')" value="@ResourceWeb.lbbtnDelete" />
                                            <input type="button" class="btn btn-success btn-sm" onclick="ChangePassword('@user.Id')" 
                                                     value="@ResourceWeb.lbbtnChangePassword"  data-bs-toggle="modal" data-bs-target="#changePasswordModal"/>
@@ -112,6 +114,8 @@
                 </div>
                 <div class="modal-body">
                     <form asp-action="Registers" asp-controller="Accounts" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="All" class="text-danger"></div>
                         <div class="form-group">
                             <input type="text" hidden class="form-control" asp-for="NewRegister.Id" id="userId" />
                             <input type="text" hidden class="form-control" asp-for="NewRegister.ImageUser" id="imgeHide" />
@@ -143,9 +147,8 @@
                         </div>
                         <div class="form-group">
                             <label asp-for="NewRegister.ActiveUser" class="control-lable">@ResourceWeb.lbActiveUser</label>
-                            <input type="checkbox" asp-for="NewRegister.ActiveUser" class="form-check-input" />
+                            <input type="checkbox" asp-for="NewRegister.ActiveUser" class="form-check-input" id="userActive" />
                             <span asp-validation-for="NewRegister.ActiveUser" class="text-danger"></span>
-
                         </div>
                         <div class="form-group" id="grPassword">
                             <label asp-for="NewRegister.Password" class="control-lable">@ResourceWeb.lbPassword</label>

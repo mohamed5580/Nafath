@@ -3,18 +3,16 @@ using Infrastructure.IRepository.Base;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-
-namespace Nafath.Controllers
+namespace Nafath.Areas.Admin.Controllers
 {
-
     [Area("Admin")]
     public class ChairsManagerController : Controller
     {
         #region Declaration
         private readonly IRepository<Chairs> _context;
-
         private readonly IWebHostEnvironment _env;
         #endregion
+
         #region Constructor
         public ChairsManagerController(IRepository<Chairs> context, IWebHostEnvironment env)
         {
@@ -22,14 +20,13 @@ namespace Nafath.Controllers
             _env = env;
         }
         #endregion
+
         #region Method
-        // GET: Chairs
-        // GET: Admin/ChairsManager
         public IActionResult Index(int page = 1, int pageSize = 1000)
         {
             int totalItems;
             var pagedChairs = _context.GetPaged(page, pageSize, out totalItems)
-                              .Where(c => c != null)  // Filter out null items
+                              .Where(c => c != null)
                               .ToList();
 
             ViewBag.CurrentPage = page;
@@ -38,59 +35,37 @@ namespace Nafath.Controllers
             return View(pagedChairs);
         }
 
-        // GET: Chairs/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var chairs = await _context.FindByIdasync(id.Value);
-            if (chairs == null)
-            {
-                return NotFound();
-            }
+            if (chairs == null) return NotFound();
 
             return View(chairs);
         }
 
-        // GET: Admin/ChairsManager/Create
-        // GET: Admin/ChairsManager/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // CREATE
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Chairs chairs)
         {
             if (!ModelState.IsValid)
             {
-                // Re‑load the full list (page 1, 1000 items) so Index.cshtml can render the table
                 int totalItems;
-                var allChairs = _context
-                    .GetPaged(1, 1000, out totalItems)
-                    .ToList();
+                var allChairs = _context.GetPaged(1, 1000, out totalItems).ToList();
 
-                // Push your validation errors into ViewBag so Index.cshtml’s alert shows them
-                ViewBag.EditErrors = ModelState.Values
-                                        .SelectMany(v => v.Errors)
-                                        .Select(e => e.ErrorMessage)
-                                        .ToList();
-                var str = ModelState.Values
-                                        .SelectMany(v => v.Errors)
-                                        .Select(e => e.ErrorMessage)
-                                        .ToList();
-                SessionMsg(Helper.Success, "خطا", str.ToString());
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                ViewBag.EditErrors = errors;
+                SessionMsg(Helper.Error, "خطأ", string.Join(" | ", errors));
 
-                // Return the Index view with the full list
                 return View("Index", allChairs);
             }
 
-            // File upload handling
             if (chairs.ImageFile != null && chairs.ImageFile.Length > 0)
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(chairs.ImageFile.FileName)}";
@@ -120,36 +95,28 @@ namespace Nafath.Controllers
             return View(chair);
         }
 
-        // POST: Admin/ChairsManager/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Chairs chairs, IFormFile? ImageFile)
         {
-            if (id != chairs.Id)
-                return NotFound();
+            if (id != chairs.Id) return NotFound();
 
             var existing = _context.FindById(id);
-            if (existing == null)
-                return NotFound();
+            if (existing == null) return NotFound();
 
             if (!ModelState.IsValid)
             {
                 int totalItems;
                 var allChairs = _context.GetPaged(1, 1000, out totalItems).ToList();
 
-                ViewBag.EditErrors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
-
-                SessionMsg(Helper.Error, "خطأ", string.Join(" | ", ViewBag.EditErrors));
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                ViewBag.EditErrors = errors;
+                SessionMsg(Helper.Error, "خطأ", string.Join(" | ", errors));
 
                 chairs.ImageUrl = existing.ImageUrl;
-
                 return View("Index", allChairs);
             }
 
-            // Update fields
             existing.Name = chairs.Name;
             existing.Description = chairs.Description;
             existing.Price = chairs.Price;
@@ -180,8 +147,7 @@ namespace Nafath.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (_context.FindById(id) == null)
-                    return NotFound();
+                if (_context.FindById(id) == null) return NotFound();
                 throw;
             }
 
@@ -189,19 +155,12 @@ namespace Nafath.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Chairs/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var chairs = await _context.FindByIdasync(id.Value);
-            if (chairs == null)
-            {
-                return NotFound();
-            }
+            if (chairs == null) return NotFound();
 
             return View(chairs);
         }
@@ -215,10 +174,9 @@ namespace Nafath.Controllers
             var chair = await _context.FindByIdasync(id.Value);
             if (chair != null)
             {
-                // build correct physical path to the image
                 var fileName = Path.GetFileName(chair.ImageUrl);
                 var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chairs");
-                var filePath = Path.Combine(uploadsDir, fileName);
+                var filePath = Path.Combine(uploadsDir, fileName ?? "");
 
                 if (System.IO.File.Exists(filePath))
                 {
@@ -234,9 +192,9 @@ namespace Nafath.Controllers
 
         private bool ChairsExists(int id)
         {
-            // Use FindById or FindAll to check existence
             return _context.FindById(id) != null;
         }
+
         private void SessionMsg(string MsgType, string Title, string Msg)
         {
             HttpContext.Session.SetString(Helper.MsgType, MsgType);

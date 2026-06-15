@@ -4,17 +4,16 @@
     ViewData["Title"] = "Checkout";
 }
 
-<h2>Checkout</h2>
 <div class="container my-5">
-    <div class="row justify-content-center">
+
+    <div class="row justify-content-center right">
         <div class="col-lg-8">
             <!-- Card wrapper -->
-            <div class="card shadow-sm rounded-2">
+            <div class="card shadow-sm rounded-2 rtl ">
                 <div class="card-header text-white bg-info">
                     <h5 class="mb-0">إتمام الطلب</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Checkout Form -->
                     <!-- Checkout Form -->
                     <form id="checkoutForm"
                           asp-controller="Order"
@@ -24,8 +23,7 @@
                         <input type="hidden" name="ItemsJson" id="ItemsJson" />
                         <input type="hidden" asp-for="OrderStatus" value="Pending" />
 
-
-
+                         
                         <div class="row g-3">
                             <!-- Name -->
                             <div class="col-md-6">
@@ -36,7 +34,7 @@
                             <!-- Email -->
                             <div class="col-md-6">
                                 <label asp-for="Email" class="form-label">البريد الإلكتروني*</label>
-                                <input asp-for="Email" type="email" class="form-control" />
+                                <input asp-for="Email" type="email" class="form-control" readonly />
                                 <span asp-validation-for="Email" class="text-danger small"></span>
                             </div>
                             <!-- Mobile -->
@@ -77,14 +75,35 @@
 
 @section Scripts {
     <script>
-        document
-          .getElementById('checkoutForm')
-          .addEventListener('submit', function() {
-            const cart = /* however you store it—e.g. */
-                         JSON.parse(localStorage.getItem('cart') || '[]');
-            document.getElementById('ItemsJson').value = JSON.stringify(cart);
-          });
+        (function(){
+
+            const form = document.getElementById('checkoutForm');
+            if (!form) return;
+            form.addEventListener('submit', function() {
+                // Support both storage keys used in the app: 'shoppingCart' (used by cart.js) and legacy 'cart'
+
+                const raw = localStorage.getItem('shoppingCart') || localStorage.getItem('cart');
+                const stored = JSON.parse(raw || '[]');
+
+                
+
+                // Map client cart shape to server DTO { ProductId, Quantity, UnitPrice }
+                const items = stored.map(function(i) {
+                    return {
+                        ProductId: i.id ?? i.ProductId ?? i.productId,
+                        Quantity: i.count ?? i.Quantity ?? i.quantity,
+                        UnitPrice: i.price ?? i.UnitPrice ?? i.unitPrice
+                    };
+                });
+
+                const itemsInput = document.getElementById('ItemsJson');
+                if (itemsInput) itemsInput.value = JSON.stringify(items);
+
+                localStorage.removeItem('shoppingCart');
+                localStorage.removeItem('cart');
+            });
+        })();
     </script>
-    await Html.RenderPartialAsync("_ValidationScriptsPartial")
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 
 }

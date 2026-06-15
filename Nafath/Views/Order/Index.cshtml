@@ -12,7 +12,9 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item">إدارة الطلبات</li>
-                    <li class="breadcrumb-item active"><a href="/Admin/Home/Index">الصفحة الرئيسية</a></li>
+                    <li class="breadcrumb-item active">
+                        <a href="/">الصفحة الرئيسية</a>
+                    </li>
                 </ol>
             </div>
             <div class="col-sm-6 text-sm-end">
@@ -29,7 +31,8 @@
             </div>
             <div class="card-body">
                 @Html.AntiForgeryToken()
-                @if (!Model.Any())
+
+                @if (Model == null || !Model.Any())
                 {
                     <div class="alert alert-info">لا توجد طلبات متاحة</div>
                 }
@@ -48,7 +51,6 @@
                         <tbody>
                             @foreach (var vm in Model)
                             {
-
                                 <tr>
                                     <td>#@vm.Order.Id</td>
                                     <td>@vm.Order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
@@ -66,7 +68,12 @@
                                             تعديل الطلب
                                         </button>
                                     </td>
-                                    <td><button class="btn btn-link text-danger remove-order" data-id="@vm.Order.Id"> &times;</button></td>
+                                    <td>
+                                        <button class="btn btn-link text-danger remove-order"
+                                                data-id="@vm.Order.Id">
+                                            &times;
+                                        </button>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -77,8 +84,6 @@
                         <ul class="pagination justify-content-center">
                             @{
                                 var prev = currentPage > 1 ? currentPage - 1 : 1;
-                            }
-                            @{
                                 var next = currentPage < totalPages ? currentPage + 1 : totalPages;
                             }
                             <li class="page-item @(currentPage == 1 ? "disabled" : "")">
@@ -101,17 +106,21 @@
     </section>
 </div>
 
-<!-- ==== مودال تعديل الطلب (Update) ==== -->
-@if (Model.Any())
+
+<!-- =============================================
+     مودال تعديل الطلب (Edit Modal)
+     ============================================= -->
+@if (Model != null && Model.Any())
 {
     foreach (var vm in Model)
     {
         <div class="modal fade" id="editModal-@vm.Order.Id" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
+
                     <div class="modal-header">
                         <h5 class="modal-title ms-auto">تعديل الطلب #@vm.Order.Id</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close ml-0" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
@@ -127,7 +136,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="cart-item">
-                                    <!-- يملأ ديناميكياً -->
+                                    <!-- يملأ ديناميكياً عند فتح المودال -->
                                 </tbody>
                             </table>
                         </div>
@@ -138,7 +147,11 @@
 
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                        <button class="btn btn-danger clear-cart" data-order-id="@vm.Order.Id">تفريغ السلة</button>
+                        <button type="button"
+                                class="btn btn-danger clear-carts"
+                                data-order-id="@vm.Order.Id">
+                            تفريغ السلة
+                        </button>
 
                         <form id="editForm-@vm.Order.Id"
                               asp-controller="Order"
@@ -147,34 +160,39 @@
                               class="d-inline">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="orderId" value="@vm.Order.Id" />
-                            <input type="hidden" id="ItemsJson-@vm.Order.Id" name="ItemsJson" />
+                            <input type="hidden" id="ItemsJson-@vm.Order.Id" name="itemsJson" />
 
-                            <!-- زر تحديث -->
                             <button type="button"
-                                    class="btn btn-primary btn-update-order"
+                                    class="btn btn-primary btnn-update-order"
                                     data-order-id="@vm.Order.Id">
                                 حفظ التعديلات
                             </button>
                         </form>
                     </div>
+
                 </div>
             </div>
         </div>
     }
 }
 
-<!-- ==== مودال عرض التفاصيل (Read‑only) ==== -->
-@if (Model.Any())
+
+<!-- =============================================
+     مودال عرض التفاصيل (View Modal - Read Only)
+     ============================================= -->
+@if (Model != null && Model.Any())
 {
     foreach (var vm in Model)
     {
         <div class="modal fade" id="viewModal-@vm.Order.Id" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header">
+
+                    <div class="modal-header" >
                         <h5 class="modal-title">تفاصيل الطلب #@vm.Order.Id</h5>
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                        <button class="btn-close ml-0" data-bs-dismiss="modal"></button>
                     </div>
+
                     <div class="modal-body">
                         @if (vm.Items.Any())
                         {
@@ -210,120 +228,223 @@
                             <div class="alert alert-warning">لا توجد بنود لهذا الطلب.</div>
                         }
                     </div>
+
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
                     </div>
+
                 </div>
             </div>
         </div>
     }
 }
 
+
 @section Scripts {
     <script>
-        $(function() {
-            // فتح مودال التعديل وتحميل البنود
-            $(document).on('show.bs.modal', '[id^="editModal-"]', function() {
+        // السلة الخاصة بالمودال المفتوح حالياً
+        let editCart = [];
+
+        $(function () {
+
+            // ========== فتح مودال التعديل: جلب عناصر الطلب ==========
+            $(document).on('show.bs.modal', '[id^="editModal-"]', function () {
+                var modal = $(this);
                 var orderId = this.id.split('-')[1];
-                shoppingCart.clearCart();
-                $.getJSON('/Order/GetOrderItems', { orderId: orderId }, function(data) {
-                    data.forEach(function(item) {
-                        shoppingCart.addItemToCart(item.id, item.name, Number(item.price), item.count, item.imageUrl);
+
+                $.getJSON('/Order/GetOrderItems', { orderId: orderId }, function (data) {
+                    // ✅ الـ map الصحيح — productId مش id
+                    editCart = data.map(function (item) {
+                        return {
+                            productId: item.productId,   // المفتاح الوحيد للتعرف على العنصر
+                            name:      item.name,
+                            price:     Number(item.price),
+                            count:     item.count,
+                            imageUrl:  item.imageUrl
+                        };
                     });
-                    updateEditCart();
+
+                    updateEditCart(modal);
                 });
             });
 
-            // تحديث العرض في مودال التعديل
-            function updateEditCart() {
-                var items = shoppingCart.listCart();
-                var tot = shoppingCart.totalCart();
-                $('.total-carts').text(tot.toFixed(2));
-                if (!items.length) {
-                    $('.cart-item').html('<tr><td colspan="5">سلة المشتريات فارغة</td></tr>');
-                } else {
-                    var html = '';
-                    items.forEach(function(i) {
-                        html += `<tr lang="en" dir="ltr">
-                                    <td> <div class="d-flex align-items-center">
-                                      <h6 class="mb-0">${i.name}</h6>
-                                      <img src="${i.imageUrl}" alt="${i.name}" class="img-thumbnail ms-3" style="width:60px;height:60px;object-fit:cover;">
-                                    </div></td>
-                                    <td>${i.price} EGP</td>
-                                    <td><div class="input-group" style="max-width:170px;"><button class="btn btn-outline-secondary btn-decrement" data-id="${i.id}">-</button><input class="form-control text-center item-count" value="${i.count}" data-id="${i.id}" /><button class="btn btn-outline-secondary btn-increment" data-id="${i.id}">+</button></div></td>
-                                    <td>${i.total} EGP</td>
-                                    <td><button class="btn btn-link text-danger btn-remove" data-id="${i.id}">&times;</button></td>
-                                </tr>`;
+            // ========== إعادة ضبط السلة عند إغلاق المودال ==========
+            $(document).on('hidden.bs.modal', '[id^="editModal-"]', function () {
+                editCart = [];
+            });
+
+            // ========== زيادة الكمية ==========
+            $(document).on('click', '.btn-increment', function () {
+                var productId = parseInt($(this).data('id'));
+                editCart.forEach(function (item) {
+                    if (item.productId === productId) {
+                        item.count += 1;
+                    }
+                });
+                updateEditCart($('.modal.show'));
+            });
+
+            // ========== إنقاص الكمية ==========
+            $(document).on('click', '.btn-decrement', function () {
+                var productId = parseInt($(this).data('id'));
+                editCart.forEach(function (item) {
+                    if (item.productId === productId && item.count > 1) {
+                        item.count -= 1;
+                    }
+                });
+                updateEditCart($('.modal.show'));
+            });
+
+            // ========== تغيير الكمية يدوياً ==========
+            $(document).on('change', '.item-count', function () {
+                var productId = parseInt($(this).data('id'));
+                var cnt = parseInt($(this).val());
+                if (cnt > 0) {
+                    editCart.forEach(function (item) {
+                        if (item.productId === productId) {
+                            item.count = cnt;
+                        }
                     });
-                    $('.cart-item').html(html);
                 }
-            }
-
-            // معالجات أزرار التعديل
-            $(document).on('click', '.btn-increment', function() {
-                var id = $(this).data('id');
-                var cnt = parseInt($(`.item-count[data-id="${id}"]`).val()) + 1;
-                shoppingCart.setCountForItem(id, cnt);
-                updateEditCart();
-            });
-            $(document).on('click', '.btn-decrement', function() {
-                var id = $(this).data('id');
-                var cnt = parseInt($(`.item-count[data-id="${id}"]`).val()) - 1;
-                if (cnt > 0) { shoppingCart.setCountForItem(id, cnt); updateEditCart(); }
-            });
-            $(document).on('change', '.item-count', function() {
-                var id = $(this).data('id'), cnt = parseInt($(this).val());
-                if (cnt > 0) { shoppingCart.setCountForItem(id, cnt); }
-                updateEditCart();
-            });
-            $(document).on('click', '.btn-remove', function() {
-                shoppingCart.removeItemById($(this).data('id'));
-                updateEditCart();
-            });
-            $(document).on('click', '.clear-cart', function() {
-                shoppingCart.clearCart();
-                updateEditCart();
+                updateEditCart($('.modal.show'));
             });
 
-            // حفظ التعديلات (Update)
-            $(document).on('click', '.btn-update-order', function() {
+            // ========== حذف عنصر من السلة ==========
+            $(document).on('click', '.btn-remove', function () {
+                var productId = parseInt($(this).data('id'));
+                editCart = editCart.filter(function (item) {
+                    return item.productId !== productId;  // ✅ productId مش id
+                });
+                updateEditCart($('.modal.show'));
+            });
+
+            // ========== تفريغ السلة بالكامل ==========
+            $(document).on('click', '.clear-carts', function (e) {
+                e.preventDefault();
+                editCart = [];
+                updateEditCart($('.modal.show'));
+            });
+
+            // ========== حفظ التعديلات ==========
+            $(document).on('click', '.btnn-update-order', function () {
                 var orderId = $(this).data('order-id');
-                var items = shoppingCart.listCart().map(i => ({ productId: i.id, quantity: i.count, unitPrice: i.price }));
+
+                var items = editCart.map(function (i) {
+                    return {
+                        productId: i.productId,
+                        quantity:  i.count,
+                        unitPrice: i.price
+                    };
+                });
+
                 $('#ItemsJson-' + orderId).val(JSON.stringify(items));
                 $('#editForm-' + orderId).submit();
-                shoppingCart.clearCart();
             });
 
-            // حذف الطلب (Remove Order)
-            $(document).on('click', '.remove-order', function(e) {
+            // ========== حذف الطلب ==========
+            $(document).on('click', '.remove-order', function (e) {
                 e.preventDefault();
                 var orderId = $(this).data('id');
+
                 Swal.fire({
                     title: 'هل أنت متأكد من حذف الطلب؟',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'نعم، احذف',
                     cancelButtonText: 'إلغاء'
-                }).then((result) => {
+                }).then(function (result) {
                     if (result.isConfirmed) {
                         $.ajax({
                             url: '/Order/DeleteConfirmed',
                             type: 'POST',
                             data: { id: orderId },
-                            headers: { 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() },
+                            headers: {
+                                'RequestVerificationToken':
+                                    $('input[name="__RequestVerificationToken"]').first().val()
+                            },
                             success: function () { location.reload(); },
-                            error: function () { Swal.fire('خطأ','حدث خطأ أثناء الحذف','error'); }
+                            error: function () {
+                                Swal.fire('خطأ', 'حدث خطأ أثناء الحذف', 'error');
+                            }
                         });
                     }
                 });
             });
         });
+
+
+        // =============================================
+        // دالة تحديث عرض السلة داخل المودال
+        // =============================================
+        function updateEditCart(modal) {
+            var tot = editCart.reduce(function (sum, item) {
+                return sum + (item.price * item.count);
+            }, 0);
+
+            modal.find('.total-carts').text(tot.toFixed(2));
+
+            if (editCart.length === 0) {
+                modal.find('.cart-item')
+                     .html('<tr><td colspan="5" class="text-center text-muted">سلة المشتريات فارغة</td></tr>');
+                return;
+            }
+
+            var html = '';
+            editCart.forEach(function (i) {
+                html += `
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="${i.imageUrl || '/default-image.png'}"
+                                     class="img-thumbnail"
+                                     style="width:60px;height:60px;object-fit:cover;">
+                                <span>${i.name}</span>
+                            </div>
+                        </td>
+                        <td>${i.price.toFixed(2)} EGP</td>
+                        <td>
+                            <div class="input-group" style="max-width:160px; margin:auto;direction: ltr;">
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-decrement"
+                                        data-id="${i.productId}">−</button>
+
+                                <input type="number"
+                                       class="form-control text-center item-count"
+                                       value="${i.count}"
+                                       min="1"
+                                       data-id="${i.productId}">
+
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-increment"
+                                        data-id="${i.productId}">+</button>
+                            </div>
+                        </td>
+                        <td>${(i.price * i.count).toFixed(2)} EGP</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-link text-danger btn-remove"
+                                    data-id="${i.productId}"
+                                    title="حذف">
+                                &times;
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+
+            modal.find('.cart-item').html(html);
+        }
     </script>
     <script>
-        document.querySelectorAll('.add-to-cart').forEach(btn => {
+        document.querySelectorAll('.btnn-update-order').forEach(btn => {
             btn.addEventListener('click', () => {
                 const name = btn.dataset.name;
-                Swal.fire({ icon: 'success', title: '@ResourceWeb.lbAdded', text: `تمت اضافة ${name}.`, timer: 2000, showConfirmButton: false });
+                Swal.fire({
+                    icon: 'success',
+                    title: '@ResourceWeb.lbAdded',
+                    text: `تم التعديل   ${name} .`,
+                    timer: 5000,
+                    showConfirmButton: false
+                });
             });
         });
     </script>

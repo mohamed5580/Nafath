@@ -3,28 +3,27 @@
 @inject Infrastructure.IRepository.Base.IRepository<ProductType> TypeRepo
 
 @{
-     // هنا تجيب الأنواع مباشرة
     var productTypes = await TypeRepo.FindAllasync();
-    var product = ViewBag.ProductTypes as IEnumerable<Domin.Entity.ProductType>;
 }
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+
+
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="linear-gradient(to bottom, #61daff, #656bff)">
+    <meta name="theme-color" content="#61daff">
     <meta name="description" content="We will simple add to cart using javascript localstorage">
     <meta name="keywords" content="add to cart, add to cart javascript, localstorage add to cart, ecommerce shopping javascript, shooping cart demo">
     <meta name="author" content="Rajamanickam">
 
    
 
-	<title>Nafath </title>
+    <title>Nafath </title>
 
     <link rel="stylesheet" href="~/Admin/assets/css/backend-plugin.min.css">
     <link rel="stylesheet" href="~/Admin/assets/css/backend.css?v=1.0.0">
@@ -34,9 +33,8 @@
 
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="~/Nafas/assets/images/logoo.png">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="~/Admin/plugins/sweetalert2/sweetalert2.min.css">
     <!-- Fonts -->
-        
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -60,7 +58,7 @@
     <header id="header" class="header d-flex sticky-top ">
         <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
-            <a asp-area ="" asp-controller="Home" asp-action="Index" class="logo d-flex ">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="logo d-flex ">
                 <img src="~/Nafas/assets/images/logoo.png" alt="">
             </a>
 
@@ -73,16 +71,16 @@
               
                     <li class="dropdown">
                         <a href="#">
-                        <span>المتجر</span>
-                        <i class="bi bi-chevron-down toggle-dropdown"></i>
+                            <span>المتجر</span>
+                            <i class="bi bi-chevron-down toggle-dropdown"></i>
                         </a>
                         <ul>
-                            @foreach(var type in productTypes)
+                            @foreach (var type in productTypes)
                             {
                                 <li>
                                     <a asp-controller="Products"
-                                        asp-action="Index"
-                                        asp-route-typeId="@type.Id">
+                                           asp-action="Index"
+                                           asp-route-typeId="@type.Id">
                                         @type.Name
                                     </a>
                                 </li>
@@ -123,15 +121,15 @@
             <!-- CART MODAL -->
             <div class="modal fade " id="cartModal"
                  data-bs-backdrop="false"
-                 tabindex="1" aria-labelledby="cartModalLabel" aria-hidden="false" >
-                <div class="modal-dialog modal-dialog-centered modal-lg" >
+                 tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
 
                         <div class="modal-header">
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            <h5 id="cartModalLabel"class="ms-auto">سلة المشتريات</h5>
+                            <h5 id="cartModalLabel" class="ms-auto">سلة المشتريات</h5>
                         </div>
-                        <div class="modal-body" >
+                        <div class="modal-body">
                             <div class="table-responsive">
                                 <table class="table table-hover text-center">
                                     <thead class="thead-light">
@@ -157,11 +155,11 @@
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">متابعة الشراء</button>
-                            <button type="button" class="btn btn-danger delete-item">تفريغ</button>
+                            <button type="button" class="btn btn-danger clear-cart">تفريغ</button>
                             
                             <a asp-controller="Order"
-                               asp-action="Checkout"
-                               class="btn btn-primary">
+                                   asp-action="Checkout"
+                                   class="btn btn-primary">
                                 اتمام الشراء
                             </a>
 
@@ -201,18 +199,18 @@
             <!-- User Icon Dropdown -->
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                   data-bs-toggle="dropdown" aria-expanded="false">
+                       data-bs-toggle="dropdown" aria-expanded="false">
                     @if (SignInManager.IsSignedIn(User))
                     {
                         var currentUser = await UserManager.GetUserAsync(User);
-                        var imgUrl = string.IsNullOrEmpty(currentUser.AvatarUrl)
+                        var imgUrl = string.IsNullOrEmpty(currentUser?.AvatarUrl)
                             ? "~/assets/images/user/11.png"
                             : currentUser.AvatarUrl;
 
                         <img src="@(Url.Content(imgUrl))"
-                                alt="Profile"
-                                class="rounded-circle"
-                                style="width:50px;height:50px;" />
+                             alt="Profile"
+                             class="rounded-circle"
+                             style="width:50px;height:50px;" />
                     }
                     else
                     {
@@ -238,7 +236,9 @@
         </ul>
     </header>
 
-    @RenderBody()
+    <main class="main-content">
+        @RenderBody()
+    </main>
 
     <footer id="footer" class="footer">
 
@@ -322,57 +322,7 @@
 
     <!-- Preloader -->
     <div id="preloader"></div>
-    <!-- Bootstrap JS (requires Popper) -->
-    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz5vG6srpKbZ1jgCK9XOnW5Z6QtdfQIjG5E74rN5QZK/EHQJ1VjHLj2w8P" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-QFhZmnv1AePj3trwKgQm+7vX/6yD+XwNm+1j5z5Q5a0Q5a0Q5a0Q5a0Q5a0Q5a0Q" crossorigin="anonymous" ></script>
-
-    <script>
-    const cartModal = document.getElementById('cartModal');
-    cartModal.addEventListener('show.bs.modal', () => {
-        document.querySelector('.main-content').classList.add('blurred');
-    });
-    cartModal.addEventListener('hidden.bs.modal', () => {
-        document.querySelector('.main-content').classList.remove('blurred');
-    });
-    </script>
-
-    @if (SignInManager.IsSignedIn(User))
-    {
-        <!-- jQuery (مرة واحدة فقط!) -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <!-- SweetAlert2 -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-        <!-- cart.js (يعرّف shoppingCart & updateCartDisplay) -->
-        <script src="~/Nafas/assets/js/cart.js"></script>
-
-
-        <script>
-            // event delegation للتأكد من عمل الـ handler دائماً
-            $(document).on('click', '.clear-cart', function(e) {
-              e.preventDefault();
-              shoppingCart.clearCart();
-              updateCartDisplay();
-            });
-
-            // باقي الربط الخاص بملفات التحكّم بالعربة يأتي في cart.js
-        </script>
-
-
-    }
-    else
-    {
-        <script>
-            $(function () {
-                const $tbody = $('.cart-items');
-                function render() {
-                    $tbody.html('<tr><td colspan="5" class="text-center">Your cart is empty</td></tr>');
-                }
-                render();
-            });
-        </script>
-    }
-
-
+    <script src="~/Admin/plugins/jquery/jquery.min.js"></script>
     <!-- Vendor JS Files -->
     <script src="~/Nafas/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/Nafas/assets/vendor/php-email-form/validate.js"></script>
@@ -382,13 +332,46 @@
     <script src="~/Nafas/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
     <script src="~/Nafas/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
     <script src="~/Nafas/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="~/Admin/plugins/sweetalert2/sweetalert2.all.min.js"></script>
     <script src="~/Nafas/assets/js/sweetalert.js"></script>
     <script src="~/Nafas/assets/js/main.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const cartModal = document.getElementById('cartModal');
+                const mainContent = document.querySelector('.main-content');
+
+                if (cartModal && mainContent) {
+                    cartModal.addEventListener('show.bs.modal', function () {
+                        mainContent.classList.add('blurred');
+                    });
+
+                    cartModal.addEventListener('hidden.bs.modal', function () {
+                        mainContent.classList.remove('blurred');
+                    });
+                }
+            });
+    </script>
+
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <script src="~/Nafas/assets/js/cart.js"></script>
+    }
+    else
+    {
+        <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const cartItems = document.querySelector('.cart-items');
+                    if (cartItems) {
+                        cartItems.innerHTML = '<tr><td colspan="5" class="text-center">Your cart is empty</td></tr>';
+                    }
+                });
+        </script>
+    }
 
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>
 
 </html>
+

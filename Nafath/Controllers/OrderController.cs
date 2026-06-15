@@ -8,17 +8,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System.Security.Claims;
-
+using System.Text.Json;
 [Authorize]
 public class OrderController : Controller
 {
+    #region Declaration
     private readonly IRepository<Order> _orderRepo;
     private readonly IRepository<OrderItem> _orderItemRepo;
     private readonly IRepository<Product> _productRepo;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ApplicationDbContext _dbContext;
+    #endregion
+    #region Constructor
     public OrderController(
         ApplicationDbContext dbContext,
         IRepository<Order> orderRepo,
@@ -32,6 +34,9 @@ public class OrderController : Controller
         _productRepo = productRepo;
         _userManager = userManager;
     }
+    #endregion
+    #region Method
+
     public async Task<IActionResult> Index()
     {
 
@@ -65,15 +70,11 @@ public class OrderController : Controller
         return View(vmList);
     }
 
-
-
-
-
     [HttpGet]
     public async Task<IActionResult> Checkout()
     {
         var user = await _userManager.GetUserAsync(User);
-        if (user == null) return Challenge();
+        if (user == null) return RedirectToAction("Login", "Account");
 
         var model = new CheckoutViewModel
         {
@@ -82,64 +83,62 @@ public class OrderController : Controller
             MobileNumber = user.PhoneNumber,
             Address = user.Address,
             Items = new List<CartItemDto>()
-
         };
-        SessionMsg(Helper.Success, "تم بنجاح", ResourceWeb.lbSave);
         return View(model);
     }
 
+    [Authorize]
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Checkout(CheckoutViewModel model, string ItemsJson)
     {
-        if (!ModelState.IsValid)
-            return View(model);
+        if (!ModelState.IsValid) return View(model);
 
-        // 1) فكّ ترميز الأصناف من الـ JSON
-        model.Items = JsonConvert
-            .DeserializeObject<List<CartItemDto>>(ItemsJson)
-            ?? new List<CartItemDto>();
+        var items = string.IsNullOrEmpty(ItemsJson)
+                    ? new List<CartItemDto>()
+                    : JsonSerializer.Deserialize<List<CartItemDto>>(ItemsJson);
 
-        if (!model.Items.Any())
+        if (items == null || !items.Any())
         {
             ModelState.AddModelError("", "السلة فارغة.");
             return View(model);
         }
 
-        // 2) أنشئ الـ Order
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = _userManager.GetUserId(User);
+
         var order = new Order
         {
             UserId = userId,
-            OrderDate = DateTime.Now
+            OrderDate = DateTime.Now,
+            OrderStatus = model.OrderStatus ?? "قيد المراجعة",
+            PaymentMethod = model.PaymentMethod,
+            Address = model.Address,
+            MobileNumber = model.MobileNumber,
+            OrderItems = new List<OrderItem>()
         };
-        await _orderRepo.AddOneAsync(order);
 
-        // 3) أنشئ كل OrderItem
-        foreach (var ci in model.Items)
+        foreach (var ci in items)
         {
+            
             var product = await _productRepo.FindByIdasync(ci.ProductId);
-            if (product == null)
+            if (product != null)
             {
-                ModelState.AddModelError("", $"المنتج {ci.ProductId} غير موجود.");
-                return View(model);
+                order.OrderItems.Add(new OrderItem
+                {
+                    ProductId = ci.ProductId,
+                    Quantity = ci.Quantity,
+                    UnitPrice = product.Price ?? 0 // نأخذ السعر من الـ DB للأمان
+                });
             }
-
-            var item = new OrderItem
-            {
-                OrderId = order.Id,
-                ProductId = ci.ProductId,
-                Quantity = ci.Quantity,
-                UnitPrice = ci.UnitPrice
-            };
-            await _orderItemRepo.AddOneAsync(item);
         }
-        SessionMsg(Helper.Success, "تم التحديث بنجاح", ResourceWeb.lbSave);
 
-        // 4) كل إضافة باستخدام AddOneAsync تحقّق SaveChanges داخليًا
+        // AddOneAsync في المستودع تقوم بعمل SaveChangesAsync
+        await _orderRepo.AddOneAsync(order);
+        SessionMsg(Helper.Success, "تم إنشاء الطلب بنجاح", ResourceWeb.lbSave);
+
         return RedirectToAction("Index");
     }
-        // GET: order/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+    // GET: order/Edit/5
+    public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -154,49 +153,49 @@ public class OrderController : Controller
             return View(orderItem);
         }
 
-        // POST: order/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, OrderItem order)
+    // POST: order/Edit/5
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, OrderItem order)
+    {
+        if (id != order.Id)
         {
-            if (id != order.Id)
-            {
-                return NotFound();
-            }
+            return NotFound();
+        }
 
-            if (ModelState.IsValid)
+        if (ModelState.IsValid)
+        {
+            try
             {
-                try
-                {
-                    _orderItemRepo.UpdateOne(order);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!orderExists(order.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _orderItemRepo.UpdateOne(order);
             }
-            return View(order);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!orderExists(order.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
-        private bool orderExists(int id)
-        {
-            // Use FindById or FindAll to check existence
-            return _orderRepo.FindById(id) != null;
-        }
-        public IActionResult Confirmation(int id)
-        {
-            TempData["SuccessOrderId"] = id;
-            return RedirectToAction("Index");
-        }
+        return View(order);
+    }
+    private bool orderExists(int id)
+    {
+        // Use FindById or FindAll to check existence
+        return _orderRepo.FindById(id) != null;
+    }
+    public IActionResult Confirmation(int id)
+    {
+        TempData["SuccessOrderId"] = id;
+        return RedirectToAction("Index");
+    }
     // OrderController.cs
     [HttpGet]
     public async Task<IActionResult> Details(int id)
@@ -310,54 +309,87 @@ public class OrderController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+    // =============================================
+    // OrderController.cs — UpdateOrder Action
+    // =============================================
+
     [HttpPost]
     [Route("Order/UpdateOrder")]
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> UpdateOrder(int orderId,List<CartItemDto> items)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateOrder(int orderId, string itemsJson)
     {
-        // 1) start a transaction
-        await using var tx = await _dbContext.Database.BeginTransactionAsync();
+        // ✅ 1. تحقق من البيانات الواردة أولاً قبل أي عملية
+        if (string.IsNullOrWhiteSpace(itemsJson))
+        {
+            SessionMsg(Helper.Error, "خطأ", "لم يتم إرسال بيانات العناصر");
+            return RedirectToAction(nameof(Index));
+        }
+
+        List<CartItemDto> items;
 
         try
         {
-            // 2) remove old items
+            items = System.Text.Json.JsonSerializer.Deserialize<List<CartItemDto>>(
+                itemsJson,
+                new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true   // ✅ يتعامل مع camelCase من JS
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            SessionMsg(Helper.Error, "خطأ", "فشل في قراءة بيانات العناصر");
+            return RedirectToAction(nameof(Index));
+        }
+
+        // ✅ 2. التحقق من أن الـ order موجود فعلاً
+        var orderExists = await _dbContext.Orders.AnyAsync(o => o.Id == orderId);
+        if (!orderExists)
+        {
+            SessionMsg(Helper.Error, "خطأ", "الطلب غير موجود");
+            return RedirectToAction(nameof(Index));
+        }
+
+        // ✅ 3. لو السلة فارغة — امسح كل عناصر الطلب
+        using var tx = await _dbContext.Database.BeginTransactionAsync();
+
+        try
+        {
+            // احذف العناصر القديمة
             var existing = await _dbContext.OrderItems
                 .Where(oi => oi.OrderId == orderId)
                 .ToListAsync();
+
             _dbContext.OrderItems.RemoveRange(existing);
 
-            // 3) build & add new ones
-            var newItems = new List<OrderItem>(items.Count);
-            foreach (var ci in items)
+            // ✅ 4. لو في عناصر جديدة — أضفها
+            if (items != null && items.Any())
             {
-                var product = await _productRepo.FindByIdasync(ci.ProductId);
-                if (product == null)
-                    return NotFound($"Product {ci.ProductId} not found.");
-
-                newItems.Add(new OrderItem
+                var newItems = items.Select(ci => new OrderItem
                 {
                     OrderId = orderId,
                     ProductId = ci.ProductId,
                     Quantity = ci.Quantity,
                     UnitPrice = ci.UnitPrice
-                });
+                }).ToList();
+
+                await _dbContext.OrderItems.AddRangeAsync(newItems);
             }
 
-            await _dbContext.OrderItems.AddRangeAsync(newItems);
             await _dbContext.SaveChangesAsync();
             await tx.CommitAsync();
 
             SessionMsg(Helper.Success, "تم التحديث بنجاح", ResourceWeb.lbSave);
         }
-        catch
+        catch (Exception ex)
         {
             await tx.RollbackAsync();
-            SessionMsg(Helper.Error, "خطأ", "حدث خطأ أثناء التحديث");
+            SessionMsg(Helper.Error, "خطأ", "حدث خطأ أثناء التحديث: " + ex.Message);
         }
 
         return RedirectToAction(nameof(Index));
     }
-
 
 
 
@@ -368,23 +400,22 @@ public class OrderController : Controller
         HttpContext.Session.SetString(Helper.Msg, Msg);
     }
 
-    [HttpGet]
     public IActionResult GetOrderItems(int orderId)
     {
         var items = _dbContext.OrderItems
-            .Where(oi => oi.OrderId == orderId)
-            .Include(oi => oi.Product)   // تأكد من إضافة using Microsoft.EntityFrameworkCore;
-            .Select(oi => new {
-                id = oi.ProductId,
-                name = oi.Product!.Name,
-                price = oi.UnitPrice,
-                count = oi.Quantity,
-                imageUrl = oi.Product!.ImageUrl ?? Url.Content("~/images/default.png")
+            .Where(x => x.OrderId == orderId)
+            .Select(x => new
+            {
+                productId = x.ProductId,
+                name = x.Product.Name,
+                price = x.UnitPrice,
+                count = x.Quantity,
+                imageUrl = x.Product.ImageUrl
             })
             .ToList();
 
         return Json(items);
     }
-
+    #endregion
 
 }
