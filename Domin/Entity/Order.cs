@@ -2,7 +2,7 @@
 
 namespace Domin.Entity
 {
-    public class Order
+    public partial class Order
     {
         [Key]
         public int Id { get; set; }
@@ -12,8 +12,7 @@ namespace Domin.Entity
 
         [Required]
         public string UserId { get; set; }
-        public virtual ApplicationUser User { get; set; }
-
+        public ApplicationUser? User { get; set; }
         // ← requires System.Collections.Generic
         public List<OrderItem> OrderItems { get; set; } = new();
 

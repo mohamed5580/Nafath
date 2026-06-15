@@ -166,7 +166,8 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("MobileNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
@@ -283,21 +284,24 @@ namespace Infrastructure.Migrations
                     b.ToTable("ProductTypes");
                 });
 
-            modelBuilder.Entity("Domin.Entity.VwUser", b =>
+            modelBuilder.Entity("Domin.Entity.VwUsers", b =>
                 {
-                    b.Property<bool?>("ActiveUser")
+                    b.Property<bool>("AcceptTerms")
                         .HasColumnType("bit");
 
+                    b.Property<string>("AvatarUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageUser")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")

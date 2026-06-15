@@ -8,6 +8,8 @@ namespace Domin.Entity
     [Area("Identity")]
     public class ApplicationUser : IdentityUser
     {
+
+
         public string? FullName { get; set; }
 
         [MaxLength(100)]

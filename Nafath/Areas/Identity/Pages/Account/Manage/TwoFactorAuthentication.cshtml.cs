@@ -8,6 +8,7 @@ using Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Domin.Entity;
 using Microsoft.Extensions.Logging;
 
 namespace Nafath.Areas.Identity.Pages.Account.Manage

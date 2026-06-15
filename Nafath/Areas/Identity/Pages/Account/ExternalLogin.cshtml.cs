@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Infrastructure.Models;
+using Domin.Entity;
 
 namespace Nafath.Areas.Identity.Pages.Account
 {

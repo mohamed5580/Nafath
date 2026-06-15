@@ -148,6 +148,7 @@ $(document).ready(function () {
     });
     $(document).on('click', '.delete-item', function () {
         shoppingCart.removeItemById($(this).data('id'));
+
         updateCartDisplay();
     });
     $(document).on('click', '.clear-cart', function (e) {

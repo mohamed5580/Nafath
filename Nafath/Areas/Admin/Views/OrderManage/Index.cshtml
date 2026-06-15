@@ -1,0 +1,279 @@
+﻿@model IEnumerable<OrderManagerDetailsViewModel>
+@{
+    ViewData["Title"] = "إدارة الطلبات";
+}
+@Html.AntiForgeryToken()
+<div class="wrapper">
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark"></h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">@ResourceWeb.lbHomePage</a></li>
+                        <li class="breadcrumb-item active"></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.content-header -->
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex align-items-center justify-content-start">
+                            <h3 class="card-title mr-2"></h3>
+                        </div>
+                        <div style="overflow-x: auto; width: 100%;">
+
+                            <div class="card-body">
+                                <div style="overflow-x: auto; width: 100%;">
+                                    <table id="ordersTable" class="table table-bordered table-hover" style="min-width: 1500px;">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>@ResourceWeb.lbUser</th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th>طريقة الدفع</th>
+                                                <th></th>
+                                                <th></th>
+                                                <th>@ResourceWeb.lbActions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var vm in Model)
+                                            {
+                                                <tr>
+                                                    <td>#@vm.Order.Id</td>
+                                                    <td>@vm.UserName</td>
+                                                    <td>@vm.UserEmail</td>
+                                                    <td>@vm.UserPhone</td>
+                                                    <td>@vm.UserAdress</td>
+                                                    <td>@vm.PaymentMethod</td>
+                                                    <td>@vm.Order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                                    <td>
+                                                        <span class="badge badge-info">@vm.Order.OrderStatus</span>
+                                                    </td>
+                                                    <td style="display:flex; justify-content:space-between; width:200px;">
+                                                        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal-@vm.Order.Id" >
+                                                            @ResourceWeb.lbView
+
+                                                        </button>
+                                                        <a class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal-@vm.Order.Id">
+                                                            @ResourceWeb.lbEdit
+                                                        </a>
+                                                        <button type="button" class="btn btn-danger btn-sm remove-order" data-id="@vm.Order.Id">
+                                                            @ResourceWeb.lbDelete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
+
+<!-- Modal for View Details -->
+@foreach (var vm in Model)
+{
+    <div class="modal fade" id="viewModal-@vm.Order.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"> #@vm.Order.Id</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>@ResourceWeb.lbImage</th>
+                                <th>@ResourceWeb.lbProduct</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in vm.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        <img src="@item.ImageUrl"
+                                             class="img-fluid rounded-circle"
+                                             alt="@item.ProductName"
+                                             width="50" height="50" />
+                                    </td>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.UnitPrice.ToString("N2")</td>
+                                    <td>@(item.Quantity* item.UnitPrice)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        @ResourceWeb.lbClose
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@foreach (var vm in Model)
+{
+    <div class="modal fade" id="editModal-@vm.Order.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="editStatusForm-@vm.Order.Id"
+                      data-order-id="@vm.Order.Id"
+                      asp-area="Admin"
+                      asp-controller="OrderManage"
+                      asp-action="UpdateStatus"
+                      method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">@ResourceWeb.lbEdit #@vm.Order.Id</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="status-@vm.Order.Id" class="form-label">
+                              
+                            </label>
+                            <select id="status-@vm.Order.Id"
+                                    name="orderStatus"
+                                    class="form-select"
+                                    required>
+                                <option value="@vm.Order.OrderStatus" selected>
+                                    @vm.Order.OrderStatus
+                                </option>
+                                <option value="قيد الشحن">قيد الشحن</option>
+                                <option value="مكتمل">مكتمل</option>
+                                <option value="ملغي">ملغي</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                     
+                        </button>
+                        <button type="submit"
+                                class="btn btn-primary">
+                            @ResourceWeb.lbSave
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section Scripts {
+    <script>
+        // grab the token once
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        document.querySelectorAll('.remove-order').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                Swal.fire({
+                    title: '@ResourceWeb.lbMsgDeletedOkCategory',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: '',
+                    cancelButtonText: ''
+                }).then(result => {
+                    if (!result.isConfirmed) return;
+
+                    $.ajax({
+                        url: '@Url.Action("Delete", "OrderManage", new { area = "Admin" })',
+                        type: 'POST',
+                        data: {
+                            id: id,
+                            __RequestVerificationToken: token
+                        },
+                        success: function () {
+                            // remove the row from table
+                            btn.closest('tr').remove();
+                            Swal.fire('', '@ResourceWeb.lbDelete', 'success');
+                        },
+                        error: function () {
+                            Swal.fire('', '', 'error');
+                        }
+                    });
+                });
+            });
+        });
+
+       document.querySelectorAll('form[id^="editStatusForm-"]').forEach(form => {
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const orderId = form.dataset.orderId;
+            const status  = form.querySelector('select[name="orderStatus"]').value;
+            const token   = form.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            fetch('@Url.Action("UpdateStatus", "OrderManage", new { area = "Admin" })', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': token
+              },
+              body: new URLSearchParams({ orderId, orderStatus: status })
+            })
+            .then(r => r.json())
+            .then(data => {
+              if (data.success) {
+                // 1) Update badge text in the table
+                const badge = document
+                  .querySelector(`button[data-id="${orderId}"]`)
+                  .closest('tr')
+                  .querySelector('span.badge');
+                badge.textContent = data.newStatus;
+
+                // 2) Hide modal and show success
+                const modalEl = document.getElementById(`editModal-${orderId}`);
+                bootstrap.Modal.getInstance(modalEl).hide();
+                Swal.fire('', '@ResourceWeb.lbSave', 'success');
+              } else {
+                Swal.fire('@ResourceWeb.lbSave', data.message, 'success');
+              }
+            })
+            .catch(() => {
+              Swal.fire('@ResourceWeb.lbSave', '@ResourceWeb.lbSave', 'success');
+            });
+          });
+        });
+    </script>
+}

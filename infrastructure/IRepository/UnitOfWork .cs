@@ -18,13 +18,16 @@ namespace Infrastructure.IRepository
         public IOrderRepository Orders { get; private set; }
         public IRepository<OrderItem> OrderItems { get; private set; }
 
-        public UnitOfWork(ApplicationDbContext context)
+        public UnitOfWork(ApplicationDbContext context, MainRepository<Product> products,
+                      MainRepository<ProductType> productTypes,
+                      OrderRepository orders,
+                      MainRepository<OrderItem> orderItems)
         {
             _context = context;
-            Products = new MainRepository<Product>(_context);
-            ProductTypes = new MainRepository<ProductType>(_context);
-            Orders = new OrderRepository(_context);
-            OrderItems = new MainRepository<OrderItem>(_context);
+            Products = products;
+            ProductTypes = productTypes;
+            Orders = orders;
+            OrderItems = orderItems;
         }
 
         public async Task<int> CommitAsync()

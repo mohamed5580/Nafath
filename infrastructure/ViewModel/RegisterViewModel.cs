@@ -13,7 +13,7 @@ namespace Infrastructure.ViewModel
         public List<IdentityRole> Roles { get; set; } = new();
 
         [BindNever]
-        public List<VwUser> Users { get; set; } = new();
+        public List<VwUsers> Users { get; set; } = new();
 
         public NewRegister NewRegister { get; set; } = new();
 
