@@ -86,18 +86,19 @@ $(document).ready(function () {
         } else {
             var itemsHtml = '';
             cartItems.forEach(function (item) {
+                // move hidden input INSIDE the first <td> to keep table structure valid
                 itemsHtml += `
 <tr lang="en" dir="ltr">
-    <input type="hidden" name="Id" value="${item.id}" />
   <td>
     <div class="d-flex align-items-center">
       <h6 class="mb-0">${item.name}</h6>
       <img src="${item.imageUrl}" alt="${item.name}" class="img-thumbnail ms-3" style="width:60px;height:60px;object-fit:cover;">
+      <input type="hidden" name="Id" value="${item.id}" />
     </div>
   </td>
   <td>${item.price} EGP</td>
   <td>
-    <div class="input-group" style="max-width:200px;">
+    <div class="input-group mx-auto" style="width: 140px;">
       <button class="btn btn-outline-secondary decrease-item" data-id="${item.id}">-</button>
       <input type="text" class="form-control text-center item-count" value="${item.count}" data-id="${item.id}">
       <button class="btn btn-outline-secondary increase-item" data-id="${item.id}">+</button>

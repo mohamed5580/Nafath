@@ -353,9 +353,7 @@ namespace Nafath.Areas.Admin.Controllers
             return userList.OrderBy(u => u.Role).ToList();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+  
 
         public async Task<IActionResult> DeleteUser(string userId)
         {

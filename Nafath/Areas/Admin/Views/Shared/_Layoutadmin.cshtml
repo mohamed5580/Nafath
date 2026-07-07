@@ -192,8 +192,8 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
-            <a href="/admin" class="brand-link">
-                <img src="~/Admin/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+            <a href="/admin/Home/Index" class="brand-link">
+                <img src="~/Admin/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3 "
                      style="opacity: .8">
                 <span class="brand-text font-weight-light">Nafas AdminLTE</span>
             </a>
@@ -218,11 +218,11 @@
                         }
 
                         <div class="image d-flex justify-content-center">
-                            <img src="@(Url.Content(imgUrl))" class="img-circle elevation-2 " alt="User Image" style="width:100px">
+                            <img src="@(Url.Content(imgUrl))" class="img-circle elevation-2 " alt="User Image" style="width:100px; height:100px">
                         </div>
                     
                         <div class="info d-block ">
-                            <a href="#" class="d-flex justify-content-center">@((await userManager.GetUserAsync(User)).FullName)</a>
+                            <a href="#" class="d-flex justify-content-center">@((await userManager.GetUserAsync(User)).FullName) @((await userManager.GetUserAsync(User)).LastName)</a>
 
                             <form asp-action="Logout" asp-controller="Accounts" method="post" class="d-flex justify-content-center">
                                 <input  type="submit" value="تسجيل الخروج" style="border:none; color:orange;background-color:#343a40">
@@ -305,11 +305,7 @@
             </div>
         </footer>
 
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <!-- Control sidebar content goes here -->
-        </aside>
-        <!-- /.control-sidebar -->
+       
     </div>
     <!-- ./wrapper -->
     <!-- jQuery -->

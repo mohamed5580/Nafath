@@ -39,8 +39,8 @@
                 }
                 else
                 {
-                    <div class="table-scroll-wrapper">
-                        <table class="table table-bordered table-hover table-fixed">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover text-center text-nowrap">
                             <thead>
                                 <tr>
                                     <th>رقم الطلب</th>
@@ -81,7 +81,6 @@
                             </tbody>
                         </table>
                     </div>
-
                     <!-- Pagination -->
                     <nav>
                         <ul class="pagination justify-content-center">
@@ -137,7 +136,7 @@
             </div>
             <div class="modal-body">
                 <div class="table-responsive table-scroll-wrapper">
-                    <table class="table table-bordered table-hover table-fixed">
+                    <table class="table table-bordered table-hover text-center text-nowrap">
                         <thead class="thead-light">
                             <tr>
                                 <th>المنتج</th>
@@ -148,11 +147,9 @@
                             </tr>
                         </thead>
                         <tbody id="editCartBody">
-                            <!-- سيتم ملؤها عبر JavaScript -->
                         </tbody>
                     </table>
-                </div>
-                <div class="d-flex justify-content-end mt-3">
+                </div>                <div class="d-flex justify-content-end mt-3">
                     <h5>المبلغ الكلي: <span id="totalCarts">0.00</span> EGP</h5>
                 </div>
             </div>
@@ -269,28 +266,28 @@
                     this.items.forEach(function (item) {
                         var itemTotal = item.price * item.count;
                         total += itemTotal;
-                        html += `
-                            <tr style="    direction: ltr;">
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <h6 class="mb-0">${item.name}</h6>
-                                        <img src="${item.imageUrl || '/default-image.png'}" alt="${item.name}" class="img-thumbnail ms-3" style="width:60px;height:60px;object-fit:cover;">
-                                    </div>
-                                </td>
-                                <td>${item.price.toFixed(2)} EGP</td>
-                                <td>
-                                    <div class="input-group " style="max-width:200px;">
-                                        <button class="btn btn-outline-secondary btn-decrement" data-product-id="${item.productId}">-</button>
-                                        <input type="text" class="form-control text-center item-count" value="${item.count}" data-product-id="${item.productId}">
-                                        <button class="btn btn-outline-secondary btn-increment" data-product-id="${item.productId}">+</button>
-                                    </div>
-                                </td>
-                                <td>${itemTotal.toFixed(2)} EGP</td>
-                                <td>
-                                    <button class="btn btn-link text-danger btn-remove-item" data-product-id="${item.productId}">&times;</button>
-                                </td>
-                            </tr>
-                        `;
+                               html += `
+                                    <tr style="direction: ltr;" class="align-middle">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <h6 class="mb-0">${item.name}</h6>
+                                                <img src="${item.imageUrl || '/default-image.png'}" alt="${item.name}" class="img-thumbnail ms-3" style="width:60px;height:60px;object-fit:cover;">
+                                            </div>
+                                        </td>
+                                        <td>${item.price.toFixed(2)} EGP</td>
+                                        <td>
+                                            <div class="input-group mx-auto" style="width: 140px;">
+                                                <button class="btn btn-outline-secondary btn-decrement" data-product-id="${item.productId}">-</button>
+                                                <input type="text" class="form-control text-center item-count" value="${item.count}" data-product-id="${item.productId}">
+                                                <button class="btn btn-outline-secondary btn-increment" data-product-id="${item.productId}">+</button>
+                                            </div>
+                                        </td>
+                                        <td>${itemTotal.toFixed(2)} EGP</td>
+                                        <td>
+                                            <button class="btn btn-link text-danger btn-remove-item" data-product-id="${item.productId}">&times;</button>
+                                        </td>
+                                    </tr>
+                                `;
                     });
 
                     tbody.html(html);
