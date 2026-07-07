@@ -17,7 +17,7 @@
                     </li>
                 </ol>
             </div>
-            <div class="col-sm-6 text-sm-end">
+            <div class="col-sm-6 ">
                 <h1 class="m-0">قائمة الطلبات</h1>
             </div>
         </div>
@@ -28,6 +28,7 @@
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">الطلبات</h4>
+                <h6 class="card-title">سيتم التواصل معكم في أقرب وقت</h6>
             </div>
             <div class="card-body">
                 @Html.AntiForgeryToken()
@@ -38,46 +39,48 @@
                 }
                 else
                 {
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>رقم الطلب</th>
-                                <th>تاريخ الطلب</th>
-                                <th>تفاصيل الطلب</th>
-                                <th>تعديل الطلب</th>
-                                <th>#</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var vm in Model)
-                            {
+                    <div class="table-scroll-wrapper">
+                        <table class="table table-bordered table-hover table-fixed">
+                            <thead>
                                 <tr>
-                                    <td>#@vm.Order.Id</td>
-                                    <td>@vm.Order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
-                                    <td>
-                                        <button class="btn btn-info"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#viewModal-@vm.Order.Id">
-                                            عرض التفاصيل
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-warning"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#editModal-@vm.Order.Id">
-                                            تعديل الطلب
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-link text-danger remove-order"
-                                                data-id="@vm.Order.Id">
-                                            &times;
-                                        </button>
-                                    </td>
+                                    <th>رقم الطلب</th>
+                                    <th>تاريخ الطلب</th>
+                                    <th>حالة الطلب</th>
+                                    <th>تفاصيل الطلب</th>
+                                    <th>تعديل الطلب</th>
+                                    <th>#</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach (var vm in Model)
+                                {
+                                    <tr>
+                                        <td>#@vm.Order.Id</td>
+                                        <td>@vm.Order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                        <td>@vm.Order.OrderStatus</td>
+                                        <td>
+                                            <button class="btn bg-gradient-success text-white btn-view-order"
+                                                    data-order-id="@vm.Order.Id">
+                                                عرض التفاصيل
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-warning btn-edit-order"
+                                                    data-order-id="@vm.Order.Id">
+                                                تعديل الطلب
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-link text-danger remove-order"
+                                                    data-order-id="@vm.Order.Id">
+                                                &times;
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
 
                     <!-- Pagination -->
                     <nav>
@@ -106,97 +109,266 @@
     </section>
 </div>
 
-
-<!-- =============================================
-     مودال تعديل الطلب (Edit Modal)
-     ============================================= -->
-@if (Model != null && Model.Any())
-{
-    foreach (var vm in Model)
-    {
-        <div class="modal fade" id="editModal-@vm.Order.Id" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <h5 class="modal-title ms-auto">تعديل الطلب #@vm.Order.Id</h5>
-                        <button type="button" class="btn-close ml-0" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div class="table-responsive">
-                            <table class="table text-center">
-                                <thead>
-                                    <tr>
-                                        <th>المنتج</th>
-                                        <th>السعر</th>
-                                        <th>الكمية</th>
-                                        <th>السعر الكلي</th>
-                                        <th>إجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="cart-item">
-                                    <!-- يملأ ديناميكياً عند فتح المودال -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="d-flex justify-content-end mt-3">
-                            <h5>المبلغ الكلي: <span class="total-carts">0.00</span> EGP</h5>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                        <button type="button"
-                                class="btn btn-danger clear-carts"
-                                data-order-id="@vm.Order.Id">
-                            تفريغ السلة
-                        </button>
-
-                        <form id="editForm-@vm.Order.Id"
-                              asp-controller="Order"
-                              asp-action="UpdateOrder"
-                              method="post"
-                              class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="orderId" value="@vm.Order.Id" />
-                            <input type="hidden" id="ItemsJson-@vm.Order.Id" name="itemsJson" />
-
-                            <button type="button"
-                                    class="btn btn-primary btnn-update-order"
-                                    data-order-id="@vm.Order.Id">
-                                حفظ التعديلات
-                            </button>
-                        </form>
-                    </div>
-
-                </div>
+<!-- ========== مودال عرض التفاصيل ========== -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewModalTitle">تفاصيل الطلب</h5>
+                <button type="button" class="btn-close ml-0" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="viewModalBody">
+                <!-- سيتم ملؤها عبر JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
             </div>
         </div>
-    }
-}
+    </div>
+</div>
 
+<!-- ========== مودال تعديل الطلب ========== -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title ms-auto" id="editModalTitle">تعديل الطلب</h5>
+                <button type="button" class="btn-close ml-0" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive table-scroll-wrapper">
+                    <table class="table table-bordered table-hover table-fixed">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>المنتج</th>
+                                <th>السعر</th>
+                                <th>الكمية</th>
+                                <th>السعر الكلي</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="editCartBody">
+                            <!-- سيتم ملؤها عبر JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <h5>المبلغ الكلي: <span id="totalCarts">0.00</span> EGP</h5>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-danger clear-carts">تفريغ السلة</button>
+                <form id="editForm" asp-controller="Order" asp-action="UpdateOrder" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="orderId" id="editOrderId" value="" />
+                    <input type="hidden" name="itemsJson" id="editItemsJson" value="" />
+                    <button type="button" class="btn btn-primary btn-save-edit">حفظ التعديلات</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-<!-- =============================================
-     مودال عرض التفاصيل (View Modal - Read Only)
-     ============================================= -->
-@if (Model != null && Model.Any())
-{
-    foreach (var vm in Model)
-    {
-        <div class="modal fade" id="viewModal-@vm.Order.Id" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+@section Scripts {
+    <script>
+        $(function () {
+            // ========== تعريف كائن إدارة السلة المؤقتة ==========
+            const editCart = {
+                items: [],           // مصفوفة العناصر { productId, name, price, count, imageUrl }
+                orderId: null,
 
-                    <div class="modal-header" >
-                        <h5 class="modal-title">تفاصيل الطلب #@vm.Order.Id</h5>
-                        <button class="btn-close ml-0" data-bs-dismiss="modal"></button>
-                    </div>
+                // جلب العناصر من الخادم
+                loadItems: function (orderId) {
+                    var self = this;
+                    self.orderId = orderId;
+                    $.getJSON('/Order/GetOrderItems', { orderId: orderId }, function (data) {
+                        self.items = data.map(function (item) {
+                            return {
+                                productId: item.productId,
+                                name: item.name,
+                                price: Number(item.price),
+                                count: item.count,
+                                imageUrl: item.imageUrl
+                            };
+                        });
+                        self.render();
+                    });
+                },
 
-                    <div class="modal-body">
-                        @if (vm.Items.Any())
-                        {
-                            <table class="table">
+                // إضافة/تحديث الكمية
+                setCount: function (productId, newCount) {
+                    var item = this.items.find(i => i.productId === productId);
+                    if (item) {
+                        if (newCount > 0) {
+                            item.count = newCount;
+                        } else {
+                            // إذا كانت الكمية 0 أو أقل، نحذف العنصر
+                            this.items = this.items.filter(i => i.productId !== productId);
+                        }
+                        this.render();
+                    }
+                },
+
+                // زيادة الكمية
+                increment: function (productId) {
+                    var item = this.items.find(i => i.productId === productId);
+                    if (item) {
+                        item.count += 1;
+                        this.render();
+                    }
+                },
+
+                // إنقاص الكمية
+                decrement: function (productId) {
+                    var item = this.items.find(i => i.productId === productId);
+                    if (item && item.count > 1) {
+                        item.count -= 1;
+                        this.render();
+                    }
+                },
+
+                // حذف عنصر
+                removeItem: function (productId) {
+                    this.items = this.items.filter(i => i.productId !== productId);
+                    this.render();
+                },
+
+                // تفريغ السلة بالكامل
+                clear: function () {
+                    this.items = [];
+                    this.render();
+                },
+
+                // حفظ التعديلات (إرسال النموذج)
+                save: function () {
+                    var itemsJson = JSON.stringify(this.items.map(i => ({
+                        productId: i.productId,
+                        quantity: i.count,
+                        unitPrice: i.price
+                    })));
+                    $('#editOrderId').val(this.orderId);
+                    $('#editItemsJson').val(itemsJson);
+                    $('#editForm').submit();
+                },
+
+                // عرض السلة في المودال
+                render: function () {
+                    var tbody = $('#editCartBody');
+                    var totalSpan = $('#totalCarts');
+
+                    if (this.items.length === 0) {
+                        tbody.html('<tr><td colspan="5" class="text-center text-muted">سلة المشتريات فارغة</td></tr>');
+                        totalSpan.text('0.00');
+                        return;
+                    }
+
+                    var total = 0;
+                    var html = '';
+                    var self = this;
+                    this.items.forEach(function (item) {
+                        var itemTotal = item.price * item.count;
+                        total += itemTotal;
+                        html += `
+                            <tr style="    direction: ltr;">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <h6 class="mb-0">${item.name}</h6>
+                                        <img src="${item.imageUrl || '/default-image.png'}" alt="${item.name}" class="img-thumbnail ms-3" style="width:60px;height:60px;object-fit:cover;">
+                                    </div>
+                                </td>
+                                <td>${item.price.toFixed(2)} EGP</td>
+                                <td>
+                                    <div class="input-group " style="max-width:200px;">
+                                        <button class="btn btn-outline-secondary btn-decrement" data-product-id="${item.productId}">-</button>
+                                        <input type="text" class="form-control text-center item-count" value="${item.count}" data-product-id="${item.productId}">
+                                        <button class="btn btn-outline-secondary btn-increment" data-product-id="${item.productId}">+</button>
+                                    </div>
+                                </td>
+                                <td>${itemTotal.toFixed(2)} EGP</td>
+                                <td>
+                                    <button class="btn btn-link text-danger btn-remove-item" data-product-id="${item.productId}">&times;</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    tbody.html(html);
+                    totalSpan.text(total.toFixed(2));
+                }
+            };
+
+            // ========== فتح مودال التعديل ==========
+            $(document).on('click', '.btn-edit-order', function () {
+                var orderId = $(this).data('order-id');
+                $('#editModalTitle').text('تعديل الطلب #' + orderId);
+                editCart.loadItems(orderId);
+                $('#editModal').modal('show');
+            });
+
+            // ========== أحداث السلة ==========
+            $(document).on('click', '.btn-increment', function () {
+                var productId = parseInt($(this).data('product-id'));
+                editCart.increment(productId);
+            });
+
+            $(document).on('click', '.btn-decrement', function () {
+                var productId = parseInt($(this).data('product-id'));
+                editCart.decrement(productId);
+            });
+
+            $(document).on('change', '.item-count', function () {
+                var productId = parseInt($(this).data('product-id'));
+                var val = parseInt($(this).val());
+                if (!isNaN(val) && val >= 0) {
+                    editCart.setCount(productId, val);
+                } else {
+                    // إذا كانت القيمة غير صالحة نعيد العرض السابق
+                    editCart.render();
+                }
+            });
+
+            $(document).on('click', '.btn-remove-item', function () {
+                var productId = parseInt($(this).data('product-id'));
+                editCart.removeItem(productId);
+            });
+
+            $(document).on('click', '.clear-carts', function (e) {
+                e.preventDefault();
+                editCart.clear();
+            });
+
+            // ========== حفظ التعديلات ==========
+            $(document).on('click', '.btn-save-edit', function () {
+                editCart.save();
+                // بعد الإرسال سيتم إعادة تحميل الصفحة أو تحديثها، ولكن نعرض رسالة نجاح
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم التعديل',
+                    text: 'تم تحديث الطلب بنجاح.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                // سيتم إعادة التوجيه بعد الـ submit، لكننا نغلق المودال فوراً
+                $('#editModal').modal('hide');
+            });
+
+            // ========== عرض تفاصيل الطلب ==========
+            $(document).on('click', '.btn-view-order', function () {
+                var orderId = $(this).data('order-id');
+                $('#viewModalTitle').text('تفاصيل الطلب #' + orderId);
+                $('#viewModalBody').html('<div class="text-center"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+                $('#viewModal').modal('show');
+
+                $.getJSON('/Order/GetOrderItems', { orderId: orderId }, function (data) {
+                    if (data.length === 0) {
+                        $('#viewModalBody').html('<div class="alert alert-warning">لا توجد بنود لهذا الطلب.</div>');
+                        return;
+                    }
+
+                    var html = `
+                        <div class="table-responsive table-scroll-wrapper">
+                            <table class="table text-center">
                                 <thead>
                                     <tr>
                                         <th>صورة</th>
@@ -207,144 +379,35 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in vm.Items)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <img src="@Url.Content(item.ImageUrl ?? "~/default-image.png")"
-                                                     style="width:60px;height:60px;object-fit:cover;" />
-                                            </td>
-                                            <td>@item.ProductName</td>
-                                            <td>@item.Quantity</td>
-                                            <td>@item.UnitPrice.ToString("N2")</td>
-                                            <td>@item.TotalPrice.ToString("N2")</td>
-                                        </tr>
-                                    }
+                    `;
+                    data.forEach(function (item) {
+                        html += `
+                            <tr>
+                                <td>
+                                    <img src="${item.imageUrl || '/default-image.png'}" style="width:60px;height:60px;object-fit:cover;" />
+                                </td>
+                                <td>${item.name}</td>
+                                <td>${item.count}</td>
+                                <td>${Number(item.price).toFixed(2)}</td>
+                                <td>${(item.price * item.count).toFixed(2)}</td>
+                            </tr>
+                        `;
+                    });
+                    html += `
                                 </tbody>
                             </table>
-                        }
-                        else
-                        {
-                            <div class="alert alert-warning">لا توجد بنود لهذا الطلب.</div>
-                        }
-                    </div>
-
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    }
-}
-
-
-@section Scripts {
-    <script>
-        // السلة الخاصة بالمودال المفتوح حالياً
-        let editCart = [];
-
-        $(function () {
-
-            // ========== فتح مودال التعديل: جلب عناصر الطلب ==========
-            $(document).on('show.bs.modal', '[id^="editModal-"]', function () {
-                var modal = $(this);
-                var orderId = this.id.split('-')[1];
-
-                $.getJSON('/Order/GetOrderItems', { orderId: orderId }, function (data) {
-                    // ✅ الـ map الصحيح — productId مش id
-                    editCart = data.map(function (item) {
-                        return {
-                            productId: item.productId,   // المفتاح الوحيد للتعرف على العنصر
-                            name:      item.name,
-                            price:     Number(item.price),
-                            count:     item.count,
-                            imageUrl:  item.imageUrl
-                        };
-                    });
-
-                    updateEditCart(modal);
+                        </div>
+                    `;
+                    $('#viewModalBody').html(html);
+                }).fail(function () {
+                    $('#viewModalBody').html('<div class="alert alert-danger">حدث خطأ أثناء تحميل التفاصيل</div>');
                 });
-            });
-
-            // ========== إعادة ضبط السلة عند إغلاق المودال ==========
-            $(document).on('hidden.bs.modal', '[id^="editModal-"]', function () {
-                editCart = [];
-            });
-
-            // ========== زيادة الكمية ==========
-            $(document).on('click', '.btn-increment', function () {
-                var productId = parseInt($(this).data('id'));
-                editCart.forEach(function (item) {
-                    if (item.productId === productId) {
-                        item.count += 1;
-                    }
-                });
-                updateEditCart($('.modal.show'));
-            });
-
-            // ========== إنقاص الكمية ==========
-            $(document).on('click', '.btn-decrement', function () {
-                var productId = parseInt($(this).data('id'));
-                editCart.forEach(function (item) {
-                    if (item.productId === productId && item.count > 1) {
-                        item.count -= 1;
-                    }
-                });
-                updateEditCart($('.modal.show'));
-            });
-
-            // ========== تغيير الكمية يدوياً ==========
-            $(document).on('change', '.item-count', function () {
-                var productId = parseInt($(this).data('id'));
-                var cnt = parseInt($(this).val());
-                if (cnt > 0) {
-                    editCart.forEach(function (item) {
-                        if (item.productId === productId) {
-                            item.count = cnt;
-                        }
-                    });
-                }
-                updateEditCart($('.modal.show'));
-            });
-
-            // ========== حذف عنصر من السلة ==========
-            $(document).on('click', '.btn-remove', function () {
-                var productId = parseInt($(this).data('id'));
-                editCart = editCart.filter(function (item) {
-                    return item.productId !== productId;  // ✅ productId مش id
-                });
-                updateEditCart($('.modal.show'));
-            });
-
-            // ========== تفريغ السلة بالكامل ==========
-            $(document).on('click', '.clear-carts', function (e) {
-                e.preventDefault();
-                editCart = [];
-                updateEditCart($('.modal.show'));
-            });
-
-            // ========== حفظ التعديلات ==========
-            $(document).on('click', '.btnn-update-order', function () {
-                var orderId = $(this).data('order-id');
-
-                var items = editCart.map(function (i) {
-                    return {
-                        productId: i.productId,
-                        quantity:  i.count,
-                        unitPrice: i.price
-                    };
-                });
-
-                $('#ItemsJson-' + orderId).val(JSON.stringify(items));
-                $('#editForm-' + orderId).submit();
             });
 
             // ========== حذف الطلب ==========
             $(document).on('click', '.remove-order', function (e) {
                 e.preventDefault();
-                var orderId = $(this).data('id');
+                var orderId = $(this).data('order-id');
 
                 Swal.fire({
                     title: 'هل أنت متأكد من حذف الطلب؟',
@@ -359,10 +422,11 @@
                             type: 'POST',
                             data: { id: orderId },
                             headers: {
-                                'RequestVerificationToken':
-                                    $('input[name="__RequestVerificationToken"]').first().val()
+                                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
                             },
-                            success: function () { location.reload(); },
+                            success: function () {
+                                location.reload();
+                            },
                             error: function () {
                                 Swal.fire('خطأ', 'حدث خطأ أثناء الحذف', 'error');
                             }
@@ -370,81 +434,11 @@
                     }
                 });
             });
-        });
 
-
-        // =============================================
-        // دالة تحديث عرض السلة داخل المودال
-        // =============================================
-        function updateEditCart(modal) {
-            var tot = editCart.reduce(function (sum, item) {
-                return sum + (item.price * item.count);
-            }, 0);
-
-            modal.find('.total-carts').text(tot.toFixed(2));
-
-            if (editCart.length === 0) {
-                modal.find('.cart-item')
-                     .html('<tr><td colspan="5" class="text-center text-muted">سلة المشتريات فارغة</td></tr>');
-                return;
-            }
-
-            var html = '';
-            editCart.forEach(function (i) {
-                html += `
-                    <tr>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <img src="${i.imageUrl || '/default-image.png'}"
-                                     class="img-thumbnail"
-                                     style="width:60px;height:60px;object-fit:cover;">
-                                <span>${i.name}</span>
-                            </div>
-                        </td>
-                        <td>${i.price.toFixed(2)} EGP</td>
-                        <td>
-                            <div class="input-group" style="max-width:160px; margin:auto;direction: ltr;">
-                                <button type="button"
-                                        class="btn btn-outline-secondary btn-decrement"
-                                        data-id="${i.productId}">−</button>
-
-                                <input type="number"
-                                       class="form-control text-center item-count"
-                                       value="${i.count}"
-                                       min="1"
-                                       data-id="${i.productId}">
-
-                                <button type="button"
-                                        class="btn btn-outline-secondary btn-increment"
-                                        data-id="${i.productId}">+</button>
-                            </div>
-                        </td>
-                        <td>${(i.price * i.count).toFixed(2)} EGP</td>
-                        <td>
-                            <button type="button"
-                                    class="btn btn-link text-danger btn-remove"
-                                    data-id="${i.productId}"
-                                    title="حذف">
-                                &times;
-                            </button>
-                        </td>
-                    </tr>`;
-            });
-
-            modal.find('.cart-item').html(html);
-        }
-    </script>
-    <script>
-        document.querySelectorAll('.btnn-update-order').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const name = btn.dataset.name;
-                Swal.fire({
-                    icon: 'success',
-                    title: '@ResourceWeb.lbAdded',
-                    text: `تم التعديل   ${name} .`,
-                    timer: 5000,
-                    showConfirmButton: false
-                });
+            // ========== إعادة ضبط السلة عند إغلاق مودال التعديل ==========
+            $('#editModal').on('hidden.bs.modal', function () {
+                editCart.items = [];
+                editCart.orderId = null;
             });
         });
     </script>

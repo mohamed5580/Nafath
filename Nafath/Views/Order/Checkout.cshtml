@@ -10,8 +10,8 @@
         <div class="col-lg-8">
             <!-- Card wrapper -->
             <div class="card shadow-sm rounded-2 rtl ">
-                <div class="card-header text-white bg-info">
-                    <h5 class="mb-0">إتمام الطلب</h5>
+                <div class="card-header  bg-gradient-success ">
+                    <h5 class="mb-0 text-white ">إتمام الطلب</h5>
                 </div>
                 <div class="card-body">
                     <!-- Checkout Form -->
@@ -21,7 +21,7 @@
                           method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="ItemsJson" id="ItemsJson" />
-                        <input type="hidden" asp-for="OrderStatus" value="Pending" />
+                        <input type="hidden" asp-for="OrderStatus" value="قيد المراجعة" />
 
                          
                         <div class="row g-3">
@@ -63,7 +63,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-info">التالي</button>
+                            <button type="submit" class="btn bg-gradient-success text-white">التالي</button>
                         </div>
                     </form>
                 </div>

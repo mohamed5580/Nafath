@@ -88,30 +88,13 @@
                         </ul>
                     </li>
 
-                    <li><a class="nav-link" href="about.html">من نحن</a></li>
-                    <li class=""><a class="nav-link" href="services.html">الخدمات</a></li>
-                    <li><a class="nav-link" href="blog.html">المدونة</a></li>
-                    <li><a class="nav-link" href="contact.html">اتصل بنا</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link" >من نحن</a></li>
+                    <li class=""><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Services">الخدمات</a></li>
+                    <li><a class="nav-link" href="https://www.facebook.com/friends/requests/?profile_id=61573614235805">اتصل بنا</a></li>
                     <li class="dropdown">
-                        <a href="#"><span>المزيد</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                        <ul>
-                            <li><a href="#">رابط 1</a></li>
-                            <li class="dropdown">
-                                <a href="#"><span>قائمة فرعية</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                                <ul>
-                                    <li><a href="#">عنصر فرعي 1</a></li>
-                                    <li><a href="#">عنصر فرعي 2</a></li>
-                                    <li><a href="#">عنصر فرعي 3</a></li>
-                                    <li><a href="#">عنصر فرعي 4</a></li>
-                                    <li><a href="#">عنصر فرعي 5</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#">رابط 2</a></li>
-                            <li><a href="#">رابط 3</a></li>
-                            <li><a href="#">رابط 4</a></li>
-                        </ul>
+                      
                     </li>
-                    <li><a href="#contact">اتصل بنا</a></li>
+                    <li></li>
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
                
@@ -122,7 +105,7 @@
             <div class="modal fade " id="cartModal"
                  data-bs-backdrop="false"
                  tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-dialog modal-dialog-centered modal-lg  ">
                     <div class="modal-content">
 
                         <div class="modal-header">
@@ -203,9 +186,16 @@
                     @if (SignInManager.IsSignedIn(User))
                     {
                         var currentUser = await UserManager.GetUserAsync(User);
-                        var imgUrl = string.IsNullOrEmpty(currentUser?.AvatarUrl)
-                            ? "~/assets/images/user/11.png"
-                            : currentUser.AvatarUrl;
+                        var imgUrl = string.IsNullOrEmpty(currentUser?.AvatarFile)
+                            ? $"{Helper.PathImageuser}user1.jpg"
+                            : currentUser.AvatarFile;
+
+                        if (!imgUrl.StartsWith("~/") && !imgUrl.StartsWith("/") &&
+                            !imgUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                            !imgUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                        {
+                            imgUrl = $"{Helper.PathImageuser}{imgUrl}";
+                        }
 
                         <img src="@(Url.Content(imgUrl))"
                              alt="Profile"

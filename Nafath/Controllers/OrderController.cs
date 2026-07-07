@@ -78,7 +78,7 @@ public class OrderController : Controller
 
         var model = new CheckoutViewModel
         {
-            Name = user.FullName ?? user.UserName,
+            Name = user.FullName +" "+ user.LastName ?? user.UserName,
             Email = user.Email,
             MobileNumber = user.PhoneNumber,
             Address = user.Address,
@@ -309,10 +309,6 @@ public class OrderController : Controller
 
         return RedirectToAction(nameof(Index));
     }
-    // =============================================
-    // OrderController.cs — UpdateOrder Action
-    // =============================================
-
     [HttpPost]
     [Route("Order/UpdateOrder")]
     [ValidateAntiForgeryToken]
@@ -389,6 +385,35 @@ public class OrderController : Controller
         }
 
         return RedirectToAction(nameof(Index));
+    }
+
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateStatus(int orderId, string orderStatus)
+    {
+        var order = await _dbContext.Orders.FindAsync(orderId);
+
+        if (order == null)
+        {
+            return Json(new
+            {
+                success = false,
+                message = "الطلب غير موجود"
+            });
+        }
+
+        order.OrderStatus = orderStatus;
+
+        await _dbContext.SaveChangesAsync();
+        SessionMsg(Helper.Success, "تم بنجاح", ResourceWeb.lbSave);
+        return Json(new
+        {
+            success = true,
+            newStatus = orderStatus,
+            message = "تم التعديل بنجاح"
+        });
     }
 
 

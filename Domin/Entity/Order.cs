@@ -18,7 +18,7 @@ namespace Domin.Entity
 
         [Required]
         [StringLength(50)]
-        public string OrderStatus { get; set; } = "قيد المراجعة";
+        public string OrderStatus { get; set; } = "قيد المراجعة" ;
 
         [Required(ErrorMessage = "يرجى اختيار طريقة الدفع")]
         [StringLength(200)]

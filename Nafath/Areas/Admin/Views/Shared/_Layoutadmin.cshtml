@@ -1,5 +1,5 @@
-﻿@* @inject UserManager<ApplicationUser> userManager
-@inject SignInManager<ApplicationUser> signInManager *@
+﻿@inject UserManager<ApplicationUser> userManager
+@inject SignInManager<ApplicationUser> signInManager
 
     <!DOCTYPE html>
 <html>
@@ -75,7 +75,7 @@
                     <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="index3.html" class="nav-link">Home</a>
+                    <a href="" class="nav-link">Home</a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
                     <a href="#" class="nav-link">Contact</a>
@@ -192,31 +192,43 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
-            <a href="index3.html" class="brand-link">
+            <a href="/admin" class="brand-link">
                 <img src="~/Admin/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
                      style="opacity: .8">
-                <span class="brand-text font-weight-light">AdminLTE 3</span>
+                <span class="brand-text font-weight-light">Nafas AdminLTE</span>
             </a>
 
             <!-- Sidebar -->
             <div class="sidebar">
                 <!-- Sidebar user panel (optional) -->
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                  @*   @if(signInManager.IsSignedIn(User))
+                <div class="user-panel mt-3 pb-3 mb-3 d-block ml-0 mr-0 align-items-center align-content-center ">
+                    @if(signInManager.IsSignedIn(User))
                     {
+                        var currentUser = await userManager.GetUserAsync(User);
 
-                    <div class="image">
-                        <img src="@Helper.PathImageuser@((await userManager.GetUserAsync(User)).ImageUser)" class="img-circle elevation-2" alt="User Image">
-                    </div>
+                        var imgUrl = string.IsNullOrEmpty(currentUser?.AvatarFile)
+                        ? $"{Helper.PathImageuser}user1.jpg"
+                        : currentUser.AvatarFile;
+                        
+                        if (!imgUrl.StartsWith("~/") && !imgUrl.StartsWith("/") &&
+                            !imgUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                            !imgUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                        {
+                            imgUrl = $"{Helper.PathImageuser}{imgUrl}";
+                        }
 
-                    <div class="info">
-                        <a href="#" class="d-block">@((await userManager.GetUserAsync(User)).Name)</a>
+                        <div class="image d-flex justify-content-center">
+                            <img src="@(Url.Content(imgUrl))" class="img-circle elevation-2 " alt="User Image" style="width:100px">
+                        </div>
+                    
+                        <div class="info d-block ">
+                            <a href="#" class="d-flex justify-content-center">@((await userManager.GetUserAsync(User)).FullName)</a>
 
-                        <form asp-action="Logout" asp-controller="Accounts" method="post">
-                            <input  type="submit" value="تسجيل الخروج" style="border:none; color:orange;background-color:#343a40">
-                        </form>
-                    </div>
-                     } *@
+                            <form asp-action="Logout" asp-controller="Accounts" method="post" class="d-flex justify-content-center">
+                                <input  type="submit" value="تسجيل الخروج" style="border:none; color:orange;background-color:#343a40">
+                            </form>
+                         </div>
+                     }
 
                 </div>
 
@@ -226,7 +238,7 @@
                         <!-- Add icons to the links using the .nav-icon class
                          with font-awesome or any other icon font library -->
                         <li class="nav-item has-treeview menu-open">
-                            <a href="/" class="nav-link active">
+                            <a href="/admin" class="nav-link active">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>
                                     Dashboard

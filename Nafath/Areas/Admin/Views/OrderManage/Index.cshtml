@@ -20,6 +20,7 @@
             </div>
         </div>
     </div>
+
     <!-- /.content-header -->
     <!-- Main content -->
     <section class="content">
@@ -30,37 +31,38 @@
                         <div class="card-header d-flex align-items-center justify-content-start">
                             <h3 class="card-title mr-2"></h3>
                         </div>
-                        <div style="overflow-x: auto; width: 100%;">
+                        <div style="overflow-x: auto; ">
 
                             <div class="card-body">
-                                <div style="overflow-x: auto; width: 100%;">
-                                    <table id="ordersTable" class="table table-bordered table-hover" style="min-width: 1500px;">
-                                        <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>@ResourceWeb.lbUser</th>
-                                                <th></th>
-                                                <th></th>
-                                                <th></th>
-                                                <th>طريقة الدفع</th>
-                                                <th></th>
-                                                <th></th>
-                                                <th>@ResourceWeb.lbActions</th>
+                                <div style="overflow-x: auto; ">
+                                    <table id="ordersTable" class="table table-bordered table-hover" >
+                                        <thead >
+                                            <tr >
+                                                <th >رقم</th>
+                                                <th >اسم العميل</th>
+                                                <th >ايميل العميل</th>
+                                                <th >رقم العميل</th>
+                                                <th >عنوان العميل</th>
+                                                <th >طريقة الدفع</th>
+                                                <th ></th>
+                                                <th ></th>
+                                                <th >@ResourceWeb.lbActions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach (var vm in Model)
                                             {
-                                                <tr>
-                                                    <td>#@vm.Order.Id</td>
-                                                    <td>@vm.UserName</td>
-                                                    <td>@vm.UserEmail</td>
-                                                    <td>@vm.UserPhone</td>
-                                                    <td>@vm.UserAdress</td>
-                                                    <td>@vm.PaymentMethod</td>
-                                                    <td>@vm.Order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
-                                                    <td>
-                                                        <span class="badge badge-info">@vm.Order.OrderStatus</span>
+                                                <tr >
+                                                    <td >#@vm.Order.Id</td>
+                                                    <td >@vm.UserName</td>
+                                                    <td >@vm.UserEmail</td>
+                                                    <td >@vm.UserPhone</td>
+                                                    <td >@vm.UserAdress</td>
+                                                    <td >@vm.PaymentMethod</td>
+                                                    <td >@vm.Order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                                    <td >
+                                                        
+                                                        <span class="badge badge-info order-status-badge" data-order-id="@vm.Order.Id">@vm.Order.OrderStatus</span>
                                                     </td>
                                                     <td style="display:flex; justify-content:space-between; width:200px;">
                                                         <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal-@vm.Order.Id" >
@@ -156,7 +158,10 @@
                       asp-controller="OrderManage"
                       asp-action="UpdateStatus"
                       method="post">
+
                     @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="orderId" value="@vm.Order.Id" />
 
                     <div class="modal-header">
                         <h5 class="modal-title">@ResourceWeb.lbEdit #@vm.Order.Id</h5>
@@ -165,34 +170,33 @@
 
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="status-@vm.Order.Id" class="form-label">
-                              
-                            </label>
-                            <select id="status-@vm.Order.Id"
-                                    name="orderStatus"
-                                    class="form-select"
-                                    required>
-                                <option value="@vm.Order.OrderStatus" selected>
-                                    @vm.Order.OrderStatus
-                                </option>
-                                <option value="قيد الشحن">قيد الشحن</option>
-                                <option value="مكتمل">مكتمل</option>
-                                <option value="ملغي">ملغي</option>
+                            <label class="form-label">@ResourceWeb.lbStatus</label>
+
+                            <select name="orderStatus" class="form-select" required>
+                                @{
+                                    var statuses = new[] { "قيد المراجعة", "قيد الشحن", "مكتمل", "ملغي" };
+                                }
+
+                                @foreach (var status in statuses)
+                                {
+                                    <option value="@status" selected="@(vm.Order.OrderStatus == status)">
+                                        @status
+                                    </option>
+                                }
                             </select>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button"
-                                class="btn btn-secondary"
-                                data-bs-dismiss="modal">
-                     
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            إلغاء
                         </button>
-                        <button type="submit"
-                                class="btn btn-primary">
+
+                        <button type="submit" class="btn btn-primary">
                             @ResourceWeb.lbSave
                         </button>
                     </div>
+
                 </form>
             </div>
         </div>
@@ -236,44 +240,55 @@
                 });
             });
         });
+        document.querySelectorAll('form[id^="editStatusForm-"]').forEach(form => {
 
-       document.querySelectorAll('form[id^="editStatusForm-"]').forEach(form => {
-          form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const orderId = form.dataset.orderId;
-            const status  = form.querySelector('select[name="orderStatus"]').value;
-            const token   = form.querySelector('input[name="__RequestVerificationToken"]').value;
+            form.addEventListener('submit', function (e) {
 
-            fetch('@Url.Action("UpdateStatus", "OrderManage", new { area = "Admin" })', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'RequestVerificationToken': token
-              },
-              body: new URLSearchParams({ orderId, orderStatus: status })
-            })
-            .then(r => r.json())
-            .then(data => {
-              if (data.success) {
-                // 1) Update badge text in the table
-                const badge = document
-                  .querySelector(`button[data-id="${orderId}"]`)
-                  .closest('tr')
-                  .querySelector('span.badge');
-                badge.textContent = data.newStatus;
+                e.preventDefault();
 
-                // 2) Hide modal and show success
-                const modalEl = document.getElementById(`editModal-${orderId}`);
-                bootstrap.Modal.getInstance(modalEl).hide();
-                Swal.fire('', '@ResourceWeb.lbSave', 'success');
-              } else {
-                Swal.fire('@ResourceWeb.lbSave', data.message, 'success');
-              }
-            })
-            .catch(() => {
-              Swal.fire('@ResourceWeb.lbSave', '@ResourceWeb.lbSave', 'success');
+                const orderId = form.querySelector('input[name="orderId"]').value;
+                const status = form.querySelector('select[name="orderStatus"]').value;
+                const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                fetch('@Url.Action("UpdateStatus", "OrderManage", new { area = "Admin" })', {
+
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+
+                    body: new URLSearchParams({
+                        orderId: orderId,
+                        orderStatus: status,
+                        __RequestVerificationToken: token
+                    })
+
+                })
+                .then(r => {
+                    if (!r.ok) {
+                        throw new Error("Request failed");
+                    }
+                    return r.json();
+                })
+                .then(data => {
+                    if (!data.success) {
+                        Swal.fire('', data.message, 'error');
+                        return;
+                    }
+                    document.querySelector(
+                        `span.order-status-badge[data-order-id="${orderId}"]`
+                    ).textContent = data.newStatus;
+
+
+                    Swal.fire('', "تم التعديل بنجاح", 'success');
+                })
+                .catch(() => {
+                    Swal.fire('', "حدث خطأ", 'error');
+                });
+
             });
-          });
+
         });
     </script>
 }

@@ -4,6 +4,22 @@
     ViewData["Title"] = "Profile";
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
+@functions {
+    private static string AvatarSrc(string? avatarFile)
+    {
+        if (string.IsNullOrWhiteSpace(avatarFile))
+            return $"{Helper.PathImageuser}user1.jpg";
+
+        if (avatarFile.StartsWith("~/") || avatarFile.StartsWith("/") ||
+            avatarFile.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            avatarFile.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            return avatarFile;
+        }
+
+        return $"{Helper.PathImageuser}{avatarFile}";
+    }
+}
 <partial name="_Notifications" />
 
 <div class="container-fluid">
@@ -51,7 +67,7 @@
                                             <div class="crm-profile-img-edit position-relative d-inline-block">
                                                 <img id="avatar-preview"
                                                      class="crm-profile-pic rounded-circle avatar-100"
-                                                     src="@(Url.Content(Model.Input.AvatarUrl ?? "~/assets/images/user/11.png"))"
+                                                     src="@Url.Content(AvatarSrc(Model.Input.AvatarUrl))"
                                                      alt="profile-pic" />
                                                 <div class="crm-p-image bg-primary position-absolute top-0 end-0 rounded-circle p-2">
                                                     <i class="las la-pen upload-button text-white"></i>
@@ -75,11 +91,15 @@
                                             <input asp-for="Input.LastName" class="form-control" placeholder="Last Name" />
                                             <span asp-validation-for="Input.LastName" class="text-danger"></span>
                                         </div>
-
                                         <div class="form-group col-sm-6 mb-3">
                                             <label asp-for="Input.UserName"></label>
                                             <input asp-for="Input.UserName" class="form-control" disabled />
                                             <input type="hidden" asp-for="Input.UserName" />
+                                        </div>
+                                        <div class="form-group col-sm-6 mb-3">
+                                            <label asp-for="Input.Email"></label>
+                                            <input asp-for="Input.Email" class="form-control" disabled />
+                                            <input type="hidden" asp-for="Input.Email" />
                                         </div>
 
                                         <div class="form-group col-sm-6 mb-3">
@@ -87,12 +107,7 @@
                                             <input asp-for="Input.PhoneNumber" class="form-control" />
                                             <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                                         </div>
-                                        <!-- City -->
-                                        <div class="form-group col-sm-6 mb-3">
-                                            <label asp-for="Input.City"></label>
-                                            <input asp-for="Input.City" class="form-control" placeholder="City" />
-                                            <span asp-validation-for="Input.City" class="text-danger"></span>
-                                        </div>
+                               
 
                                         <!-- Gender -->
                                         <fieldset class="form-group col-sm-6 mb-3">
@@ -115,19 +130,6 @@
                                             <span asp-validation-for="Input.DateOfBirth" class="text-danger"></span>
                                         </div>
 
-                                        <!-- Marital Status -->
-                                        <div class="form-group col-sm-6 mb-3">
-                                            <label asp-for="Input.MaritalStatus"></label>
-                                            <select asp-for="Input.MaritalStatus" class="form-control">
-                                                <option value="">-- select status --</option>
-                                                <option>Single</option>
-                                                <option>Married</option>
-                                                <option>Widowed</option>
-                                                <option>Divorced</option>
-                                                <option>Separated</option>
-                                            </select>
-                                            <span asp-validation-for="Input.MaritalStatus" class="text-danger"></span>
-                                        </div>
 
                                         <!-- Age Range -->
                                         <div class="form-group col-sm-6 mb-3">
@@ -142,32 +144,7 @@
                                             <span asp-validation-for="Input.AgeRange" class="text-danger"></span>
                                         </div>
 
-                                        <!-- Country -->
-                                        <div class="form-group col-sm-6 mb-3">
-                                            <label asp-for="Input.Country"></label>
-                                            <select asp-for="Input.Country" class="form-control">
-                                                <option>Canada</option>
-                                                <option>Noida</option>
-                                                <option>USA</option>
-                                                <option>India</option>
-                                                <option>Africa</option>
-                                            </select>
-                                            <span asp-validation-for="Input.Country" class="text-danger"></span>
-                                        </div>
-
-                                        <!-- State -->
-                                        <div class="form-group col-sm-6 mb-3">
-                                            <label asp-for="Input.State"></label>
-                                            <select asp-for="Input.State" class="form-control">
-                                                <option>California</option>
-                                                <option>Florida</option>
-                                                <option>Georgia</option>
-                                                <option>Connecticut</option>
-                                                <option>Louisiana</option>
-                                            </select>
-                                            <span asp-validation-for="Input.State" class="text-danger"></span>
-                                        </div>
-
+                                 
                                         <!-- Address -->
                                         <div class="form-group col-sm-12 mb-3">
                                             <label asp-for="Input.Address"></label>

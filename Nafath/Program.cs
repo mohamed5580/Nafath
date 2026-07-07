@@ -16,20 +16,20 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Add Connection String and DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
     options.UseSqlServer(
         connectionString,
-        sql => sql.MigrationsAssembly("Infrastructure")  
-        // <- now migrations go here
-    )
-);
+        sql => sql.MigrationsAssembly("Infrastructure"));
 
+    options.ConfigureWarnings(w =>
+        w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+});
 // 2. Add Identity Services
 // Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<Domin.Entity.ApplicationUser, IdentityRole>()
      .AddDefaultUI()                // <— brings in the Razor pages for login/register/confirm
     .AddDefaultTokenProviders()    // <— for email confirmation, password reset, etc.
     .AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddSession(); // Add session support
 // ✅ Add session support
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -50,6 +50,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Accounts/Accounts/Login";
+    options.AccessDeniedPath = "/Accounts/Accounts/AccessDenied";
+});
 
 var app = builder.Build();
 
@@ -71,11 +76,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// ✅ Enable session middleware
+// Enable session middleware
 app.UseSession();
 
 app.UseAuthentication();
-app.UseAuthorization();
 
 // Required to serve the built-in Identity Razor Pages:
 app.MapRazorPages();
@@ -95,9 +99,16 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(uploadsPath),
     RequestPath = "/user-images"
 });
-
+app.UseStatusCodePages(async context =>
+{
+    if (context.HttpContext.Response.StatusCode == 403)
+    {
+        context.HttpContext.Response.Redirect("/Accounts/Accounts/Login");
+    }
+});
+app.UseAuthorization();
 app.MapAreaControllerRoute(
-    name: "accounts",
+    name: "Accounts",
     areaName: "Accounts",
     pattern: "Accounts/{controller=Accounts}/{action=Login}/{id?}");
 
@@ -106,7 +117,7 @@ app.MapAreaControllerRoute(
 app.MapAreaControllerRoute(
     name: "admin",
     areaName: "Admin",
-    pattern: "Admin/{controller=Home}/{action=Index}/{id?}");
+    pattern: "Admin/{controller=Accounts}/{action=Login}/{id?}");
 
 // Default MVC route
 app.MapControllerRoute(

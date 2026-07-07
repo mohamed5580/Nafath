@@ -97,7 +97,7 @@ $(document).ready(function () {
   </td>
   <td>${item.price} EGP</td>
   <td>
-    <div class="input-group" style="max-width:170px;">
+    <div class="input-group" style="max-width:200px;">
       <button class="btn btn-outline-secondary decrease-item" data-id="${item.id}">-</button>
       <input type="text" class="form-control text-center item-count" value="${item.count}" data-id="${item.id}">
       <button class="btn btn-outline-secondary increase-item" data-id="${item.id}">+</button>

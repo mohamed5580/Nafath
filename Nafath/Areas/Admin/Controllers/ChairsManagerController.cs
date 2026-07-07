@@ -1,5 +1,6 @@
 ﻿using Domin.Entity;
 using Infrastructure.IRepository.Base;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,9 @@ namespace Nafath.Areas.Admin.Controllers
         #endregion
 
         #region Method
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Index(int page = 1, int pageSize = 1000)
         {
             int totalItems;
@@ -34,7 +38,9 @@ namespace Nafath.Areas.Admin.Controllers
 
             return View(pagedChairs);
         }
-
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -44,7 +50,9 @@ namespace Nafath.Areas.Admin.Controllers
 
             return View(chairs);
         }
-
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();

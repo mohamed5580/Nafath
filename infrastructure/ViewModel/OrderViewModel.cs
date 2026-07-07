@@ -12,6 +12,7 @@ namespace Infrastructure.ViewModel
         public Order Order { get; set; }
 
         public List<OrderItemDetailDto> Items { get; set; }
+
     }
     public class OrderItemUpdateDto
     {

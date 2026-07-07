@@ -1,5 +1,6 @@
 ﻿using Domin.Entity;
 using Infrastructure.IRepository.Base;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +31,8 @@ namespace Nafath.Areas.Admin.Controllers
             
             return View(type);
         }
-
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(int page = 1, int pageSize = 1000)
         {
             var (items, total) = await _context.GetPagedAsync(page, pageSize);
@@ -86,8 +88,6 @@ namespace Nafath.Areas.Admin.Controllers
             return View(chair);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ProductType ProductType, IFormFile? ImageFile)
         {
             if (id != ProductType.Id) return NotFound();

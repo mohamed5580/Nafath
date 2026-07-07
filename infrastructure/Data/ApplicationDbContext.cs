@@ -1,11 +1,9 @@
 ﻿using Domin.Entity;
-using Infrastructure.Models;
-using Infrastructure.Models.ViewModel;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
-using static NuGet.Packaging.PackagingConstants;
+
 
 namespace Infrastructure.Data
 {
@@ -18,6 +16,30 @@ namespace Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<IdentityRole>().HasData(
+            new IdentityRole
+            {
+                Id = "471B7DBC-9503-479A-A187-756C81150B8C",
+                Name = "User",
+                NormalizedName = "USER",
+                ConcurrencyStamp = "D25F24F2-0D34-40CB-8BED-EE8F4CE8568E"
+            },
+            new IdentityRole
+            {
+                Id = "B0DB744E-4552-45E2-9458-640CC402F915",
+                Name = "SuperAdmin",
+                NormalizedName = "SUPERADMIN",
+                ConcurrencyStamp = "39EDDF3F-BC2D-4A31-89EE-17F22694C947"
+            },
+            new IdentityRole
+            {
+                Id = "C0234CD1-C1C1-40D1-B6BC-A497B6887F44",
+                Name = "Admin",
+                NormalizedName = "ADMIN",
+                ConcurrencyStamp = "F5FF5D8B-5DB6-4B3E-8E18-6DC14B9135F8"
+            });
+
             builder.Entity<Chairs>()
                 .Property(c => c.Name)
                 .IsRequired()

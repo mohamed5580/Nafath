@@ -10,14 +10,14 @@ namespace Infrastructure.ViewModel
 {
     public class ChangePasswordViewModel
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         [Required(ErrorMessageResourceType = typeof(ResourceData),ErrorMessageResourceName ="Password")]
         [MinLength(5)]
-        public string NewPassword { get; set; }
+        public string NewPassword { get; set; } = string.Empty;
 
 
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "ComparePassword")]
         [Compare("NewPassword")]
-        public string ComparePassword { get; set; }
+        public string ComparePassword { get; set; } = string.Empty;
     }
 }

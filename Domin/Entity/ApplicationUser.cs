@@ -1,15 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domin.Entity
 {
-    [Area("Identity")]
     public class ApplicationUser : IdentityUser
     {
 
 
+        [MaxLength(100)]
         public string? FullName { get; set; }
 
         [MaxLength(100)]
@@ -26,7 +24,7 @@ namespace Domin.Entity
         /// URL or path to the stored avatar image (e.g. “/uploads/avatars/…png”)
         /// </summary>
         [MaxLength(256)]
-        public string? AvatarUrl { get; set; } = "1.png";
+        public string? AvatarFile { get; set; } = "user1.jpg";
 
 
         [MaxLength(10)]
@@ -40,5 +38,7 @@ namespace Domin.Entity
 
         [MaxLength(500)]
         public string? Address { get; set; }
+
+
     }
 }

@@ -41,7 +41,7 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<string>("AvatarUrl")
+                    b.Property<string>("AvatarFile")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -60,7 +60,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Gender")
                         .HasMaxLength(10)
@@ -289,8 +290,7 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("AcceptTerms")
                         .HasColumnType("bit");
 
-                    b.Property<string>("AvatarUrl")
-                        .IsRequired()
+                    b.Property<string>("AvatarFile")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -310,20 +310,6 @@ namespace Infrastructure.Migrations
                     b.ToTable((string)null);
 
                     b.ToView("VwUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Infrastructure.Models.ViewModel.NewRole", b =>
-                {
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("RoleId");
-
-                    b.ToTable("NewRole");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

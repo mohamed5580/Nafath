@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -18,6 +19,7 @@ namespace Infrastructure.ViewModel
         public NewRegister NewRegister { get; set; } = new();
 
         [BindNever]
+        [ValidateNever]
         public ChangePasswordViewModel ChangePassword { get; set; } = new();
     }
 
@@ -45,10 +47,10 @@ namespace Infrastructure.ViewModel
         // **must** be non‑nullable bool for asp-for="ActiveUser"
         public bool ActiveUser { get; set; } = true;
 
-        [Required, MinLength(5), MaxLength(20)]
+        [MinLength(5), MaxLength(20)]
         public string? Password { get; set; }
 
-        [Required, Compare("Password")]
+        [Compare(nameof(Password))]
         public string? ComparePassword { get; set; }
     }
 

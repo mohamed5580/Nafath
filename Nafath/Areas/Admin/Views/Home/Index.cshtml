@@ -1,10 +1,7 @@
-﻿
+﻿@model Infrastructure.ViewModel.DashboardViewModel
 @{
     ViewData["Title"] = "Index";
 }
-
-<h1>Index</h1>
-
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -34,14 +31,14 @@
                     <!-- small box -->
                     <div class="small-box bg-info">
                         <div class="inner">
-                            <h3>150</h3>
+                            <h3>@Model.TotalOrders</h3>
 
-                            <p>New Orders</p>
+                            <p>Total Orders</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-bag"></i>
                         </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a asp-area="Admin" asp-controller="OrderManage" asp-action="Index" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 <!-- ./col -->
@@ -49,14 +46,14 @@
                     <!-- small box -->
                     <div class="small-box bg-success">
                         <div class="inner">
-                            <h3>53<sup style="font-size: 20px">%</sup></h3>
+                            <h3>@Model.TotalRevenue.ToString("N0")</h3>
 
-                            <p>Bounce Rate</p>
+                            <p>Total Revenue</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-stats-bars"></i>
                         </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a asp-area="Admin" asp-controller="OrderManage" asp-action="Index" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 <!-- ./col -->
@@ -64,14 +61,14 @@
                     <!-- small box -->
                     <div class="small-box bg-warning">
                         <div class="inner">
-                            <h3>44</h3>
+                            <h3>@Model.TotalUsers</h3>
 
                             <p>User Registrations</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-person-add"></i>
                         </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a asp-area="Admin" asp-controller="Accounts" asp-action="Registers" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 <!-- ./col -->
@@ -79,14 +76,14 @@
                     <!-- small box -->
                     <div class="small-box bg-danger">
                         <div class="inner">
-                            <h3>65</h3>
+                            <h3>@Model.TotalProducts</h3>
 
-                            <p>Unique Visitors</p>
+                            <p>Total Products</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-pie-graph"></i>
                         </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a asp-area="Admin" asp-controller="ProductsManager" asp-action="Index" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 <!-- ./col -->
@@ -534,24 +531,24 @@
                         <div class="card-footer bg-transparent">
                             <div class="row">
                                 <div class="col-4 text-center">
-                                    <input type="text" class="knob" data-readonly="true" value="20" data-width="60" data-height="60"
+                                    <input type="text" class="knob" data-readonly="true" value="@Model.PendingOrders" data-width="60" data-height="60"
                                             data-fgColor="#39CCCC">
 
-                                    <div class="text-white">Mail-Orders</div>
+                                    <div class="text-white">Pending</div>
                                 </div>
                                 <!-- ./col -->
                                 <div class="col-4 text-center">
-                                    <input type="text" class="knob" data-readonly="true" value="50" data-width="60" data-height="60"
+                                    <input type="text" class="knob" data-readonly="true" value="@Model.CompletedOrders" data-width="60" data-height="60"
                                             data-fgColor="#39CCCC">
 
-                                    <div class="text-white">Online</div>
+                                    <div class="text-white">Completed</div>
                                 </div>
                                 <!-- ./col -->
                                 <div class="col-4 text-center">
-                                    <input type="text" class="knob" data-readonly="true" value="30" data-width="60" data-height="60"
+                                    <input type="text" class="knob" data-readonly="true" value="@Model.TotalOrders" data-width="60" data-height="60"
                                             data-fgColor="#39CCCC">
 
-                                    <div class="text-white">In-Store</div>
+                                    <div class="text-white">Total Orders</div>
                                 </div>
                                 <!-- ./col -->
                             </div>
@@ -608,4 +605,104 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
-       
+
+@section Scripts {
+    <script>
+        $(function () {
+            if (typeof Chart === 'undefined') return;
+
+            Object.keys(Chart.instances).forEach(function (key) {
+                Chart.instances[key].destroy();
+            });
+
+            var monthlyLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyLabels));
+            var monthlyRevenue = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyRevenue));
+            var statusLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.OrderStatusLabels));
+            var statusCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.OrderStatusCounts));
+            var statusColors = ['#f56954', '#00a65a', '#f39c12', '#3c8dbc', '#d2d6de'];
+
+            var revenueCanvas = document.getElementById('revenue-chart-canvas');
+            if (revenueCanvas) {
+                new Chart(revenueCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: monthlyLabels,
+                        datasets: [{
+                            label: 'Revenue',
+                            backgroundColor: 'rgba(60,141,188,0.9)',
+                            borderColor: 'rgba(60,141,188,0.8)',
+                            pointRadius: false,
+                            data: monthlyRevenue
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        legend: { display: false },
+                        scales: {
+                            xAxes: [{ gridLines: { display: false } }],
+                            yAxes: [{ gridLines: { display: false } }]
+                        }
+                    }
+                });
+            }
+
+            var salesCanvas = document.getElementById('sales-chart-canvas');
+            if (salesCanvas && statusLabels.length) {
+                new Chart(salesCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: statusLabels,
+                        datasets: [{
+                            data: statusCounts,
+                            backgroundColor: statusColors.slice(0, statusLabels.length)
+                        }]
+                    },
+                    options: {
+                        legend: { display: false },
+                        maintainAspectRatio: false,
+                        responsive: true
+                    }
+                });
+            }
+
+            var lineCanvas = document.getElementById('line-chart');
+            if (lineCanvas) {
+                new Chart(lineCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: monthlyLabels,
+                        datasets: [{
+                            label: 'Revenue',
+                            fill: false,
+                            borderWidth: 2,
+                            lineTension: 0,
+                            spanGaps: true,
+                            borderColor: '#efefef',
+                            pointRadius: 3,
+                            pointHoverRadius: 7,
+                            pointColor: '#efefef',
+                            pointBackgroundColor: '#efefef',
+                            data: monthlyRevenue
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        legend: { display: false },
+                        scales: {
+                            xAxes: [{
+                                ticks: { fontColor: '#efefef' },
+                                gridLines: { display: false, color: '#efefef', drawBorder: false }
+                            }],
+                            yAxes: [{
+                                ticks: { fontColor: '#efefef' },
+                                gridLines: { display: true, color: '#efefef', drawBorder: false }
+                            }]
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

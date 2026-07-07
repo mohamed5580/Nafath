@@ -1990,4 +1990,32 @@ display: block;
     .iconNav {
         margin-left: 20px;
     }
-}
+    .modal-dialog {
+        max-width:90%;
+    }
+    .container, .container-sm {
+        max-width: 700px;
+    }
+
+
+  
+
+    .table-fixed th,
+    .table-fixed td {
+ 
+    }
+    /* keep header visible while body scrolls */
+    .table-scroll-wrapper {
+        max-height: 400px; /* change to desired height */
+        overflow-y: auto;
+        align-items:revert
+    }
+
+    .table-fixed thead th {
+        position: sticky;
+        top: 0;
+        background: #fff; /* match page background */
+        z-index: 5;
+    } 
+    
+ }

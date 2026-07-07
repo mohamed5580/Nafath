@@ -35,7 +35,8 @@ namespace Nafath.Areas.Admin.Controllers
             _productRepo = productRepo;
             _userManager = userManager;
         }
-
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(int page = 1)
         {
             const int pageSize = 20;
@@ -63,7 +64,7 @@ namespace Nafath.Areas.Admin.Controllers
             {
                 Order = o,
 
-                UserName = o.User?.FullName ?? "",
+                UserName = o.User?.FullName +" "+ o.User?.LastName ?? "",
                 UserEmail = o.User?.Email ?? "",
                 UserPhone = o.MobileNumber ?? "",
                 UserAdress = o.Address ?? "",
@@ -147,6 +148,7 @@ namespace Nafath.Areas.Admin.Controllers
                 return View(model);
             }
         }
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -245,6 +247,7 @@ namespace Nafath.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -253,6 +256,17 @@ namespace Nafath.Areas.Admin.Controllers
             if (order == null) return NotFound();
 
             return View(order);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var order = await _orderRepo.FindByIdasync(id);
+            if (order == null)
+                return NotFound();
+
+            await _orderRepo.DeleteOneAsync(order);
+            return Ok();
         }
 
         [HttpPost, ValidateAntiForgeryToken]
@@ -267,6 +281,30 @@ namespace Nafath.Areas.Admin.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private static readonly HashSet<string> AllowedOrderStatuses = new(StringComparer.Ordinal)
+        {
+            "قيد المراجعة",
+            "قيد الشحن",
+            "مكتمل",
+            "ملغي"
+        };
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateStatus(int orderId, string orderStatus)
+        {
+            if (!AllowedOrderStatuses.Contains(orderStatus))
+                return Json(new { success = false, message = "حالة غير صالحة" });
+
+            var order = await _orderRepo.FindByIdasync(orderId);
+            if (order == null)
+                return Json(new { success = false, message = "الطلب غير موجود" });
+
+            order.OrderStatus = orderStatus;
+            await _orderRepo.UpdateOneAsync(order);
+
+            return Json(new { success = true, newStatus = orderStatus });
         }
 
         private void SessionMsg(string MsgType, string Title, string Msg)

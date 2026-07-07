@@ -63,6 +63,9 @@ namespace Nafath.Areas.Identity.Pages.Account.Manage
             [Display(Name = "User Name")]
             public string? UserName { get; set; }
 
+            [Display(Name = "Email")]
+            public string? Email { get; set; }
+
             // Note: Password fields are now optional at the model level
             // because the profile form doesn't need them. We will validate them manually in the password handler.
             [DataType(DataType.Password)]
@@ -86,7 +89,6 @@ namespace Nafath.Areas.Identity.Pages.Account.Manage
             [MaxLength(50)][Display(Name = "City")] public string? City { get; set; }
             [Required][Display(Name = "Gender")] public string? Gender { get; set; }
             [DataType(DataType.Date)][Display(Name = "Date of Birth")] public DateTime? DateOfBirth { get; set; }
-            [MaxLength(50)][Display(Name = "Marital Status")] public string? MaritalStatus { get; set; }
             [MaxLength(20)][Display(Name = "Age Range")] public string? AgeRange { get; set; }
             [MaxLength(50)][Display(Name = "Country")] public string? Country { get; set; }
             [MaxLength(50)][Display(Name = "State")] public string? State { get; set; }
@@ -99,7 +101,7 @@ namespace Nafath.Areas.Identity.Pages.Account.Manage
         {
             Input = new InputModel
             {
-                AvatarUrl = user.AvatarUrl,
+                AvatarUrl = user.AvatarFile,
                 FullName = user.FullName,
                 LastName = user.LastName,
                 UserName = user.UserName,
@@ -107,7 +109,8 @@ namespace Nafath.Areas.Identity.Pages.Account.Manage
                 DateOfBirth = user.DateOfBirth,
                 AgeRange = user.AgeRange,
                 Address = user.Address,
-                PhoneNumber = await _userManager.GetPhoneNumberAsync(user)
+                PhoneNumber = await _userManager.GetPhoneNumberAsync(user),
+                Email= user.Email
             };
         }
 
@@ -157,7 +160,7 @@ namespace Nafath.Areas.Identity.Pages.Account.Manage
                 }
 
                 // 4. Update the user's AvatarUrl property with the web-accessible path
-                user.AvatarUrl = "/uploads/avatars/" + uniqueFileName;
+                user.AvatarFile = "/uploads/avatars/" + uniqueFileName;
             }
 
             // --- Phone update ---
@@ -179,7 +182,7 @@ namespace Nafath.Areas.Identity.Pages.Account.Manage
             user.DateOfBirth = Input.DateOfBirth;
             user.AgeRange = Input.AgeRange;
             user.Address = Input.Address;
-
+            user.Email= Input.Email;
             // Note: UserName is usually not changed this way, but preserving your logic
             if (!string.IsNullOrWhiteSpace(Input.UserName) && Input.UserName != user.UserName)
                 user.UserName = Input.UserName;

@@ -36,16 +36,16 @@ Edit = (id, name, email, image, role, active) => {
     document.getElementById("userEmail").value = email;
     document.getElementById("ddluserRole").value = role;
     var Active = document.getElementById("userActive");
-    if (active == "True")
+    if (active === true || active === "True" || active === "true")
         Active.checked = true;
     else
         Active.checked = false;
     $('#grPassword').hide();
     $('#grcomPassword').hide();
-    document.getElementById("userPassword").value = "$$$$$$";
-    document.getElementById("userCompare").value = "$$$$$$";
+    document.getElementById("userPassword").value = "";
+    document.getElementById("userCompare").value = "";
     document.getElementById("image").hidden = false;
-    document.getElementById("image").src = PathImageuser + image; 
+    document.getElementById("image").src = resolveAvatarUrl(image);
     document.getElementById("imgeHide").value = image;
 }
 
@@ -57,7 +57,7 @@ Rest = () => {
     document.getElementById("userEmail").value = "";
     //document.getElementById("userImage").value = "";
     document.getElementById("ddluserRole").value = "";
-    document.getElementById("userActive").checked = false;
+    document.getElementById("userActive").checked = true;
     $('#grPassword').show();
     $('#grcomPassword').show();
     document.getElementById("userPassword").value = "";
@@ -71,4 +71,20 @@ Rest = () => {
 function ChangePassword(id) {
 
     document.getElementById('userPassId').value = id;
+}
+
+function resolveAvatarUrl(image) {
+    if (!image) {
+        return DefaultAvatarUrl;
+    }
+
+    if (image.startsWith("~/")) {
+        return image.substring(1);
+    }
+
+    if (image.startsWith("/") || /^https?:\/\//i.test(image)) {
+        return image;
+    }
+
+    return PathImageuser + image;
 }

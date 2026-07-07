@@ -4,10 +4,12 @@ using Infrastructure.Data;
 using Infrastructure.Models;
 using Infrastructure.Models.ViewModel;
 using Infrastructure.ViewModel;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 
 namespace Nafath.Areas.Admin.Controllers
@@ -21,22 +23,34 @@ namespace Nafath.Areas.Admin.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        public IList<AuthenticationScheme> ExternalLogins { get; set; }
+
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _environment;
+        private const string DefaultAvatarFile = "user1.jpg";
         #endregion
+
 
         #region Constructor
         public AccountsController(RoleManager<IdentityRole> roleManager,
-            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ApplicationDbContext context)
+            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
+            _environment = environment;
         }
         #endregion
 
         #region Method
-        //[Authorize(Roles = "Admin,User")]
+
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Roles()
         {
             return View(new RolesViewModel
@@ -46,8 +60,8 @@ namespace Nafath.Areas.Admin.Controllers
             });
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Admin,User")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Roles(RolesViewModel model)
         {
             if (ModelState.IsValid) // CORRECTED: Check for VALID model state
@@ -90,8 +104,7 @@ namespace Nafath.Areas.Admin.Controllers
             return View(model);
         }
 
-        //[Authorize(Roles = "Admin,User")]
-
+        [HttpPost]
         public async Task<IActionResult> DeleteRole(string Id)
         {
             var role = _roleManager.Roles.FirstOrDefault(x => x.Id == Id);
@@ -103,31 +116,14 @@ namespace Nafath.Areas.Admin.Controllers
 
 
 
-        //[Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Registers()
         {
-            var users = await _userManager.Users.ToListAsync();
-
-            var userList = new List<VwUsers>();
-            foreach (var user in users)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-                userList.Add(new VwUsers
-                {
-                    Id = user.Id,
-                    Name = user.FullName ?? "",
-                    Email = user.Email ?? "",
-                    Role = roles.FirstOrDefault() ?? "No Role",
-                    AcceptTerms = user.AcceptTerms ?? false,
-                    AvatarUrl = user.AvatarUrl ?? "user1.png"
-                });
-            }
-
             var model = new RegisterViewModel
             {
                 NewRegister = new NewRegister(),
                 Roles = _roleManager.Roles.OrderBy(r => r.Name).ToList(),
-                Users = userList.OrderBy(u => u.Role).ToList()
+                Users = await LoadUsersAsync()
             };
 
             return View(model);
@@ -137,7 +133,7 @@ namespace Nafath.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Registers(RegisterViewModel model)
         {
             /* PSEUDOCODE / PLAN (detailed)
@@ -146,7 +142,7 @@ namespace Nafath.Areas.Admin.Controllers
             2. Handle uploaded file:
                - If files present, save first file to configured path with GUID filename and set model.NewRegister.ImageUser to the filename.
                - If no file:
-                 - If editing existing user (Id provided) -> load existing user's AvatarUrl and use it (fallback to default).
+                 - If editing existing user (Id provided) -> load existing user's AvatarFile and use it (fallback to default).
                  - Else (creating) -> set default avatar path.
             3. For creating a new user:
                - Ensure required fields (Password and RoleName) are present; if not, add ModelState errors and return View with repopulated lists.
@@ -172,36 +168,10 @@ namespace Nafath.Areas.Admin.Controllers
                 return View(model);
             }
 
-            // 2. Handle uploaded file
-            var files = HttpContext.Request.Form.Files;
-            if (files.Count > 0)
-            {
-                var file = files[0];
-                if (file.Length > 0)
-                {
-                    string imageName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    var saveFolder = Path.Combine("wwwroot", Helper.PathSaveImageuser);
-                    if (!Directory.Exists(saveFolder))
-                        Directory.CreateDirectory(saveFolder);
+            var uploadedAvatarFile = await SaveAvatarAsync(model.NewRegister.ImageFile);
+            if (!string.IsNullOrWhiteSpace(uploadedAvatarFile))
+                model.NewRegister.ImageUser = uploadedAvatarFile;
 
-                    var filePath = Path.Combine(saveFolder, imageName);
-                    using var fileStream = new FileStream(filePath, FileMode.Create);
-                    await file.CopyToAsync(fileStream);
-                    model.NewRegister.ImageUser = imageName;
-                }
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(model.NewRegister?.Id))
-                {
-                    var existingUser = await _userManager.FindByIdAsync(model.NewRegister.Id);
-                    model.NewRegister.ImageUser = existingUser?.AvatarUrl ?? Path.Combine("Images", "user", "1.png");
-                }
-                else
-                {
-                    model.NewRegister.ImageUser = Path.Combine("Images", "user", "1.png");
-                }
-            }
 
             // 3. Create new user
             if (string.IsNullOrEmpty(model.NewRegister.Id))
@@ -229,8 +199,19 @@ namespace Nafath.Areas.Admin.Controllers
                     UserName = model.NewRegister.Email,
                     Email = model.NewRegister.Email,
                     AcceptTerms = model.NewRegister.ActiveUser,
-                    AvatarUrl = model.NewRegister.ImageUser
+                    AvatarFile = NormalizeStoredAvatar(model.NewRegister.ImageUser)
                 };
+                var exist = await _userManager.FindByEmailAsync(model.NewRegister.Email!);
+
+                if (exist != null)
+                {
+                    ModelState.AddModelError("", "البريد الإلكتروني مستخدم بالفعل");
+
+                    model.Roles = _roleManager.Roles.OrderBy(x => x.Name).ToList();
+                    model.Users = await LoadUsersAsync();
+
+                    return View(model);
+                }
 
                 var result = await _userManager.CreateAsync(user, model.NewRegister.Password!);
                 if (result.Succeeded)
@@ -274,16 +255,38 @@ namespace Nafath.Areas.Admin.Controllers
                     model.Users = await LoadUsersAsync();
                     return View(model);
                 }
+                var oldAvatarFile = userUpdate.AvatarFile;
+                var newAvatarFile = string.IsNullOrWhiteSpace(model.NewRegister.ImageUser)
+                    ? oldAvatarFile
+                    : model.NewRegister.ImageUser;
+
+                if (!string.Equals(userUpdate.Email, model.NewRegister.Email, StringComparison.OrdinalIgnoreCase))
+                {
+                    var existingEmail = await _userManager.FindByEmailAsync(model.NewRegister.Email!);
+                    if (existingEmail != null && existingEmail.Id != userUpdate.Id)
+                    {
+                        ModelState.AddModelError("", "البريد الإلكتروني مستخدم بالفعل");
+                        model.Roles = _roleManager.Roles.OrderBy(r => r.Name).ToList();
+                        model.Users = await LoadUsersAsync();
+                        return View(model);
+                    }
+                }
 
                 userUpdate.FullName = model.NewRegister.FullName;
                 userUpdate.UserName = model.NewRegister.Email;
                 userUpdate.Email = model.NewRegister.Email;
                 userUpdate.AcceptTerms = model.NewRegister.ActiveUser;
-                userUpdate.AvatarUrl = model.NewRegister.ImageUser;
+                userUpdate.AvatarFile = NormalizeStoredAvatar(newAvatarFile);
 
                 var result = await _userManager.UpdateAsync(userUpdate);
                 if (result.Succeeded)
                 {
+                    if (!string.IsNullOrWhiteSpace(uploadedAvatarFile) &&
+                        !string.Equals(oldAvatarFile, userUpdate.AvatarFile, StringComparison.OrdinalIgnoreCase))
+                    {
+                        DeleteStoredAvatar(oldAvatarFile);
+                    }
+
                     var oldRoles = await _userManager.GetRolesAsync(userUpdate);
                     if (oldRoles.Any())
                         await _userManager.RemoveFromRolesAsync(userUpdate, oldRoles);
@@ -324,7 +327,9 @@ namespace Nafath.Areas.Admin.Controllers
 
             return RedirectToAction("Registers", "Accounts");
         }
-
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         // دالة مساعدة لتحميل جميع المستخدمين من UserManager
         private async Task<List<VwUsers>> LoadUsersAsync()
         {
@@ -341,42 +346,46 @@ namespace Nafath.Areas.Admin.Controllers
                     Email = user.Email ?? "",
                     Role = roles.FirstOrDefault() ?? "No Role",
                     AcceptTerms = user.AcceptTerms ?? false,
-                    AvatarUrl = user.AvatarUrl ?? "user1.png"
+                    AvatarFile = NormalizeStoredAvatar(user.AvatarFile)
                 });
             }
 
             return userList.OrderBy(u => u.Role).ToList();
         }
 
-        //[Authorize(Roles = "Admin,User")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> DeleteUser(string userId)
         {
-            var User = _userManager.Users.FirstOrDefault(x => x.Id == userId);
-
-            if (User.AvatarUrl != null && User.AvatarUrl != Guid.Empty.ToString())
-            {
-                var PathImage = Path.Combine(@"wwwroot/", Helper.PathImageuser, User.AvatarUrl);
-                if (System.IO.File.Exists(PathImage))
-                    System.IO.File.Delete(PathImage);
-            }
-
-            if ((await _userManager.DeleteAsync(User)).Succeeded)
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
                 return RedirectToAction("Registers", "Accounts");
+
+            var avatarFile = user.AvatarFile;
+            if ((await _userManager.DeleteAsync(user)).Succeeded)
+                DeleteStoredAvatar(avatarFile);
 
             return RedirectToAction("Registers", "Accounts");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Admin,User")]
-        public async Task<IActionResult> ChangePassword(RegisterViewModel model)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ChangePassword([Bind(Prefix = nameof(RegisterViewModel.ChangePassword))] ChangePasswordViewModel model)
         {
-            var user = await _userManager.FindByIdAsync(model.ChangePassword.Id);
+            if (!ModelState.IsValid || string.IsNullOrWhiteSpace(model.Id))
+            {
+                SessionMsg(Helper.Error, ResourceWeb.lbNotSaved, ResourceWeb.lbMsgNotSavedChangePassword);
+                return RedirectToAction(nameof(Registers));
+            }
+
+            var user = await _userManager.FindByIdAsync(model.Id);
             if (user != null)
             {
                 await _userManager.RemovePasswordAsync(user);
-                var AddNewPassword = await _userManager.AddPasswordAsync(user, model.ChangePassword.NewPassword);
+                var AddNewPassword = await _userManager.AddPasswordAsync(user, model.NewPassword);
                 if (AddNewPassword.Succeeded)
                     SessionMsg(Helper.Success, ResourceWeb.lbSave, ResourceWeb.lbMsgSavedChangePassword);
                 else
@@ -392,11 +401,7 @@ namespace Nafath.Areas.Admin.Controllers
         [AllowAnonymous]
         public IActionResult Login()
         {
-            SessionMsg(
-                   Helper.Error,
-                   ResourceWeb.lbNotSaved,
-                   ResourceWeb.lbMsgNotSavedChangePassword
-               );
+      
             return View();
         }
 
@@ -405,58 +410,126 @@ namespace Nafath.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (!ModelState.IsValid) 
-                
+       
+            string returnUrl = Url.Content("~/");
 
-                return View(model);
-
-            var user = await _userManager.FindByEmailAsync(model.Email);
-
-            if (user == null)
+            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            
+            string login = model.Email;
+            if (new EmailAddressAttribute().IsValid(model.Email))
             {
-                ModelState.AddModelError("", "المستخدم غير موجود");
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null)
+                {
+                    login = user.UserName;
+                }
+            }
+
+            if (ModelState.IsValid)
+            {
+                var result = await _signInManager.PasswordSignInAsync(login, model.Password, model.RememberMy, lockoutOnFailure: false);
+                if (result.Succeeded)
+                {
+                    ModelState.AddModelError("", $"فشل تسجيل الدخول: {result}");
+                    return RedirectToAction("Index", "Home", new { area = "Admin" });
+                }
+                if (result.RequiresTwoFactor)
+                {
+                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = model.RememberMy });
+                }
+                if (result.IsLockedOut)
+                {
+                    return RedirectToPage("./Lockout");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                }
+                if (result.Succeeded)
+                {
+
+                    return RedirectToAction("Index", "Home", new { area = "Admin" });
+                }
+                ModelState.AddModelError("", $"فشل تسجيل الدخول: {result}");
                 return View(model);
             }
 
-            // التحقق من كلمة المرور مباشرة
-            var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
-
-            if (!passwordValid)
-            {
-                ModelState.AddModelError("", "فشل تسجيل الدخول:");
-                return View(model);
-            }
-            if (!user.EmailConfirmed)
-            {
-                ModelState.AddModelError("", "يجب تفعيل الحساب أولاً");
-                return View(model);
-            }
-
-            var result = await _signInManager.PasswordSignInAsync(
-                    model.Email, // قد يحتاج إلى تغيير
-                    model.Password,
-                    model.RememberMy,
-                    lockoutOnFailure: false
-                );
-
-            if (result.Succeeded)
-            {
-
-                return RedirectToAction("Roles", "Accounts", new { area = "Admin" });
-            }
-
-            ModelState.AddModelError("", $"فشل تسجيل الدخول: {result}");
             return View(model);
+
+
         }
 
 
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction(nameof(Login));
+        }
+
+        private async Task<string?> SaveAvatarAsync(IFormFile? imageFile)
+        {
+            if (imageFile == null || imageFile.Length == 0)
+                return null;
+
+            var imageName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
+            var folder = Path.Combine(_environment.WebRootPath, Helper.PathSaveImageuser);
+
+            Directory.CreateDirectory(folder);
+
+            await using var stream = new FileStream(Path.Combine(folder, imageName), FileMode.Create);
+            await imageFile.CopyToAsync(stream);
+
+            return imageName;
+        }
+
+        private static string NormalizeStoredAvatar(string? avatarFile)
+        {
+            return string.IsNullOrWhiteSpace(avatarFile)
+                ? DefaultAvatarFile
+                : avatarFile.Trim();
+        }
+
+        private void DeleteStoredAvatar(string? avatarFile)
+        {
+            var fileName = GetAdminAvatarFileName(avatarFile);
+            if (string.IsNullOrWhiteSpace(fileName) || IsDefaultAvatar(fileName))
+                return;
+
+            var path = Path.Combine(_environment.WebRootPath, Helper.PathSaveImageuser, fileName);
+            if (System.IO.File.Exists(path))
+                System.IO.File.Delete(path);
+        }
+
+        private static string? GetAdminAvatarFileName(string? avatarFile)
+        {
+            if (string.IsNullOrWhiteSpace(avatarFile))
+                return null;
+
+            var value = avatarFile.Trim();
+            if (value.StartsWith("~/", StringComparison.Ordinal))
+                value = value[1..];
+
+            if (value.StartsWith(Helper.PathImageuser, StringComparison.OrdinalIgnoreCase))
+                return Path.GetFileName(value.Replace('/', Path.DirectorySeparatorChar));
+
+            if (value.StartsWith("/", StringComparison.Ordinal) ||
+                Uri.TryCreate(value, UriKind.Absolute, out _))
+            {
+                return null;
+            }
+
+            return Path.GetFileName(value);
+        }
+
+        private static bool IsDefaultAvatar(string fileName)
+        {
+            return string.Equals(fileName, DefaultAvatarFile, StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(fileName, "user1.png", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(fileName, "Defult.png", StringComparison.OrdinalIgnoreCase);
         }
 
         private void SessionMsg(string MsgType, string Title, string Msg)

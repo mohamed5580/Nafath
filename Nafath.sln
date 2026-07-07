@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36203.30
+VisualStudioVersion = 17.14.37216.2 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nafath", "Nafath\Nafath.csproj", "{58329932-CE27-4B85-A6A1-AE538CAEF9CA}"
 EndProject
@@ -20,11 +20,9 @@ Global
 		{58329932-CE27-4B85-A6A1-AE538CAEF9CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58329932-CE27-4B85-A6A1-AE538CAEF9CA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E4659518-ECE0-45F8-8FA9-E185F8DDAA3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4659518-ECE0-45F8-8FA9-E185F8DDAA3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4659518-ECE0-45F8-8FA9-E185F8DDAA3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4659518-ECE0-45F8-8FA9-E185F8DDAA3E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{67381763-01EC-4AF0-ADC4-E93157BF96B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{67381763-01EC-4AF0-ADC4-E93157BF96B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67381763-01EC-4AF0-ADC4-E93157BF96B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67381763-01EC-4AF0-ADC4-E93157BF96B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
