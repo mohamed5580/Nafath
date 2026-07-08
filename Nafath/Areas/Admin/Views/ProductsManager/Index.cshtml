@@ -55,87 +55,83 @@
                          </button>
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered table-hover">
-                             <thead class="bg-white text-uppercase">
-                                <tr>
-                                    <th><input type="checkbox" /></th>
-                                    <th>@Html.DisplayNameFor(m => m.First().ImageUrl)</th>
-                                    <th>@Html.DisplayNameFor(m => m.First().Name)</th>
-                                    <th>@Html.DisplayNameFor(m => m.First().ProductType.Name)</th>
-                                    <th>@Html.DisplayNameFor(m => m.First().Description)</th>
-                                    <th>@Html.DisplayNameFor(m => m.First().IsAvailable)</th>
-                                    <th>@Html.DisplayNameFor(m => m.First().Price)</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover text-center align-middle text-nowrap">
+                                <thead class="bg-white text-uppercase">
                                     <tr>
-                                        <td><input type="checkbox" /></td>
-                                        <td>
-                                            <img src="@item.ImageUrl"
-                                                 class="img-fluid rounded-circle"
-                                                 alt="@item.Name"
-                                                 width="50" height="50" />
-                                        </td>
-                                        <td>@item.Name</td>
-                                        <td>@item.ProductType?.Name</td>
-                                        <td>@item.Description</td>
-                                        <td>@(item.IsAvailable ? "Yes" : "No")</td>
-                                        <td>@item.Price</td>
-                                        <td>
-                                            <button type="button"
-                                                class="badge bg-success text-white border-0"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#editModal-@item.Id"
-                                                onclick="resetCreateForm()">
-                                              @ResourceWeb.lbEdit
-                                            </button>
-                                            |
-                                            <button class="badge bg-info text-white"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#viewModal-@item.Id"
-                                                    onclick="resetCreateForm()">
-                                              @ResourceWeb.lbDetails
-                                            </button>
-                                            |
-                                            <button class="badge bg-danger text-white"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#deleteModal-@item.Id">
-                                              @ResourceWeb.lbDelete
-                                            </button>
-                                        </td>
+                                        <th><input type="checkbox" /></th>
+                                        <th>@Html.DisplayNameFor(m => m.First().ImageUrl)</th>
+                                        <th>@Html.DisplayNameFor(m => m.First().Name)</th>
+                                        <th>@Html.DisplayNameFor(m => m.First().ProductType.Name)</th>
+                                        <th style="white-space: normal; min-width: 250px;">@Html.DisplayNameFor(m => m.First().Description)</th>
+                                        <th>@Html.DisplayNameFor(m => m.First().IsAvailable)</th>
+                                        <th>@Html.DisplayNameFor(m => m.First().Price)</th>
+                                        <th>Actions</th>
                                     </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td><input type="checkbox" /></td>
+                                            <td>
+                                                <img src="@item.ImageUrl"
+                                                     class="img-fluid rounded-circle"
+                                                     alt="@item.Name"
+                                                     width="50" height="50" style="object-fit: cover;" />
+                                            </td>
+                                            <td>@item.Name</td>
+                                            <td>@item.ProductType?.Name</td>
+                                            <td style="white-space: normal; text-align: justify;">@item.Description</td>
+                                            <td>
+                                                <span class="badge @(item.IsAvailable ? "bg-success" : "bg-danger")">
+                                                    @(item.IsAvailable ? "Yes" : "No")
+                                                </span>
+                                            </td>
+                                            <td>@item.Price</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-success"
+                                                        data-bs-toggle="modal" data-bs-target="#editModal-@item.Id" onclick="resetCreateForm()">
+                                                    @ResourceWeb.lbEdit
+                                                </button>
+                        
+                                                <button type="button" class="btn btn-sm btn-info text-white mx-1"
+                                                        data-bs-toggle="modal" data-bs-target="#viewModal-@item.Id" onclick="resetCreateForm()">
+                                                    @ResourceWeb.lbDetails
+                                                </button>
+                        
+                                                <button type="button" class="btn btn-sm btn-danger"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal-@item.Id">
+                                                    @ResourceWeb.lbDelete
+                                                </button>
 
-                                    <!-- DELETE CONFIRMATION MODAL -->
-                                    <div class="modal fade" id="deleteModal-@item.Id" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content border-danger">
-                                                <div class="modal-header bg-danger text-white">
-                                                    <h5 class="modal-title">@ResourceWeb.lbDeleteProduct</h5>
-                                                    <button type="button" class="btn-close btn-close-white"
-                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <div class="modal fade" id="deleteModal-@item.Id" tabindex="-1" aria-hidden="true" style="white-space: normal;">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content border-danger">
+                                                            <div class="modal-header bg-danger text-white">
+                                                                <h5 class="modal-title">@ResourceWeb.lbDeleteProduct</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form asp-area="Admin" asp-controller="ProductsManager" asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post">
+                                                                @Html.AntiForgeryToken()
+                                                                <div class="modal-body text-start">
+                                                                    <p>@ResourceWeb.lbConfirmDeleteProduct <strong>@item.Name</strong>?</p>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@ResourceWeb.lbcancelButtonText</button>
+                                                                    <button type="submit" class="btn btn-danger">@ResourceWeb.lbDelete</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <form asp-area="Admin" asp-controller="ProductsManager" asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post">
-                                                    @Html.AntiForgeryToken()
-                                                    <div class="modal-body">
-                                                        <p>@ResourceWeb.lbConfirmDeleteProduct <strong>@item.Name</strong>?</p>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">@ResourceWeb.lbcancelButtonText</button>
-                                                        <button type="submit" class="btn btn-danger">
-                                                            @ResourceWeb.lbDelete
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            </tbody>
-                        </table>
+
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -109,7 +109,7 @@ public class OrderController : Controller
         {
             UserId = userId,
             OrderDate = DateTime.Now,
-            OrderStatus = model.OrderStatus ?? "قيد المراجعة",
+            OrderStatus = model.OrderStatus ?? OrderStatuses.PendingReview,
             PaymentMethod = model.PaymentMethod,
             Address = model.Address,
             MobileNumber = model.MobileNumber,

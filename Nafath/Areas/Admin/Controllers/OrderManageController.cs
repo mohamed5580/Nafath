@@ -283,18 +283,10 @@ namespace Nafath.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private static readonly HashSet<string> AllowedOrderStatuses = new(StringComparer.Ordinal)
-        {
-            "قيد المراجعة",
-            "قيد الشحن",
-            "مكتمل",
-            "ملغي"
-        };
-
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int orderId, string orderStatus)
         {
-            if (!AllowedOrderStatuses.Contains(orderStatus))
+            if (!OrderStatuses.IsAllowed(orderStatus))
                 return Json(new { success = false, message = "حالة غير صالحة" });
 
             var order = await _orderRepo.FindByIdasync(orderId);

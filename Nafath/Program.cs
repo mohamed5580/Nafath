@@ -42,6 +42,7 @@ builder.Services.AddSession(options =>
 
 // ... rest of the code
 builder.Services.AddTransient(typeof(IRepository<>), typeof(MainRepository<>));
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 
 
