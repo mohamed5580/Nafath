@@ -24,7 +24,7 @@ namespace Domin.Entity
         /// URL or path to the stored avatar image (e.g. “/uploads/avatars/…png”)
         /// </summary>
         [MaxLength(256)]
-        public string? AvatarFile { get; set; } = "user1.jpg";
+        public string? AvatarFile { get; set; } = "user.png";
 
 
         [MaxLength(10)]

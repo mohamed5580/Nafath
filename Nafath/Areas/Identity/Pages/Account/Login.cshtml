@@ -19,8 +19,8 @@
                             <div class="d-flex align-items-center auth-content">
                                 <div class="col-lg-7 align-self-center">
                                     <div class="p-3">
-                                        <h2 class="mb-2">Login In</h2>
-                                        <p>Login to stay connected.</p>
+                                        <h2 class="mb-2">تسجيل الدخول</h2>
+                                        <p></p>
 
                                         <form id="account"
                                               method="post"
@@ -56,14 +56,14 @@
                                                 </div>
 
                                                 <!-- Remember Me -->
-                                                <div class="col-lg-6">
+                                                <div class="col-lg-6 rtl ">
                                                     <div class="custom-control custom-checkbox mb-3">
                                                         <input asp-for="Input.RememberMe"
                                                                class="custom-control-input"
                                                                id="rememberMe" />
                                                         <label class="custom-control-label control-label-1"
                                                                for="rememberMe">
-                                                            @Html.DisplayNameFor(m => m.Input.RememberMe)
+                                                            تذكر كلمة السر
                                                         </label>
                                                     </div>
                                                 </div>
@@ -72,21 +72,62 @@
                                                 <div class="col-lg-6 text-right">
                                                     <a asp-page="./ForgotPassword"
                                                        class="text-primary">
-                                                        Forgot Password?
+                                                       هل نسيت كلمة السر؟
                                                     </a>
                                                 </div>
                                             </div>
 
-                                            <button type="submit" class="btn btn-primary">Login In</button>
+                                            <button type="submit" class="btn btn-primary">تسجيل  الدخول</button>
 
                                             <p class="mt-3">
-                                                Create an Account
+                                                انشاء حساب جديد
                                                 <a asp-page="./Register"
                                                    asp-route-returnUrl="@Model.ReturnUrl"
                                                    class="text-primary">
-                                                    Sign Up
+                                                   تسجيل
                                                 </a>
                                             </p>
+
+                                           
+                                        </form>
+
+                                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="mt-3">
+                                          @foreach (var provider in Model.ExternalLogins)
+                                            {
+                                                string imageSrc = string.Empty;
+
+                                                switch (provider.DisplayName)
+                                                {
+                                                    case "Google":
+                                                        imageSrc = Url.Content("~/Nafas/assets/images/google.png");
+                                                        break;
+
+                                                    case "Facebook":
+                                                        imageSrc = Url.Content("~/Nafas/assets/images/facebook.png");
+                                                        break;
+
+                                                    case "Microsoft":
+                                                        imageSrc = "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg";
+                                                        break;
+                                                }
+                                            
+
+                                            <button type="submit"
+                                                    class="btn btn-light btn-block d-flex align-items-center justify-content-center gap-2"
+                                                    name="provider"
+                                                    value="@provider.Name"
+                                                    title="Log in using your @provider.DisplayName account">
+
+                                                @if (!string.IsNullOrEmpty(imageSrc))
+                                                {
+                                                    <img src="@imageSrc"
+                                                         alt="@provider.DisplayName"
+                                                         style="width:20px;height:20px;object-fit:contain;" />
+                                                }
+
+                                                <span>Login with @provider.DisplayName</span>
+                                            </button>
+                                            }
                                         </form>
 
                                     </div>

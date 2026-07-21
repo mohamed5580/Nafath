@@ -68,7 +68,7 @@ namespace Infrastructure.Data
                  .WithMany() // no navigation collection on ApplicationUser
                  .HasForeignKey(o => o.UserId)
                  .HasPrincipalKey(u => u.Id)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
 
                 b.Property(o => o.OrderStatus)
                  .HasMaxLength(50)
@@ -80,26 +80,11 @@ namespace Infrastructure.Data
             });
 
 
-            builder.Entity<OrderItem>(oi =>
-            {
-                // ربط صحيح لـ Product
-                oi.HasOne(oi => oi.Product)
-                  .WithMany(p => p.OrderItems)
-                  .HasForeignKey(oi => oi.ProductId)
-                  .OnDelete(DeleteBehavior.Restrict);
-
-                // ربط صحيح لـ Order
-                oi.HasOne(oi => oi.Order)
-                  .WithMany(o => o.OrderItems)
-                  .HasForeignKey(oi => oi.OrderId)
-                  .OnDelete(DeleteBehavior.Cascade);
-
-                oi.Property(oi => oi.UnitPrice).HasColumnType("decimal(18,2)");
-                oi.Property(x => x.TotalPrice)
-                  .HasPrecision(18, 2)
-                  .HasComputedColumnSql("[Quantity] * [UnitPrice]", stored: true);
-
-            });
+            builder.Entity<OrderItem>()
+            .HasOne(x => x.Product)
+            .WithMany(x => x.OrderItems)
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
 
 
             builder.Entity<ProductType>(b =>

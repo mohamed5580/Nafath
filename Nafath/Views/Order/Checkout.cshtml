@@ -28,25 +28,25 @@
                             <!-- Name -->
                             <div class="col-md-6">
                                 <label asp-for="Name" class="form-label">الاسم*</label>
-                                <input asp-for="Name" class="form-control" />
+                                <input asp-for="Name" class="form-control" required />
                                 <span asp-validation-for="Name" class="text-danger small"></span>
                             </div>
                             <!-- Email -->
                             <div class="col-md-6">
                                 <label asp-for="Email" class="form-label">البريد الإلكتروني*</label>
-                                <input asp-for="Email" type="email" class="form-control" readonly />
+                                <input asp-for="Email" type="email" class="form-control" readonly required />
                                 <span asp-validation-for="Email" class="text-danger small"></span>
                             </div>
                             <!-- Mobile -->
                             <div class="col-md-6">
                                 <label asp-for="MobileNumber" class="form-label">رقم الجوال*</label>
-                                <input asp-for="MobileNumber" type="tel" class="form-control" />
+                                <input asp-for="MobileNumber" type="tel" class="form-control" required />
                                 <span asp-validation-for="MobileNumber" class="text-danger small"></span>
                             </div>
                             <!-- Payment Method -->
                             <div class="col-md-6">
                                 <label asp-for="PaymentMethod" class="form-label">طريقة الدفع*</label>
-                                <select asp-for="PaymentMethod" class="form-select">
+                                <select asp-for="PaymentMethod" class="form-select" required>
                                     <option value="">اختر طريقة الدفع</option>
                                     <option value="COD">الدفع عند الاستلام</option>
                                     <option value="CreditCard">بطاقة ائتمان</option>
@@ -57,7 +57,7 @@
                             <!-- Address -->
                             <div class="col-12">
                                 <label asp-for="Address" class="form-label">العنوان الكامل*</label>
-                                <textarea asp-for="Address" class="form-control" rows="4"></textarea>
+                                <textarea asp-for="Address" class="form-control" rows="4" required></textarea>
                                 <span asp-validation-for="Address" class="text-danger small"></span>
                             </div>
                         </div>

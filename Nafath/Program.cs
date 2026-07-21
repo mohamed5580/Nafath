@@ -39,8 +39,24 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId =
+            builder.Configuration["Authentication:GoogleKeys:ClientId"];
 
-// ... rest of the code
+        options.ClientSecret =
+            builder.Configuration["Authentication:GoogleKeys:ClientSecret"];
+    })
+    .AddFacebook(options =>
+    {
+        options.AppId =
+            builder.Configuration["Authentication:FacebookKeys:AppId"];
+
+        options.AppSecret =
+            builder.Configuration["Authentication:FacebookKeys:AppSecret"];
+    });
+
 builder.Services.AddTransient(typeof(IRepository<>), typeof(MainRepository<>));
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 

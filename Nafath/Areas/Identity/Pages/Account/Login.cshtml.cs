@@ -152,5 +152,57 @@ namespace Nafath.Areas.Identity.Pages.Account
             // If we got this far, something failed, redisplay form
             return Page();
         }
+        public IActionResult OnGetGoogleLogin(string returnUrl = null)
+        {
+            // تأكد من وجود returnUrl إذا أردت العودة إلى الصفحة السابقة
+            var redirectUrl = Url.Page("./Login", pageHandler: "GoogleResponse", new { returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            return Challenge(properties, "Google");
+        }
+        public async Task<IActionResult> OnGetGoogleResponse(string returnUrl = null)
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+                return RedirectToPage("./Login");
+
+            var result = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider, info.ProviderKey, false);
+
+            if (result.Succeeded)
+                return LocalRedirect(returnUrl ?? "/");
+
+            // إذا فشل، يمكن التوجيه إلى صفحة التسجيل
+            return RedirectToPage("./Register", new { returnUrl });
+        }
+        public IActionResult FacebookLogin()
+        {
+            var redirectUrl = Url.Action("FacebookResponse");
+
+            var properties =
+                _signInManager.ConfigureExternalAuthenticationProperties(
+                    "Facebook",
+                    redirectUrl);
+
+            return Challenge(properties, "Facebook");
+        }
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var info =
+                await _signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+                return RedirectToAction("Login");
+
+            var result =
+                await _signInManager.ExternalLoginSignInAsync(
+                    info.LoginProvider,
+                    info.ProviderKey,
+                    false);
+
+            if (result.Succeeded)
+                return RedirectToAction("Index", "Home");
+
+            return RedirectToAction("Register");
+        }
     }
 }

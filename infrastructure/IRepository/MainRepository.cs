@@ -191,7 +191,7 @@ namespace Infrastructure.IRepository
         public async Task<int> CountAsync(Expression<Func<T, bool>> predicate) => await _context.Set<T>().CountAsync(predicate);
 
         public async Task<IDbContextTransaction> BeginTransactionAsync() => await _context.Database.BeginTransactionAsync();
-
+            
         public async Task DeleteOneAsync(T entity) { _context.Set<T>().Remove(entity); await _context.SaveChangesAsync(); }
         public async Task UpdateOneAsync(T entity) { _context.Set<T>().Update(entity); await _context.SaveChangesAsync(); }
         public async Task DeleteRangeAsync(IEnumerable<T> entities) { _context.Set<T>().RemoveRange(entities); await _context.SaveChangesAsync(); }

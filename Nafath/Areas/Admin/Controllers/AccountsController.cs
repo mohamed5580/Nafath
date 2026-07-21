@@ -27,7 +27,7 @@ namespace Nafath.Areas.Admin.Controllers
 
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
-        private const string DefaultAvatarFile = "user1.jpg";
+        private const string DefaultAvatarFile = "user.png";
         #endregion
 
 
@@ -526,7 +526,7 @@ namespace Nafath.Areas.Admin.Controllers
         private static bool IsDefaultAvatar(string fileName)
         {
             return string.Equals(fileName, DefaultAvatarFile, StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(fileName, "user1.png", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(fileName, "user.png", StringComparison.OrdinalIgnoreCase) ||
                    string.Equals(fileName, "Defult.png", StringComparison.OrdinalIgnoreCase);
         }
 

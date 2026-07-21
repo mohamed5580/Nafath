@@ -132,8 +132,8 @@ namespace Nafath.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required(ErrorMessage = "You must agree to the terms of use.")]
-            [Display(Name = "I agree with the terms of use")]
+            [Required(ErrorMessage = "يجب عليك الموافقة علي شروط الاستخدام")]
+            [Display(Name = "اوافق علي شروط الاسنخدام")]
             public bool AcceptTerms { get; set; }
         }
 
