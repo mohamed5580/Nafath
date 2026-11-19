@@ -3,7 +3,7 @@
 @inject IWebHostEnvironment Env 
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "إدارة المنتجات";
 }
 
 <partial name="_Notifications" />
@@ -20,18 +20,18 @@
     </div>
 }
 
-<div class="wrapper">
+<div class="wrapper" lang="ar" dir="rtl">
     <!--Content-Header-->
-    <div class="content-header">
+    <div class="content-header py-3">
         <div class="container-fluid">
-            <div class="row mb-2">
+            <div class="row align-items-center">
                 <div class="col-sm-6">
-                    <h1 class="m-0 text-dark">
-                        قائمة المنتجات
-                    </h1>
+                    <h2 class="m-0 text-dark fw-bold">
+                        <i class="las la-boxes me-2"></i> إدارة المنتجات والمخزون
+                    </h2>
                 </div>
                 <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
+                    <ol class="breadcrumb float-sm-start mb-0">
                         <li class="breadcrumb-item"><a href="/Admin/Home/Index">@ResourceWeb.lbHomePage</a></li>
                         <li class="breadcrumb-item active">إدارة المنتجات</li>
                     </ol>
@@ -43,95 +43,123 @@
 
     <!-- Main content -->
     <section class="content">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div  class="card-header d-flex align-items-center justify-content-between">
-                         <h3 class="card-title mb-0">قائمة المنتجات</h3>
-                         <button class="btn btn-info" data-bs-toggle="modal"
-                                 data-bs-target="#createModal"
-                                 onclick="resetCreateForm()">
-                            <i class="las la-plus me-2"></i>@ResourceWeb.lbAddNew
-                         </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover text-center align-middle text-nowrap">
-                                <thead class="bg-white text-uppercase">
+        <div class="container-fluid">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title fw-bold mb-0">قائمة المنتجات (@Model.Count())</h5>
+                    <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal"
+                            data-bs-target="#createModal"
+                            onclick="resetCreateForm()">
+                        <i class="las la-plus me-1"></i> @ResourceWeb.lbAddNew
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center align-middle mb-0 text-nowrap">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>الصورة</th>
+                                    <th>اسم المنتج</th>
+                                    <th>الكود (SKU)</th>
+                                    <th>التصنيف</th>
+                                    <th>السعر</th>
+                                    <th>سعر قبل الخصم</th>
+                                    <th>المخزون</th>
+                                    <th>الحالة</th>
+                                    <th>الصور الإضافية</th>
+                                    <th>العمليات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
                                     <tr>
-                                        <th><input type="checkbox" /></th>
-                                        <th>@Html.DisplayNameFor(m => m.First().ImageUrl)</th>
-                                        <th>@Html.DisplayNameFor(m => m.First().Name)</th>
-                                        <th>@Html.DisplayNameFor(m => m.First().ProductType.Name)</th>
-                                        <th style="white-space: normal; min-width: 250px;">@Html.DisplayNameFor(m => m.First().Description)</th>
-                                        <th>@Html.DisplayNameFor(m => m.First().IsAvailable)</th>
-                                        <th>@Html.DisplayNameFor(m => m.First().Price)</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        <tr>
-                                            <td><input type="checkbox" /></td>
-                                            <td>
-                                                <img src="@item.ImageUrl"
-                                                     class="img-fluid rounded-circle"
-                                                     alt="@item.Name"
-                                                     width="50" height="50" style="object-fit: cover;" />
-                                            </td>
-                                            <td>@item.Name</td>
-                                            <td>@item.ProductType?.Name</td>
-                                            <td style="white-space: normal; text-align: justify;">@item.Description</td>
-                                            <td>
-                                                <span class="badge @(item.IsAvailable ? "bg-success" : "bg-danger")">
-                                                    @(item.IsAvailable ? "Yes" : "No")
-                                                </span>
-                                            </td>
-                                            <td>@item.Price</td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-success"
-                                                        data-bs-toggle="modal" data-bs-target="#editModal-@item.Id" onclick="resetCreateForm()">
-                                                    @ResourceWeb.lbEdit
-                                                </button>
-                        
-                                                <button type="button" class="btn btn-sm btn-info text-white mx-1"
-                                                        data-bs-toggle="modal" data-bs-target="#viewModal-@item.Id" onclick="resetCreateForm()">
-                                                    @ResourceWeb.lbDetails
-                                                </button>
-                        
-                                                <button type="button" class="btn btn-sm btn-danger"
-                                                        data-bs-toggle="modal" data-bs-target="#deleteModal-@item.Id">
-                                                    @ResourceWeb.lbDelete
-                                                </button>
+                                        <td>
+                                            <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/default.png" : item.ImageUrl)"
+                                                 class="rounded-3 border"
+                                                 alt="@item.Name"
+                                                 width="50" height="50" style="object-fit: cover;" />
+                                        </td>
+                                        <td class="fw-bold">@item.Name</td>
+                                        <td><code>@(item.SKU ?? "-")</code></td>
+                                        <td>@(item.ProductType?.Name ?? "-")</td>
+                                        <td class="text-primary fw-bold">@item.Price EGP</td>
+                                        <td>
+                                            @if (item.OldPrice.HasValue && item.OldPrice > item.Price)
+                                            {
+                                                <span class="text-muted text-decoration-line-through">@item.OldPrice EGP</span>
+                                            }
+                                            else
+                                            {
+                                                <span>-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.StockQuantity <= 0)
+                                            {
+                                                <span class="badge bg-danger rounded-pill">نفذ (@item.StockQuantity)</span>
+                                            }
+                                            else if (item.StockQuantity <= item.LowStockThreshold)
+                                            {
+                                                <span class="badge bg-warning text-dark rounded-pill">منخفض (@item.StockQuantity)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success rounded-pill">@item.StockQuantity قطعة</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge @(item.IsAvailable ? "bg-success" : "bg-secondary") rounded-pill">
+                                                @(item.IsAvailable ? "نشط" : "معطل")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">
+                                                <i class="las la-images me-1"></i> @(item.Images?.Count ?? 0)
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3"
+                                                    data-bs-toggle="modal" data-bs-target="#viewModal-@item.Id">
+                                                <i class="las la-eye"></i>
+                                            </button>
 
-                                                <div class="modal fade" id="deleteModal-@item.Id" tabindex="-1" aria-hidden="true" style="white-space: normal;">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content border-danger">
-                                                            <div class="modal-header bg-danger text-white">
-                                                                <h5 class="modal-title">@ResourceWeb.lbDeleteProduct</h5>
-                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                            </div>
-                                                            <form asp-area="Admin" asp-controller="ProductsManager" asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post">
-                                                                @Html.AntiForgeryToken()
-                                                                <div class="modal-body text-start">
-                                                                    <p>@ResourceWeb.lbConfirmDeleteProduct <strong>@item.Name</strong>?</p>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@ResourceWeb.lbcancelButtonText</button>
-                                                                    <button type="submit" class="btn btn-danger">@ResourceWeb.lbDelete</button>
-                                                                </div>
-                                                            </form>
+                                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 mx-1"
+                                                    data-bs-toggle="modal" data-bs-target="#editModal-@item.Id">
+                                                <i class="las la-edit"></i>
+                                            </button>
+
+                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteModal-@item.Id">
+                                                <i class="las la-trash"></i>
+                                            </button>
+
+                                            <!-- DELETE MODAL -->
+                                            <div class="modal fade" id="deleteModal-@item.Id" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content border-danger rounded-4">
+                                                        <div class="modal-header bg-danger text-white">
+                                                            <h5 class="modal-title">@ResourceWeb.lbDeleteProduct</h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                         </div>
+                                                        <form asp-area="Admin" asp-controller="ProductsManager" asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post">
+                                                            @Html.AntiForgeryToken()
+                                                            <div class="modal-body text-end p-4">
+                                                                <p class="mb-0">هل أنت متأكد من حذف المنتج: <strong>@item.Name</strong>؟ سيتم حذف جميع الصور التابعة له.</p>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">@ResourceWeb.lbcancelButtonText</button>
+                                                                <button type="submit" class="btn btn-danger rounded-pill">@ResourceWeb.lbDelete</button>
+                                                            </div>
+                                                        </form>
                                                     </div>
                                                 </div>
-
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -140,66 +168,89 @@
 </div>
 
 <!-- CREATE MODAL -->
-<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog card card-success card-outline">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">@ResourceWeb.lbNewProduct</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true" lang="ar" dir="rtl">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="las la-plus-circle me-1"></i> إضافة منتج جديد</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form asp-area="Admin" asp-controller="ProductsManager" asp-action="Create" method="post" enctype="multipart/form-data" id="createProductForm" enctype="multipart/form-data">
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>@ResourceWeb.lbName</label>
-                        <input name="Name" class="form-control" required minlength="2" maxlength="100" />
-                        <span data-valmsg-for="Name" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>@ResourceWeb.lbProductType</label>
-                        <select name="ProductTypeId" class="form-control" required>
-                            <option value="">-- @ResourceWeb.lbSelectType --</option>
-                            @if (ViewData["ProductTypeId"] is SelectList types)
-                            {
-                                foreach (var t in types)
+            <form asp-area="Admin" asp-controller="ProductsManager" asp-action="Create" method="post" enctype="multipart/form-data" id="createProductForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">اسم المنتج <span class="text-danger">*</span></label>
+                            <input name="Name" class="form-control" required minlength="2" maxlength="100" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">التصنيف <span class="text-danger">*</span></label>
+                            <select name="ProductTypeId" class="form-select" required>
+                                <option value="">-- اختر التصنيف --</option>
+                                @if (ViewData["ProductTypeId"] is SelectList types)
                                 {
-                                    <option value="@t.Value">@t.Text</option>
+                                    foreach (var t in types)
+                                    {
+                                        <option value="@t.Value">@t.Text</option>
+                                    }
                                 }
-                            }
-                        </select>
-                        <span data-valmsg-for="ProductTypeId" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>@ResourceWeb.lbDescription</label>
-                        <textarea name="Description" class="form-control" required minlength="5" maxlength="500"></textarea>
-                        <span data-valmsg-for="Description" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>@ResourceWeb.lbPrice</label>
-                        <input name="Price" type="number" class="form-control" step="0.01" min="0" required />
-                        <span data-valmsg-for="Price" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>@ResourceWeb.lbImage</label>
-                        <div class="mb-4 d-flex justify-content-center">
-                            <img id="createPreview" src="https://mdbootstrap.com/img/Photos/Others/placeholder.jpg"
-                                 alt="image preview" style="width: 300px;" />
+                            </select>
                         </div>
-                        <div class="d-flex justify-content-center">
-                            <label class="btn btn-primary btn-rounded">
-                                <input name="ImageFile" type="file" hidden accept="image/*" onchange="previewImage(event,'createPreview')" required />
-                            </label>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">كود المنتج (SKU)</label>
+                            <input name="SKU" class="form-control" placeholder="مثال: CHR-001" maxlength="50" />
                         </div>
-                        <span data-valmsg-for="ImageFile" class="text-danger"></span>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input type="checkbox" name="IsAvailable" value="true" class="form-check-input" id="isAvailableCheck" />
-                        <label for="isAvailableCheck" class="form-check-label">@ResourceWeb.lbAvailable</label>
-                        <input type="hidden" name="IsAvailable" value="false" />
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">السعر الحالي (EGP) <span class="text-danger">*</span></label>
+                            <input name="Price" type="number" class="form-control" step="0.01" min="0.01" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">السعر قبل الخصم (اختياري)</label>
+                            <input name="OldPrice" type="number" class="form-control" step="0.01" min="0" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">الكمية بالمخزن <span class="text-danger">*</span></label>
+                            <input name="StockQuantity" type="number" class="form-control" min="0" value="10" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">حد التنبيه بنقص المخزون</label>
+                            <input name="LowStockThreshold" type="number" class="form-control" min="0" value="3" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">الوصف <span class="text-danger">*</span></label>
+                            <textarea name="Description" class="form-control" rows="3" required minlength="5" maxlength="500"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">الصورة الرئيسية للمنتج</label>
+                            <input name="ImageFile" type="file" class="form-control" accept="image/*" onchange="previewImage(event,'createPreview')" />
+                            <div class="mt-2 text-center">
+                                <img id="createPreview" src="https://mdbootstrap.com/img/Photos/Others/placeholder.jpg"
+                                     class="rounded-3 border" style="max-height: 120px; object-fit: contain;" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">صور إضافية للمعرض (Multiple)</label>
+                            <input name="AdditionalImages" type="file" class="form-control" accept="image/*" multiple />
+                            <small class="text-muted">يمكنك اختيار عدة صور معاً لتظهر في معرض صور المنتج.</small>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check form-switch mt-2">
+                                <input type="checkbox" name="IsAvailable" value="true" class="form-check-input" id="isAvailableCheck" checked />
+                                <label for="isAvailableCheck" class="form-check-label fw-semibold">متاح للطلب والعرض في المتجر</label>
+                                <input type="hidden" name="IsAvailable" value="false" />
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">@ResourceWeb.lbCreate</button>
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">حفظ المنتج</button>
                 </div>
             </form>
         </div>
@@ -209,101 +260,157 @@
 <!-- EDIT MODALS -->
 @foreach (var product in Model)
 {
-    <div class="modal fade" id="editModal-@product.Id" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog card card-success card-outline">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">@ResourceWeb.lbEditProduct</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal fade" id="editModal-@product.Id" tabindex="-1" aria-hidden="true" lang="ar" dir="rtl">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title fw-bold"><i class="las la-edit me-1"></i> تعديل المنتج: @product.Name</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
           </div>
-          <form asp-area="Admin" asp-controller="ProductsManager" asp-action="Edit" asp-route-id="@product.Id" method="post" enctype="multipart/form-data" id="editProductForm-@product.Id">
+          <form asp-area="Admin" asp-controller="ProductsManager" asp-action="Edit" asp-route-id="@product.Id" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="Id" value="@product.Id" />
                 <input type="hidden" name="ImageUrl" value="@product.ImageUrl" />
 
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>@ResourceWeb.lbName</label>
-                        <input name="Name" class="form-control" value="@product.Name" required minlength="2" maxlength="100" />
-                        <span data-valmsg-for="Name" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>@ResourceWeb.lbProductType</label>
-                        <select name="ProductTypeId" class="form-control" required>
-                            @if (ViewData["ProductTypeId"] is SelectList types2)
-                            {
-                                foreach (var t in types2)
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">اسم المنتج <span class="text-danger">*</span></label>
+                            <input name="Name" class="form-control" value="@product.Name" required minlength="2" maxlength="100" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">التصنيف <span class="text-danger">*</span></label>
+                            <select name="ProductTypeId" class="form-select" required>
+                                @if (ViewData["ProductTypeId"] is SelectList types2)
                                 {
-                                    var sel = t.Value == product.ProductTypeId.ToString() ? "selected" : "";
-                                    <option value="@t.Value">@t.Text</option>
+                                    foreach (var t in types2)
+                                    {
+                                        var sel = t.Value == product.ProductTypeId.ToString() ? "selected" : "";
+                                        <option value="@t.Value">@t.Text</option>
+                                    }
                                 }
-                            }
-                        </select>
-                        <span data-valmsg-for="ProductTypeId" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>@ResourceWeb.lbDescription</label>
-                        <textarea name="Description" class="form-control" required minlength="5" maxlength="500">@product.Description</textarea>
-                        <span data-valmsg-for="Description" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>@ResourceWeb.lbPrice</label>
-                        <input name="Price" type="number" class="form-control" step="0.01" min="0" value="@product.Price" required />
-                        <span data-valmsg-for="Price" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>@ResourceWeb.lbCurrentImage</label>
-                        <div class="mb-4 text-center">
-                            <img id="editPreview-@product.Id" src="@product.ImageUrl" style="max-width:300px;" />
+                            </select>
                         </div>
-                        <div class="text-center">
-                            <label class="btn btn-primary">
-                                @ResourceWeb.lbChooseNewImage
-                                <input name="ImageFile" type="file" hidden accept="image/*" onchange="previewImage(event,'editPreview-@product.Id')" />
-                            </label>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">كود المنتج (SKU)</label>
+                            <input name="SKU" class="form-control" value="@product.SKU" maxlength="50" />
                         </div>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input type="checkbox" name="IsAvailable" value="true" class="form-check-input" id="isAvailableCheck-@product.Id" @(product.IsAvailable?"checked":"") />
-                        <label for="isAvailableCheck-@product.Id" class="form-check-label">@ResourceWeb.lbAvailable</label>
-                        <input type="hidden" name="IsAvailable" value="false" />
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">السعر الحالي (EGP) <span class="text-danger">*</span></label>
+                            <input name="Price" type="number" class="form-control" step="0.01" min="0.01" value="@product.Price" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">السعر قبل الخصم</label>
+                            <input name="OldPrice" type="number" class="form-control" step="0.01" min="0" value="@product.OldPrice" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">الكمية بالمخزن <span class="text-danger">*</span></label>
+                            <input name="StockQuantity" type="number" class="form-control" min="0" value="@product.StockQuantity" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">حد التنبيه بنقص المخزون</label>
+                            <input name="LowStockThreshold" type="number" class="form-control" min="0" value="@product.LowStockThreshold" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">الوصف <span class="text-danger">*</span></label>
+                            <textarea name="Description" class="form-control" rows="3" required minlength="5" maxlength="500">@product.Description</textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">الصورة الرئيسية الحالية</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <img id="editPreview-@product.Id" src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/default.png" : product.ImageUrl)"
+                                     class="rounded-3 border" style="max-height: 80px; object-fit: contain;" />
+                                <div>
+                                    <label class="btn btn-sm btn-outline-primary rounded-pill">
+                                        تغيير الصورة
+                                        <input name="ImageFile" type="file" hidden accept="image/*" onchange="previewImage(event,'editPreview-@product.Id')" />
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">إضافة صور جديدة للمعرض</label>
+                            <input name="AdditionalImages" type="file" class="form-control" accept="image/*" multiple />
+                        </div>
+
+                        <!-- Existing Gallery Images Preview -->
+                        @if (product.Images != null && product.Images.Any())
+                        {
+                            <div class="col-12">
+                                <label class="form-label fw-semibold d-block">الصور الإضافية الحالية في المعرض:</label>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    @foreach (var gImg in product.Images)
+                                    {
+                                        <div class="position-relative border rounded-3 p-1" id="gallery-box-@gImg.Id">
+                                            <img src="@gImg.ImageUrl" style="width: 70px; height: 70px; object-fit: cover;" class="rounded-2" />
+                                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 p-0 rounded-circle"
+                                                    style="width: 22px; height: 22px; line-height: 18px;"
+                                                    onclick="deleteGalleryImage(@gImg.Id)">
+                                                &times;
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="col-12">
+                            <div class="form-check form-switch mt-2">
+                                <input type="checkbox" name="IsAvailable" value="true" class="form-check-input" id="isAvailableCheck-@product.Id" @(product.IsAvailable ? "checked" : "") />
+                                <label for="isAvailableCheck-@product.Id" class="form-check-label fw-semibold">متاح للطلب والعرض في المتجر</label>
+                                <input type="hidden" name="IsAvailable" value="false" />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">@ResourceWeb.lbSave</button>
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">@ResourceWeb.lbSave</button>
                 </div>
           </form>
         </div>
       </div>
     </div>
 }
-<!-- VIEW MODAL -->
+
+<!-- VIEW MODALS -->
 @foreach (var product in Model)
 {
-    <div class="modal fade" id="viewModal-@product.Id" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog card card-success card-outline">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@ResourceWeb.lbProductDetails</h5>
+    <div class="modal fade" id="viewModal-@product.Id" tabindex="-1" aria-hidden="true" lang="ar" dir="rtl">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold">تفاصيل المنتج: @product.Name</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <dl class="row">
-                        <dt class="col-sm-4">@ResourceWeb.lbName</dt>
-                        <dd class="col-sm-8">@product.Name</dd>
-                        <dt class="col-sm-4">@ResourceWeb.lbProductType</dt>
-                        <dd class="col-sm-8">@product.ProductType?.Name</dd>
-                        <dt class="col-sm-4">@ResourceWeb.lbDescription</dt>
+                <div class="modal-body p-4 text-center">
+                    <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/default.png" : product.ImageUrl)"
+                         class="img-fluid rounded-4 mb-3 border p-2" style="max-height: 200px; object-fit: contain;" />
+                    <dl class="row text-start g-2">
+                        <dt class="col-sm-4 text-muted">الاسم:</dt>
+                        <dd class="col-sm-8 fw-bold">@product.Name</dd>
+                        <dt class="col-sm-4 text-muted">كود المنتج (SKU):</dt>
+                        <dd class="col-sm-8 font-monospace">@(product.SKU ?? "-")</dd>
+                        <dt class="col-sm-4 text-muted">التصنيف:</dt>
+                        <dd class="col-sm-8">@(product.ProductType?.Name ?? "-")</dd>
+                        <dt class="col-sm-4 text-muted">السعر:</dt>
+                        <dd class="col-sm-8 text-primary fw-bold">@product.Price EGP</dd>
+                        <dt class="col-sm-4 text-muted">المخزون:</dt>
+                        <dd class="col-sm-8">@product.StockQuantity قطعة</dd>
+                        <dt class="col-sm-4 text-muted">الحالة:</dt>
+                        <dd class="col-sm-8">@(product.IsAvailable ? "متاح" : "معطل")</dd>
+                        <dt class="col-sm-4 text-muted">الوصف:</dt>
                         <dd class="col-sm-8">@product.Description</dd>
-                        <dt class="col-sm-4">@ResourceWeb.lbAvailable</dt>
-                        <dd class="col-sm-8">@(product.IsAvailable ? ResourceWeb.lbYes : ResourceWeb.lbNo)</dd>
-                        <dt class="col-sm-4">@ResourceWeb.lbPrice</dt>
-                        <dd class="col-sm-8">@product.Price</dd>
                     </dl>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@ResourceWeb.lbClose</button>
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">إغلاق</button>
                 </div>
             </div>
         </div>
@@ -322,12 +429,32 @@
                 reader.readAsDataURL(file);
             }
         }
+
         function resetCreateForm() {
             const form = document.querySelector('#createModal form');
             if (form) {
                 form.reset();
-                document.getElementById('createPreview').src = 'https://mdbootstrap.com/img/Photos/Others/placeholder.jpg';
+                const p = document.getElementById('createPreview');
+                if (p) p.src = 'https://mdbootstrap.com/img/Photos/Others/placeholder.jpg';
             }
+        }
+
+        function deleteGalleryImage(id) {
+            if (!confirm('هل تريد حذف هذه الصورة من المعرض؟')) return;
+
+            fetch(`/Admin/ProductsManager/DeleteGalleryImage?id=${id}`, {
+                method: 'POST'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const el = document.getElementById(`gallery-box-${id}`);
+                    if (el) el.remove();
+                } else {
+                    alert(data.message || 'حدث خطأ أثناء الحذف');
+                }
+            })
+            .catch(err => console.error(err));
         }
     </script>
 }

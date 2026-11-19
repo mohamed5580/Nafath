@@ -95,11 +95,21 @@ namespace Infrastructure.Data
             builder.Entity<Product>(b =>
             {
                 b.Property(p => p.Price).HasPrecision(18, 2);
+                b.Property(p => p.OldPrice).HasPrecision(18, 2);
+                b.Property(p => p.SKU).HasMaxLength(50);
                 b.HasOne(p => p.ProductType)
                  .WithMany(pt => pt.Products)
                  .HasForeignKey(p => p.ProductTypeId);
+                b.HasMany(p => p.Images)
+                 .WithOne(pi => pi.Product)
+                 .HasForeignKey(pi => pi.ProductId)
+                 .OnDelete(DeleteBehavior.Cascade);
             });
 
+            builder.Entity<ProductImage>(b =>
+            {
+                b.Property(pi => pi.ImageUrl).IsRequired().HasMaxLength(500);
+            });
         }
 
         public DbSet<Chairs> Chairs { get; set; }
@@ -108,6 +118,7 @@ namespace Infrastructure.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
    
     }
 

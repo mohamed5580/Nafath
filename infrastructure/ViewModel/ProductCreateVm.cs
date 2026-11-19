@@ -20,8 +20,23 @@ namespace Infrastructure.ViewModel
         [Required, Range(0.01, 100000)]
         public decimal Price { get; set; }
 
+        [Range(0.01, 100000)]
+        public decimal? OldPrice { get; set; }
+
+        [StringLength(50)]
+        public string? SKU { get; set; }
+
+        [Range(0, 100000)]
+        public int StockQuantity { get; set; } = 10;
+
+        public int LowStockThreshold { get; set; } = 3;
+
         public bool IsAvailable { get; set; } = true;
 
+        [Display(Name = "Main Image")]
         public IFormFile? ImageFile { get; set; }
+
+        [Display(Name = "Gallery Images")]
+        public List<IFormFile>? AdditionalImages { get; set; }
     }
 }

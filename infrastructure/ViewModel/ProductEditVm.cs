@@ -32,6 +32,26 @@ namespace Infrastructure.ViewModel
         [Range(0.01, 100000, ErrorMessage = "Price must be positive.")]
         public decimal? Price { get; set; }
 
+        [Display(Name = "Old Price")]
+        [Range(0.01, 100000, ErrorMessage = "Old price must be positive.")]
+        public decimal? OldPrice { get; set; }
+
+        [StringLength(50)]
+        [Display(Name = "SKU")]
+        public string? SKU { get; set; }
+
+        [Display(Name = "Stock Quantity")]
+        [Range(0, 100000, ErrorMessage = "Stock quantity cannot be negative.")]
+        public int StockQuantity { get; set; } = 10;
+
+        [Display(Name = "Low Stock Threshold")]
+        public int LowStockThreshold { get; set; } = 3;
+
+        [Display(Name = "Gallery Images to Add")]
+        public List<IFormFile>? AdditionalImages { get; set; }
+
+        public List<Domin.Entity.ProductImage>? ExistingImages { get; set; }
+
         [Required]
         public int ProductTypeId { get; set; }
     }

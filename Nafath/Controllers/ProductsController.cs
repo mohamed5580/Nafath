@@ -1,12 +1,12 @@
 ﻿using Domin.Entity;
 using Domin.Resource;
 using Infrastructure.IRepository.Base;
+using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Nafath.Controllers
 {
-
     public class ProductsController : Controller
     {
         #region Declaration
@@ -14,220 +14,131 @@ namespace Nafath.Controllers
         private readonly IRepository<ProductType> _typeRepo;
         private readonly IWebHostEnvironment _env;
         #endregion
+
         #region Constructor
-        public ProductsController(IRepository<Product> context, IRepository<ProductType> typeRepo, IWebHostEnvironment env)
+        public ProductsController(
+            IRepository<Product> productRepo,
+            IRepository<ProductType> typeRepo,
+            IWebHostEnvironment env)
         {
-            _productRepo = context;
+            _productRepo = productRepo;
             _typeRepo = typeRepo;
             _env = env;
         }
         #endregion
-        #region Method
-        // ProductsController.cs
-        public async Task<IActionResult> Index(int? typeId, int page = 1, int pageSize = 12)
+
+        #region Actions
+
+        // GET: Products
+        public async Task<IActionResult> Index([FromQuery] ProductFilterVm filter)
         {
-            // 1) جلب كل المنتجات مع الـ ProductType في الذاكرة
-            var all = await _productRepo.FindAllasync("ProductType"); // IEnumerable<Product>
+            filter ??= new ProductFilterVm();
+            filter.Page = filter.Page < 1 ? 1 : filter.Page;
+            filter.PageSize = filter.PageSize < 1 ? 12 : filter.PageSize;
 
-            // 2) ترشيح (إن وُجد typeId)
-            var filtered = typeId.HasValue
-                ? all.Where(p => p.ProductTypeId == typeId.Value)
-                : all;
+            var baseQuery = _productRepo.Query("ProductType", "Images");
 
-            // 3) حساب العدد و Paging
-            var totalItems = filtered.Count();
-            var items = filtered
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            // Calculate overall price range for filter UI
+            var allPrices = await _productRepo.Query()
+                .Where(p => p.Price.HasValue)
+                .Select(p => p.Price!.Value)
+                .ToListAsync();
 
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-            ViewBag.TypeFilterId = typeId;
-            ViewBag.CurrentTypeId = typeId;
+            filter.PriceFloor = allPrices.Any() ? Math.Floor(allPrices.Min()) : 0;
+            filter.PriceCeiling = allPrices.Any() ? Math.Ceiling(allPrices.Max()) : 10000;
 
-            // 4) جلب أنواع المنتجات للقائمة الجانبية
-            ViewBag.ProductTypes = await _typeRepo.FindAllasync();
+            // Apply Filters
+            var query = baseQuery;
 
-            return View(items);
+            // 1) Search keyword (Name, Description, SKU)
+            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+            {
+                var term = filter.SearchTerm.Trim().ToLower();
+                query = query.Where(p =>
+                    p.Name.ToLower().Contains(term) ||
+                    p.Description.ToLower().Contains(term) ||
+                    (p.SKU != null && p.SKU.ToLower().Contains(term)));
+            }
+
+            // 2) Category / ProductType filter
+            if (filter.ProductTypeId.HasValue && filter.ProductTypeId.Value > 0)
+            {
+                query = query.Where(p => p.ProductTypeId == filter.ProductTypeId.Value);
+            }
+
+            // 3) Price range filter
+            if (filter.MinPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= filter.MinPrice.Value);
+            }
+            if (filter.MaxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= filter.MaxPrice.Value);
+            }
+
+            // 4) In-Stock only filter
+            if (filter.InStockOnly)
+            {
+                query = query.Where(p => p.IsAvailable && p.StockQuantity > 0);
+            }
+
+            // 5) Sorting
+            query = (filter.SortBy?.ToLower()) switch
+            {
+                "price_asc" => query.OrderBy(p => p.Price),
+                "price_desc" => query.OrderByDescending(p => p.Price),
+                "name_asc" => query.OrderBy(p => p.Name),
+                "name_desc" => query.OrderByDescending(p => p.Name),
+                "oldest" => query.OrderBy(p => p.Id),
+                _ => query.OrderByDescending(p => p.Id), // default: newest
+            };
+
+            // 6) Pagination
+            filter.TotalItems = await query.CountAsync();
+            filter.Products = await query
+                .Skip((filter.Page - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToListAsync();
+
+            // 7) Categories list for sidebar / pills
+            filter.Categories = (await _typeRepo.FindAllasync()).OrderBy(c => c.Name).ToList();
+
+            // Backward compatibility for existing views/helpers
+            ViewBag.CurrentPage = filter.Page;
+            ViewBag.TotalPages = filter.TotalPages;
+            ViewBag.TypeFilterId = filter.ProductTypeId;
+            ViewBag.ProductTypes = filter.Categories;
+
+            return View(filter);
         }
 
-
-
-
-        // GET: products/Details/5
+        // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var products = await _productRepo.FindByIdasync(id.Value);
-            if (products == null)
-            {
-                return NotFound();
-            }
+            var product = await _productRepo.Query("ProductType", "Images")
+                .FirstOrDefaultAsync(p => p.Id == id.Value);
 
-            return View(products);
+            if (product == null) return NotFound();
+
+            // Fetch related products in same category
+            var relatedProducts = await _productRepo.Query("ProductType", "Images")
+                .Where(p => p.ProductTypeId == product.ProductTypeId && p.Id != product.Id && p.IsAvailable)
+                .Take(4)
+                .ToListAsync();
+
+            ViewBag.RelatedProducts = relatedProducts;
+
+            return View(product);
         }
 
-        // GET: products/Create
-        public IActionResult Create()
+        // GET: Products/ByType?typeId=1
+        public IActionResult ByType(int typeId)
         {
-            return View();
+            return RedirectToAction(nameof(Index), new { ProductTypeId = typeId });
         }
 
-        // POST: products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Product products)
-        {
-            // First, always check if the submitted data is valid based on your model's annotations
-            if (!ModelState.IsValid)
-            {
-                // If not valid, return the same view. The user will see the validation errors.
-                return View(products);
-            }
-
-            // Handle the file upload ONLY if a file was provided.
-            if (products.ImageFile != null && products.ImageFile.Length > 0)
-            {
-                // pick a safe filename (GUID avoids name conflicts)
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(products.ImageFile.FileName)}";
-
-                // Define the directory to save the file
-                var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "products");
-                // Ensure the directory exists
-                Directory.CreateDirectory(uploadsDir);
-
-                var filePath = Path.Combine(uploadsDir, fileName);
-
-                // Save the file to the server's filesystem
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await products.ImageFile.CopyToAsync(stream);
-                }
-
-                // store t  he relative URL that can be used in an <img> tag
-                products.ImageUrl = $"/uploads/products/{fileName}";
-            }
-
-            // Add the new chair object to the EF Core context
-            _productRepo.AddOne(products);
-
-            // Save all changes to the database
-            TempData["Success"] = "the Chair Add succses";
-            // Redirect to the index page to show the updated list of products
-            return RedirectToAction(nameof(Index));
-        }
-
-
-        // GET: products/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var products = _productRepo.FindById(id);
-            if (products == null)
-            {
-                return NotFound();
-            }
-            return View(products);
-        }
-
-        // POST: products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Product products)
-        {
-            if (id != products.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _productRepo.UpdateOne(products);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!productsExists(products.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(products);
-        }
-
-            // GET: products/Delete/5
-            public async Task<IActionResult> Delete(int? id)
-            {
-                if (id == null)
-                {
-                    return NotFound();
-                }
-
-                var products = await _productRepo.FindByIdasync(id.Value);
-                if (products == null)
-                {
-                    return NotFound();
-                }
-
-                return View(products);
-            }
-
-            // POST: products/Delete/5
-            [ValidateAntiForgeryToken]
-            public async Task<IActionResult> DeleteConfirmed(int? id)
-            {
-                if (id == null)
-                {
-                    return NotFound();
-                }
-
-                var products = await _productRepo.FindByIdasync(id.Value); // Correct method to find the entity by ID
-                if (products != null)
-                {
-                    _productRepo.DeleteOne(products); // Delete the entity
-                }
-
-                return RedirectToAction(nameof(Index));
-            }
-
-        private bool productsExists(int id)
-        {
-            // Use FindById or FindAll to check existence
-            return _productRepo.FindById(id) != null;
-        }
-        [HttpPost]
-        public IActionResult AddToCart(int id, string name, decimal price, string imageUrl)
-        {
-            SessionMsg(Helper.Success, "تم بنجاح", ResourceWeb.lbSave);
-
-            return RedirectToAction("Index");
-        }
-        private void SessionMsg(string MsgType, string Title, string Msg)
-        {
-            HttpContext.Session.SetString(Helper.MsgType, MsgType);
-            HttpContext.Session.SetString(Helper.Title, Title);
-            HttpContext.Session.SetString(Helper.Msg, Msg);
-        }
         #endregion
     }
 }
