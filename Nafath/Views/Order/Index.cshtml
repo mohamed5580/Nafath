@@ -207,7 +207,7 @@
 
                     $('#editCartBody').html(
                         '<tr><td colspan="7" class="text-center">' +
-                        '<i class="bi bi-arrow-repeat nafas-spin"></i> جاري تحميل المنتجات...</td></tr>'
+                        '<i class="fa fa-spinner fa-spin"></i> جاري تحميل المنتجات...</td></tr>'
                     );
 
                     $.getJSON('/Order/GetOrderItems', { orderId: orderId })
@@ -495,7 +495,7 @@
 
                 $('#viewModalBody').html(
                     '<div class="text-center">' +
-                    '<i class="bi bi-arrow-repeat nafas-spin" style="font-size:2rem"></i>' +
+                    '<i class="fa fa-spinner fa-spin fa-2x"></i>' +
                     '</div>'
                 );
 

@@ -23,6 +23,12 @@
 
     <title>@ViewData["Title"] - @companyInformation.Name</title>
 
+    <link rel="stylesheet" href="~/Admin/assets/css/backend-plugin.min.css">
+    <link rel="stylesheet" href="~/Admin/assets/css/backend.css?v=1.0.0">
+    <link rel="stylesheet" href="~/Admin/assets/vendor/@@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/Admin/assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css">
+    <link rel="stylesheet" href="~/Admin/assets/vendor/remixicon/fonts/remixicon.css">
+
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="@Url.Content(string.IsNullOrWhiteSpace(companyInformation.LogoUrl) ? "~/Nafas/assets/images/logoo.png" : companyInformation.LogoUrl)">
     <link rel="stylesheet" href="~/Admin/plugins/sweetalert2/sweetalert2.min.css">
@@ -37,6 +43,7 @@
     <link href="~/Nafas/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="~/Nafas/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
     <link href="~/Nafas/assets/css/style.css" rel="stylesheet">
@@ -240,7 +247,10 @@
     <script src="~/Nafas/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/Nafas/assets/vendor/php-email-form/validate.js"></script>
     <script src="~/Nafas/assets/vendor/aos/aos.js"></script>
+    <script src="~/Nafas/assets/vendor/glightbox/js/glightbox.min.js"></script>
     <script src="~/Nafas/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="~/Nafas/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+    <script src="~/Nafas/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
     <script src="~/Nafas/assets/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="~/Admin/plugins/sweetalert2/sweetalert2.all.min.js"></script>
     <script src="~/Nafas/assets/js/sweetalert.js"></script>

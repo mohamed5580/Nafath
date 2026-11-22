@@ -97,7 +97,6 @@
    * Animation on scroll function and init
    */
   function aosInit() {
-    if (typeof AOS === 'undefined') return;
     AOS.init({
       duration: 600,
       easing: 'ease-in-out',
@@ -108,16 +107,20 @@
   window.addEventListener('load', aosInit);
 
   /**
+   * Initiate glightbox
+   */
+  const glightbox = GLightbox({
+    selector: '.glightbox'
+  });
+
+  /**
    * Initiate Pure Counter
    */
-  if (typeof PureCounter !== 'undefined') {
-    new PureCounter();
-  }
+  new PureCounter();
 
   /**
    * Init isotope layout and filters
    */
-  if (typeof imagesLoaded !== 'undefined' && typeof Isotope !== 'undefined') {
   document.querySelectorAll('.isotope-layout').forEach(function(isotopeItem) {
     let layout = isotopeItem.getAttribute('data-layout') ?? 'masonry';
     let filter = isotopeItem.getAttribute('data-default-filter') ?? '*';
@@ -147,7 +150,6 @@
     });
 
   });
-  }
 
   /**
    * Init swiper sliders
@@ -158,7 +160,7 @@
         swiperElement.querySelector(".swiper-config").innerHTML.trim()
       );
 
-      if (swiperElement.classList.contains("swiper-tab") && typeof initSwiperWithCustomPagination === 'function') {
+      if (swiperElement.classList.contains("swiper-tab")) {
         initSwiperWithCustomPagination(swiperElement, config);
       } else {
         new Swiper(swiperElement, config);

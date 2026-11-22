@@ -963,13 +963,3 @@
     }
 }
 
-.nafas-spin {
-    display: inline-block;
-    animation: nafas-spin 1s linear infinite;
-}
-
-@keyframes nafas-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
