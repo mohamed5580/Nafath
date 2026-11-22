@@ -59,7 +59,7 @@ builder.Services.AddAuthentication()
 
 builder.Services.AddTransient(typeof(IRepository<>), typeof(MainRepository<>));
 builder.Services.AddScoped<IDashboardService, DashboardService>();
-
+builder.Services.AddScoped<ICompanyInformationService, CompanyInformationService>();
 
 
 // 3) MVC + Razor Pages
@@ -69,8 +69,9 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Accounts/Accounts/Login";
-    options.AccessDeniedPath = "/Accounts/Accounts/AccessDenied";
+    options.LoginPath = "/Identity/Account/Login";
+    options.LogoutPath = "/Identity/Account/Logout";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
 });
 
 var app = builder.Build();
@@ -86,10 +87,10 @@ else
     app.UseHsts();
 }
 
-
-
-// 5) Middleware
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 app.UseRouting();
 
@@ -116,13 +117,6 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(uploadsPath),
     RequestPath = "/user-images"
 });
-app.UseStatusCodePages(async context =>
-{
-    if (context.HttpContext.Response.StatusCode == 403)
-    {
-        context.HttpContext.Response.Redirect("/Accounts/Accounts/Login");
-    }
-});
 app.UseAuthorization();
 app.MapAreaControllerRoute(
     name: "Accounts",
@@ -143,6 +137,7 @@ app.MapControllerRoute(
 
 
 app.Run();
+
 
 
 

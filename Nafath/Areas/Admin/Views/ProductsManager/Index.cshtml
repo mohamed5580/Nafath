@@ -60,6 +60,8 @@
                                 <tr>
                                     <th>الصورة</th>
                                     <th>اسم المنتج</th>
+                                    <th>المقاسات</th>
+                                    <th>الالوان</th>
                                     <th>الكود (SKU)</th>
                                     <th>التصنيف</th>
                                     <th>السعر</th>
@@ -80,7 +82,38 @@
                                                  alt="@item.Name"
                                                  width="50" height="50" style="object-fit: cover;" />
                                         </td>
-                                        <td class="fw-bold">@item.Name</td>
+                                        <td class="fw-bold">
+                                            @item.Name
+                                            
+                                        </td>
+                                         <td class="fw-bold">
+                                        
+                                            @if (item.Colors != null && item.Colors.Any())
+                                            {
+                                                <div class="d-flex gap-1 justify-content-center mt-1 align-items-center">
+                                                    @foreach (var c in item.Colors.Take(5))
+                                                    {
+                                                        <span class="rounded-circle border" style="width:14px;height:14px;background-color:@c.HexCode;display:inline-block;" title="@c.ColorName (@c.HexCode)"></span>
+                                                    }
+                                                    @if (item.Colors.Count > 5)
+                                                    {
+                                                        <small class="text-muted">+@(item.Colors.Count - 5)</small>
+                                                    }
+                                                </div>
+                                            }
+                                        </td>
+                                        <td class="fw-bold">
+                                           
+                                            @if (item.Sizes.Any())
+                                            {
+                                                <div class="d-flex flex-wrap gap-1 justify-content-center mt-1">
+                                                    @foreach (var size in item.Sizes)
+                                                    {
+                                                        <span class="badge bg-light text-dark border">@size</span>
+                                                    }
+                                                </div>
+                                            }
+                                        </td>
                                         <td><code>@(item.SKU ?? "-")</code></td>
                                         <td>@(item.ProductType?.Name ?? "-")</td>
                                         <td class="text-primary fw-bold">@item.Price EGP</td>
@@ -239,6 +272,55 @@
                             <small class="text-muted">يمكنك اختيار عدة صور معاً لتظهر في معرض صور المنتج.</small>
                         </div>
 
+                        <!-- SIZES SECTION - CREATE -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">المقاسات المتاحة</label>
+                            <div class="d-flex flex-wrap gap-2 p-3 border rounded-3 bg-light" id="createSizesContainer">
+                                @foreach (var sz in Domin.Entity.ProductSizeOptions.All)
+                                {
+                                    <div class="form-check form-check-inline m-0">
+                                        <input class="form-check-input" type="checkbox" name="Sizes" value="@sz" id="create-size-@sz" />
+                                        <label class="form-check-label badge bg-white border text-dark px-3 py-2 rounded-pill" for="create-size-@sz" style="cursor:pointer;">@sz</label>
+                                    </div>
+                                }
+                            </div>
+                            <div class="mt-2">
+                                <label class="form-label text-muted small">مقاسات مخصصة (افصل بفاصلة، مثال: 38, 40, 42)</label>
+                                <input name="CustomSizes" class="form-control form-control-sm" placeholder="مقاسات إضافية..." />
+                            </div>
+                        </div>
+
+                        <!-- COLORS SECTION - CREATE -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">
+                                <i class="las la-palette me-1 text-primary"></i> ألوان المنتج المتاحة
+                            </label>
+                            <div class="p-3 border rounded-3 bg-light">
+                                <small class="text-muted d-block mb-3">أضف ألوان المنتج باختيار اللون وتحديد اسمه:</small>
+                                <div class="row g-2 align-items-end mb-3">
+                                    <div class="col-md-5">
+                                        <label class="form-label small text-muted mb-1">اسم اللون</label>
+                                        <input type="text" id="createColorName" class="form-control form-control-sm" placeholder="مثال: أسود، أزرق كحلي" maxlength="50" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small text-muted mb-1">كود اللون (HEX)</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="color" id="createColorPicker" class="form-control form-control-color p-1" value="#000000" title="اختر لوناً" style="max-width:44px;" />
+                                            <input type="text" id="createColorHex" class="form-control font-monospace" placeholder="#000000" maxlength="7" value="#000000" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill w-100" onclick="addCreateColor()">
+                                            <i class="las la-plus me-1"></i> إضافة
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2" id="createColorsList"></div>
+                                <small class="text-muted" id="createNoColorsHint">لم تتم إضافة ألوان بعد.</small>
+                                <input type="hidden" name="ColorsJson" id="createColorsJson" value="[]" />
+                            </div>
+                        </div>
+
                         <div class="col-12">
                             <div class="form-check form-switch mt-2">
                                 <input type="checkbox" name="IsAvailable" value="true" class="form-check-input" id="isAvailableCheck" checked />
@@ -359,6 +441,60 @@
                             </div>
                         }
 
+                        <!-- SIZES SECTION - EDIT -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">المقاسات المتاحة</label>
+                            <div class="d-flex flex-wrap gap-2 p-3 border rounded-3 bg-light">
+                                @foreach (var sz in Domin.Entity.ProductSizeOptions.All)
+                                {
+                                    var isChecked = product.Sizes.Contains(sz, StringComparer.OrdinalIgnoreCase);
+                                    <div class="form-check form-check-inline m-0">
+                                        <input class="form-check-input" type="checkbox" name="sizes" value="@sz"
+                                               id="edit-size-@(product.Id)-@sz" @(isChecked ? "checked" : "") />
+                                        <label class="form-check-label badge @(isChecked ? "bg-primary text-white" : "bg-white border text-dark") px-3 py-2 rounded-pill size-label"
+                                               for="edit-size-@(product.Id)-@sz" style="cursor:pointer;">@sz</label>
+                                    </div>
+                                }
+                            </div>
+                            <div class="mt-2">
+                                <label class="form-label text-muted small">مقاسات مخصصة (افصل بفاصلة، مثال: 38, 40, 42)</label>
+                                <input name="customSizes" class="form-control form-control-sm"
+                                       placeholder="مقاسات إضافية..."
+                                       value="@string.Join(", ", product.Sizes.Where(s => !Domin.Entity.ProductSizeOptions.All.Contains(s, StringComparer.OrdinalIgnoreCase)))" />
+                            </div>
+                        </div>
+
+                        <!-- COLORS SECTION - EDIT -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">
+                                <i class="las la-palette me-1 text-primary"></i> ألوان المنتج المتاحة
+                            </label>
+                            <div class="p-3 border rounded-3 bg-light">
+                                <small class="text-muted d-block mb-3">يمكنك إضافة ألوان جديدة، اختيار كود HEX أو حذف الألوان:</small>
+                                <div class="row g-2 align-items-end mb-3">
+                                    <div class="col-md-5">
+                                        <label class="form-label small text-muted mb-1">اسم اللون</label>
+                                        <input type="text" id="editColorName-@product.Id" class="form-control form-control-sm" placeholder="مثال: أسود، أحمر" maxlength="50" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small text-muted mb-1">كود اللون (HEX)</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="color" id="editColorPicker-@product.Id" class="form-control form-control-color p-1" value="#000000" title="اختر لوناً" style="max-width:44px;" />
+                                            <input type="text" id="editColorHex-@product.Id" class="form-control font-monospace" placeholder="#000000" maxlength="7" value="#000000" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill w-100" onclick="addEditColor(@product.Id)">
+                                            <i class="las la-plus me-1"></i> إضافة
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2" id="editColorsList-@product.Id"></div>
+                                <small class="text-muted" id="editNoColorsHint-@product.Id">لم تتم إضافة ألوان لهذا المنتج بعد.</small>
+                                <input type="hidden" name="colorsJson" id="editColorsJson-@product.Id" value="[]" />
+                            </div>
+                        </div>
+
                         <div class="col-12">
                             <div class="form-check form-switch mt-2">
                                 <input type="checkbox" name="IsAvailable" value="true" class="form-check-input" id="isAvailableCheck-@product.Id" @(product.IsAvailable ? "checked" : "") />
@@ -403,6 +539,41 @@
                         <dd class="col-sm-8 text-primary fw-bold">@product.Price EGP</dd>
                         <dt class="col-sm-4 text-muted">المخزون:</dt>
                         <dd class="col-sm-8">@product.StockQuantity قطعة</dd>
+                        <dt class="col-sm-4 text-muted">المقاسات:</dt>
+                        <dd class="col-sm-8">
+                            @if (product.Sizes.Any())
+                            {
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (var sz in product.Sizes)
+                                    {
+                                        <span class="badge bg-primary rounded-pill">@sz</span>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </dd>
+                        <dt class="col-sm-4 text-muted">الألوان المتاحة:</dt>
+                        <dd class="col-sm-8">
+                            @if (product.Colors != null && product.Colors.Any())
+                            {
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (var c in product.Colors.OrderBy(x => x.DisplayOrder))
+                                    {
+                                        <span class="badge bg-light text-dark border d-inline-flex align-items-center gap-1 px-2 py-1">
+                                            <span class="rounded-circle border" style="width:12px;height:12px;background-color:@c.HexCode;"></span>
+                                            @c.ColorName <small class="text-muted font-monospace">(@c.HexCode)</small>
+                                        </span>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </dd>
                         <dt class="col-sm-4 text-muted">الحالة:</dt>
                         <dd class="col-sm-8">@(product.IsAvailable ? "متاح" : "معطل")</dd>
                         <dt class="col-sm-4 text-muted">الوصف:</dt>
@@ -419,7 +590,186 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <style>
+        .color-swatch-admin {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 6px;
+            border-radius: 999px;
+            border: 1.5px solid #dee2e6;
+            background: #fff;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: default;
+        }
+        .color-swatch-admin .dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+        .color-swatch-admin .remove-color {
+            border: none;
+            background: none;
+            padding: 0 0 0 3px;
+            line-height: 1;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+        }
+        .color-swatch-admin .remove-color:hover { color: #dc3545; }
+    </style>
     <script>
+        // ------------------ CREATE MODAL COLORS ------------------
+        let createColors = [];
+
+        const createPicker = document.getElementById('createColorPicker');
+        const createHex = document.getElementById('createColorHex');
+        if (createPicker && createHex) {
+            createPicker.addEventListener('input', function () {
+                createHex.value = this.value.toUpperCase();
+            });
+            createHex.addEventListener('input', function () {
+                const val = this.value.trim();
+                if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
+                    createPicker.value = val;
+                }
+            });
+        }
+
+        function addCreateColor() {
+            const name = document.getElementById('createColorName').value.trim();
+            const hex = document.getElementById('createColorHex').value.trim();
+            if (!name) { alert('أدخل اسم اللون.'); return; }
+            if (!/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex)) { alert('أدخل كود HEX صحيح (مثال: #FF0000).'); return; }
+            createColors.push({ id: 0, colorName: name, hexCode: hex.toUpperCase(), displayOrder: createColors.length });
+            renderCreateColors();
+            document.getElementById('createColorName').value = '';
+            document.getElementById('createColorHex').value = '#000000';
+            if (createPicker) createPicker.value = '#000000';
+        }
+
+        function removeCreateColor(idx) {
+            createColors.splice(idx, 1);
+            createColors.forEach((c, i) => c.displayOrder = i);
+            renderCreateColors();
+        }
+
+        function renderCreateColors() {
+            const container = document.getElementById('createColorsList');
+            const hint = document.getElementById('createNoColorsHint');
+            const jsonInput = document.getElementById('createColorsJson');
+            if (!container) return;
+            container.innerHTML = '';
+            if (createColors.length === 0) {
+                if (hint) hint.classList.remove('d-none');
+            } else {
+                if (hint) hint.classList.add('d-none');
+                createColors.forEach((c, i) => {
+                    const el = document.createElement('span');
+                    el.className = 'color-swatch-admin';
+                    el.innerHTML = `<span class="dot" style="background:${c.hexCode};" title="${c.hexCode}"></span>
+                        ${c.colorName} <span class="text-muted small">(${c.hexCode})</span>
+                        <button type="button" class="remove-color" onclick="removeCreateColor(${i})" title="حذف">&times;</button>`;
+                    container.appendChild(el);
+                });
+            }
+            if (jsonInput) jsonInput.value = JSON.stringify(createColors);
+        }
+
+        // ------------------ EDIT MODALS COLORS ------------------
+        const editProductColors = {
+            @foreach (var prod in Model)
+            {
+                var cList = (prod.Colors ?? new List<Domin.Entity.ProductColor>())
+                    .OrderBy(c => c.DisplayOrder)
+                    .Select(c => new { id = c.Id, colorName = c.ColorName, hexCode = c.HexCode, displayOrder = c.DisplayOrder });
+                var cJson = System.Text.Json.JsonSerializer.Serialize(cList);
+                @:@prod.Id: @Html.Raw(cJson),
+            }
+        };
+
+        function initEditColorPicker(id) {
+            const picker = document.getElementById(`editColorPicker-${id}`);
+            const hex = document.getElementById(`editColorHex-${id}`);
+            if (picker && hex) {
+                picker.addEventListener('input', function () {
+                    hex.value = this.value.toUpperCase();
+                });
+                hex.addEventListener('input', function () {
+                    const val = this.value.trim();
+                    if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
+                        picker.value = val;
+                    }
+                });
+            }
+        }
+
+        function addEditColor(id) {
+            const nameEl = document.getElementById(`editColorName-${id}`);
+            const hexEl = document.getElementById(`editColorHex-${id}`);
+            const pickerEl = document.getElementById(`editColorPicker-${id}`);
+            const name = nameEl ? nameEl.value.trim() : '';
+            const hex = hexEl ? hexEl.value.trim() : '';
+
+            if (!name) { alert('أدخل اسم اللون.'); return; }
+            if (!/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex)) { alert('أدخل كود HEX صحيح (مثال: #FF0000).'); return; }
+
+            if (!editProductColors[id]) editProductColors[id] = [];
+            editProductColors[id].push({
+                id: 0,
+                colorName: name,
+                hexCode: hex.toUpperCase(),
+                displayOrder: editProductColors[id].length
+            });
+
+            renderEditColors(id);
+            if (nameEl) nameEl.value = '';
+            if (hexEl) hexEl.value = '#000000';
+            if (pickerEl) pickerEl.value = '#000000';
+        }
+
+        function removeEditColor(id, idx) {
+            if (!editProductColors[id]) return;
+            editProductColors[id].splice(idx, 1);
+            editProductColors[id].forEach((c, i) => c.displayOrder = i);
+            renderEditColors(id);
+        }
+
+        function renderEditColors(id) {
+            const container = document.getElementById(`editColorsList-${id}`);
+            const hint = document.getElementById(`editNoColorsHint-${id}`);
+            const jsonInput = document.getElementById(`editColorsJson-${id}`);
+            if (!container) return;
+            container.innerHTML = '';
+            const list = editProductColors[id] || [];
+            if (list.length === 0) {
+                if (hint) hint.classList.remove('d-none');
+            } else {
+                if (hint) hint.classList.add('d-none');
+                list.forEach((c, i) => {
+                    const el = document.createElement('span');
+                    el.className = 'color-swatch-admin';
+                    el.innerHTML = `<span class="dot" style="background:${c.hexCode};" title="${c.hexCode}"></span>
+                        ${c.colorName} <span class="text-muted small">(${c.hexCode})</span>
+                        <button type="button" class="remove-color" onclick="removeEditColor(${id}, ${i})" title="حذف">&times;</button>`;
+                    container.appendChild(el);
+                });
+            }
+            if (jsonInput) jsonInput.value = JSON.stringify(list);
+        }
+
+        // Initialize all edit color pickers and render their lists
+        Object.keys(editProductColors).forEach(id => {
+            initEditColorPicker(id);
+            renderEditColors(id);
+        });
+
+        // Initialize create colors
+        renderCreateColors();
+
         function previewImage(event, previewId) {
             const preview = document.getElementById(previewId);
             const file = event.target.files[0];
@@ -434,6 +784,8 @@
             const form = document.querySelector('#createModal form');
             if (form) {
                 form.reset();
+                createColors = [];
+                renderCreateColors();
                 const p = document.getElementById('createPreview');
                 if (p) p.src = 'https://mdbootstrap.com/img/Photos/Others/placeholder.jpg';
             }
@@ -456,5 +808,33 @@
             })
             .catch(err => console.error(err));
         }
+
+        // Toggle size badge style on checkbox change
+        document.addEventListener('change', function (e) {
+            if (e.target.type === 'checkbox' && e.target.name === 'sizes') {
+                const label = document.querySelector(`label[for="${e.target.id}"]`);
+                if (label) {
+                    if (e.target.checked) {
+                        label.classList.remove('bg-white', 'border', 'text-dark');
+                        label.classList.add('bg-primary', 'text-white');
+                    } else {
+                        label.classList.remove('bg-primary', 'text-white');
+                        label.classList.add('bg-white', 'border', 'text-dark');
+                    }
+                }
+            }
+            if (e.target.type === 'checkbox' && e.target.name === 'Sizes') {
+                const label = document.querySelector(`label[for="${e.target.id}"]`);
+                if (label) {
+                    if (e.target.checked) {
+                        label.classList.remove('bg-white', 'border', 'text-dark');
+                        label.classList.add('bg-primary', 'text-white');
+                    } else {
+                        label.classList.remove('bg-primary', 'text-white');
+                        label.classList.add('bg-white', 'border', 'text-dark');
+                    }
+                }
+            }
+        });
     </script>
 }

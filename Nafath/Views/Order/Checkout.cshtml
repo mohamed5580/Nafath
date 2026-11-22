@@ -22,6 +22,7 @@
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="ItemsJson" id="ItemsJson" />
                         <input type="hidden" asp-for="OrderStatus" value="قيد المراجعة" />
+                        <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
 
                          
                         <div class="row g-3">
@@ -82,25 +83,31 @@
             form.addEventListener('submit', function() {
                 // Support both storage keys used in the app: 'shoppingCart' (used by cart.js) and legacy 'cart'
 
-                const raw = localStorage.getItem('shoppingCart') || localStorage.getItem('cart');
-                const stored = JSON.parse(raw || '[]');
+                let stored = [];
+                try {
+                    const raw = localStorage.getItem('shoppingCart') || localStorage.getItem('cart');
+                    stored = JSON.parse(raw || '[]');
+                } catch {
+                    stored = [];
+                }
+                if (!Array.isArray(stored)) stored = [];
 
                 
 
-                // Map client cart shape to server DTO { ProductId, Quantity, UnitPrice }
+                // Map client cart shape to server DTO { ProductId, Quantity, UnitPrice, Size, Color, ColorCode }
                 const items = stored.map(function(i) {
                     return {
                         ProductId: i.id ?? i.ProductId ?? i.productId,
                         Quantity: i.count ?? i.Quantity ?? i.quantity,
-                        UnitPrice: i.price ?? i.UnitPrice ?? i.unitPrice
+                        UnitPrice: i.price ?? i.UnitPrice ?? i.unitPrice,
+                        Size: i.size ?? i.Size,
+                        Color: i.color ?? i.Color ?? i.colorLabel ?? i.colorName,
+                        ColorCode: i.colorCode ?? i.ColorCode ?? i.colorHex ?? i.hex
                     };
                 });
 
                 const itemsInput = document.getElementById('ItemsJson');
                 if (itemsInput) itemsInput.value = JSON.stringify(items);
-
-                localStorage.removeItem('shoppingCart');
-                localStorage.removeItem('cart');
             });
         })();
     </script>

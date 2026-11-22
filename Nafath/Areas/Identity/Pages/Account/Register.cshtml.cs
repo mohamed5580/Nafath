@@ -150,9 +150,22 @@ namespace Nafath.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
+                var userName = new MailAddress(Input.Email).User;
+                if (await _userManager.FindByEmailAsync(Input.Email) != null)
+                {
+                    ModelState.AddModelError(nameof(Input.Email), "هذا البريد الإلكتروني مستخدم بالفعل.");
+                    return Page();
+                }
+
+                if (await _userManager.FindByNameAsync(userName) != null)
+                {
+                    ModelState.AddModelError(nameof(Input.Email), "اسم المستخدم المرتبط بهذا البريد مستخدم بالفعل.");
+                    return Page();
+                }
+
                 var user = new ApplicationUser
                 {
-                    UserName = new MailAddress(Input.Email).User,
+                    UserName = userName,
                     Email = Input.Email,
                     FullName = Input.FullName,
                     LastName = Input.LastName,
@@ -167,7 +180,17 @@ namespace Nafath.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-                    await _userManager.AddToRoleAsync(user, "User");
+                    var roleResult = await _userManager.AddToRoleAsync(user, "User");
+                    if (!roleResult.Succeeded)
+                    {
+                        await _userManager.DeleteAsync(user);
+                        foreach (var error in roleResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+
+                        return Page();
+                    }
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

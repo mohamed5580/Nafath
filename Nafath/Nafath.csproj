@@ -36,4 +36,9 @@
     <ProjectReference Include="..\infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\uploads\**" />
+    <None Include="wwwroot\uploads\**" />
+  </ItemGroup>
+
 </Project>

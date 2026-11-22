@@ -353,7 +353,7 @@ namespace Nafath.Areas.Admin.Controllers
             return userList.OrderBy(u => u.Role).ToList();
         }
 
-  
+
 
         public async Task<IActionResult> DeleteUser(string userId)
         {
@@ -399,7 +399,7 @@ namespace Nafath.Areas.Admin.Controllers
         [AllowAnonymous]
         public IActionResult Login()
         {
-      
+
             return View();
         }
 
@@ -408,11 +408,11 @@ namespace Nafath.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-       
+
             string returnUrl = Url.Content("~/");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            
+
             string login = model.Email;
             if (new EmailAddressAttribute().IsValid(model.Email))
             {

@@ -1,11 +1,16 @@
-﻿<!-- About Section -->
+﻿@inject Nafath.Services.ICompanyInformationService CompanyInformationService
+@{
+    var company = await CompanyInformationService.GetAsync();
+}
+
+<!-- About Section -->
 <section id="about" class="about section">
 
     <!-- Section Title -->
     <div class="container section-title" data-aos="fade-up">
         <span>من نحن<br></span>
-        <h2>من نحن</h2>
-        <p>نحن ملتزمون بتقديم أفضل الحلول والخدمات لعملائنا الكرام.</p>
+        <h2>@company.Name</h2>
+        <p>@(string.IsNullOrWhiteSpace(company.Description) ? "نحن ملتزمون بتقديم أفضل الحلول والخدمات لعملائنا الكرام." : company.Description)</p>
     </div><!-- End Section Title -->
 
     <div class="container">
@@ -14,7 +19,25 @@
             <div class="col-lg-6 position-relative align-self-start" data-aos="fade-up" data-aos-delay="100">
 
                 <div class="img-fluid img-About">
-                    <iframe src="https://www.facebook.com/plugins/video.php?height=316&href=https%3A%2F%2Fwww.facebook.com%2F61573614235805%2Fvideos%2F1492041895100589%2F&show_text=false&width=560&t=0" width="98%" height="316" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
+                    @if (!string.IsNullOrWhiteSpace(company.MapUrl))
+                    {
+                        <iframe src="@company.MapUrl" width="98%" height="316" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light border text-center py-5">
+                            <i class="bi bi-geo-alt fs-3 d-block mb-2"></i>
+                            <strong>@company.Address</strong>
+                            @if (!string.IsNullOrWhiteSpace(company.PhoneNumber))
+                            {
+                                <div class="mt-2"><a href="tel:@company.PhoneNumber">@company.PhoneNumber</a></div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(company.Email))
+                            {
+                                <div><a href="mailto:@company.Email">@company.Email</a></div>
+                            }
+                        </div>
+                    }
                 </div>
             </div>
             <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="200">
@@ -45,28 +68,28 @@
 
             <div class="col-lg-3 col-md-6">
                 <div class="stats-item text-center w-100 h-100">
-                    <span data-purecounter-start="0" data-purecounter-end="232" data-purecounter-duration="1" class="purecounter"></span>
+                    <span data-purecounter-start="0" data-purecounter-end="@company.ClientsNumber" data-purecounter-duration="1" class="purecounter"></span>
                     <p>عملاء</p>
                 </div>
             </div><!-- End Stats Item -->
 
             <div class="col-lg-3 col-md-6">
                 <div class="stats-item text-center w-100 h-100">
-                    <span data-purecounter-start="0" data-purecounter-end="521" data-purecounter-duration="1" class="purecounter"></span>
+                    <span data-purecounter-start="0" data-purecounter-end="@company.ProjectsNumber" data-purecounter-duration="1" class="purecounter"></span>
                     <p>مشاريع</p>
                 </div>
             </div><!-- End Stats Item -->
 
             <div class="col-lg-3 col-md-6">
                 <div class="stats-item text-center w-100 h-100">
-                    <span data-purecounter-start="0" data-purecounter-end="1453" data-purecounter-duration="1" class="purecounter"></span>
+                    <span data-purecounter-start="0" data-purecounter-end="@company.SupportHours" data-purecounter-duration="1" class="purecounter"></span>
                     <p>ساعات دعم</p>
                 </div>
             </div><!-- End Stats Item -->
 
             <div class="col-lg-3 col-md-6">
                 <div class="stats-item text-center w-100 h-100">
-                    <span data-purecounter-start="0" data-purecounter-end="32" data-purecounter-duration="1" class="purecounter"></span>
+                    <span data-purecounter-start="0" data-purecounter-end="@company.EmployeesNumber" data-purecounter-duration="1" class="purecounter"></span>
                     <p>موظفون</p>
                 </div>
             </div><!-- End Stats Item -->

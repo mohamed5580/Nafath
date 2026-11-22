@@ -24,6 +24,15 @@ namespace Domin.Entity
         [Required]
         public decimal UnitPrice { get; set; }
 
+        [StringLength(10)]
+        public string? Size { get; set; }
+
+        [StringLength(50)]
+        public string? Color { get; set; }
+
+        [StringLength(50)]
+        public string? ColorCode { get; set; }
+
         // EF needs a setter or backing field…
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public decimal TotalPrice { get; private set; }

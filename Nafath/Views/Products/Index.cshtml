@@ -9,18 +9,17 @@
 
 <partial name="_Notifications" />
 
-<div class="container py-4" lang="ar" dir="rtl">
+<div class="container py-4 store-products" lang="ar" dir="rtl">
     <!-- Hero / Store Header -->
-    <div class="bg-primary text-white rounded-4 p-4 p-lg-5 mb-4 shadow-sm position-relative overflow-hidden"
-         style="background: linear-gradient(135deg, #1d3557 0%, #457b9d 100%);">
+    <div class="store-products-hero rounded-4 p-4 p-lg-5 mb-4 shadow-sm position-relative overflow-hidden">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <span class="badge bg-white text-primary mb-2 px-3 py-2 rounded-pill fw-bold">تسوق أفضل الأثاث المكتبي</span>
-                <h1 class="display-6 fw-bold mb-2">متجر نفاذ</h1>
+                <span class="store-products-hero-badge mb-2 px-3 py-2 rounded-pill fw-bold">تسوق أفضل الأثاث المكتبي</span>
+                <h1 class="display-6 fw-bold mb-2 white">متجر نفاذ</h1>
                 <p class="lead mb-0 text-white-50">اكتشف تشكيلتنا الواسعة من الكراسي والمكاتب والحلول المكتبية المتكاملة بأعلى جودة وضمان.</p>
             </div>
             <div class="col-lg-4 text-lg-start text-center mt-3 mt-lg-0">
-                <button class="btn btn-light btn-lg px-4 rounded-pill shadow-sm text-primary fw-bold"
+                <button class="store-products-cart btn btn-lg px-4 rounded-pill shadow-sm fw-bold"
                         data-bs-toggle="modal"
                         data-bs-target="#cartModal">
                     <i class="bi bi-cart3 me-1"></i> سلة المشتريات
@@ -33,11 +32,11 @@
     <div class="row g-4">
         <!-- Sidebar Filters -->
         <aside class="col-lg-3">
-            <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 90px;">
+            <div class="card store-filter-card border-0 shadow-sm rounded-4 sticky-top" style="top: 90px;">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="fw-bold mb-0"><i class="bi bi-funnel me-1"></i> تصفية المنتجات</h5>
-                        <a asp-action="Index" class="small text-danger text-decoration-none">إعادة ضبط</a>
+                        <a asp-action="Index" class="store-filter-reset small text-decoration-none">إعادة ضبط</a>
                     </div>
 
                     <form method="get" asp-action="Index" id="filterForm">
@@ -124,7 +123,7 @@
         <!-- Main Content Area -->
         <main class="col-lg-9">
             <!-- Top Controls (Count + Sort) -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card store-products-toolbar border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
                     <div class="text-muted small">
                         عرض <strong class="text-dark">@Model.Products.Count</strong> من إجمالي <strong class="text-dark">@Model.TotalItems</strong> منتج
@@ -159,14 +158,14 @@
                     @foreach (var product in Model.Products)
                     {
                         <div class="col">
-                            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card transition-all"
+                            <div class="card store-product-card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card transition-all"
                                  style="transition: transform 0.2s ease, box-shadow 0.2s ease;">
                                 <!-- Image Container -->
                                 <div class="position-relative bg-light text-center p-3" style="min-height: 220px; display: flex; align-items: center; justify-content: center;">
                                     @if (product.IsOnSale)
                                     {
                                         var discount = Math.Round((1 - (product.Price!.Value / product.OldPrice!.Value)) * 100);
-                                        <span class="badge bg-danger position-absolute top-0 end-0 m-3 px-2 py-1 rounded-pill small">
+                                        <span class="badge store-sale-badge position-absolute top-0 end-0 m-3 px-2 py-1 rounded-pill small">
                                             خصم @discount%
                                         </span>
                                     }
@@ -208,7 +207,7 @@
                                     <!-- Price & Cart Action -->
                                     <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
                                         <div>
-                                            <span class="h5 fw-bold text-primary mb-0">@product.Price EGP</span>
+                                            <span class="h5 fw-bold store-product-price mb-0">@product.Price EGP</span>
                                             @if (product.IsOnSale)
                                             {
                                                 <div class="small text-muted text-decoration-line-through">@product.OldPrice EGP</div>
@@ -224,6 +223,8 @@
                                                     data-name="@product.Name"
                                                     data-price="@product.Price"
                                                     data-imageurl="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/default.png" : product.ImageUrl)"
+                                                    data-has-sizes="@(product.Sizes.Any() ? "true" : "false")"
+                                                    data-details-url="@Url.Action("Details", new { id = product.Id })"
                                                     title="أضف إلى السلة">
                                                 <i class="bi bi-cart-plus fs-5"></i>
                                             </button>
@@ -316,6 +317,11 @@
                 const name = this.dataset.name;
                 const price = parseFloat(this.dataset.price);
                 const imageUrl = this.dataset.imageurl;
+
+                if (this.dataset.hasSizes === 'true') {
+                    window.location.href = this.dataset.detailsUrl;
+                    return;
+                }
 
                 if (typeof shoppingCart !== 'undefined') {
                     shoppingCart.addItemToCart(id, name, price, 1, imageUrl);

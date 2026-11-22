@@ -32,7 +32,9 @@
     mobileNavToggleBtn.classList.toggle('bi-list');
     mobileNavToggleBtn.classList.toggle('bi-x');
   }
-  mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
+  if (mobileNavToggleBtn) {
+    mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
+  }
 
   /**
    * Hide mobile nav on same-page/hash links
@@ -78,13 +80,15 @@
       window.scrollY > 100 ? scrollTop.classList.add('active') : scrollTop.classList.remove('active');
     }
   }
-  scrollTop.addEventListener('click', (e) => {
-    e.preventDefault();
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
+  if (scrollTop) {
+    scrollTop.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     });
-  });
+  }
 
   window.addEventListener('load', toggleScrollTop);
   document.addEventListener('scroll', toggleScrollTop);
@@ -93,6 +97,7 @@
    * Animation on scroll function and init
    */
   function aosInit() {
+    if (typeof AOS === 'undefined') return;
     AOS.init({
       duration: 600,
       easing: 'ease-in-out',
@@ -103,20 +108,16 @@
   window.addEventListener('load', aosInit);
 
   /**
-   * Initiate glightbox
-   */
-  const glightbox = GLightbox({
-    selector: '.glightbox'
-  });
-
-  /**
    * Initiate Pure Counter
    */
-  new PureCounter();
+  if (typeof PureCounter !== 'undefined') {
+    new PureCounter();
+  }
 
   /**
    * Init isotope layout and filters
    */
+  if (typeof imagesLoaded !== 'undefined' && typeof Isotope !== 'undefined') {
   document.querySelectorAll('.isotope-layout').forEach(function(isotopeItem) {
     let layout = isotopeItem.getAttribute('data-layout') ?? 'masonry';
     let filter = isotopeItem.getAttribute('data-default-filter') ?? '*';
@@ -146,6 +147,7 @@
     });
 
   });
+  }
 
   /**
    * Init swiper sliders
@@ -156,7 +158,7 @@
         swiperElement.querySelector(".swiper-config").innerHTML.trim()
       );
 
-      if (swiperElement.classList.contains("swiper-tab")) {
+      if (swiperElement.classList.contains("swiper-tab") && typeof initSwiperWithCustomPagination === 'function') {
         initSwiperWithCustomPagination(swiperElement, config);
       } else {
         new Swiper(swiperElement, config);
@@ -164,7 +166,11 @@
     });
   }
 
-  window.addEventListener("load", initSwiper);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSwiper, { once: true });
+  } else {
+    initSwiper();
+  }
 
   /**
    * Correct scrolling position upon page load for URLs containing hash links.

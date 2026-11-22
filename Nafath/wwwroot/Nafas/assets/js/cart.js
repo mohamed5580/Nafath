@@ -1,14 +1,21 @@
 ﻿var shoppingCart = (function () {
     var cart = [];
 
-    function Item(id, name, price, count, imageUrl) {
+    function Item(id, name, price, count, imageUrl, size, color, colorCode) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.count = count;
         this.imageUrl = imageUrl;
+        this.size = size || null;
+        this.color = color || null;
+        this.colorCode = colorCode || null;
+
     }
 
+    function itemKey(id, size, color, colorCode) {
+        return `${id}:${size || ''}:${color || ''}:${colorCode || ''}`;
+    }
     function saveCart() {
         localStorage.setItem('shoppingCart', JSON.stringify(cart));
     }
@@ -23,28 +30,39 @@
     loadCart();
 
     return {
-        addItemToCart: function (id, name, price, count, imageUrl) {
+        addItemToCart: function (id, name, price, count, imageUrl, size, color, colorCode) {
             for (var i = 0; i < cart.length; i++) {
-                if (cart[i].id === id) {
-                    cart[i].count++;
+                if (
+                    cart[i].id === id &&
+                    cart[i].size === (size || null) &&
+                    cart[i].color === (color || null) &&
+                    cart[i].colorCode === (colorCode || null)
+                ) {
+                    cart[i].count += count;
                     saveCart();
                     return;
                 }
             }
-            var item = new Item(id, name, price, count, imageUrl);
+
+            var item = new Item(
+                id, name, price, count, imageUrl, size, color, colorCode
+            );
+
             cart.push(item);
             saveCart();
         },
-        setCountForItem: function (id, count) {
+        setCountForItem: function (key, count) {
             cart.forEach(function (item) {
-                if (item.id === id) {
+                if (itemKey(item.id, item.size, item.color, item.colorCode) === key) {
                     item.count = count;
                 }
             });
             saveCart();
         },
-        removeItemById: function (id) {
-            cart = cart.filter(item => item.id !== id);
+        removeItemById: function (key) {
+            cart = cart.filter(item =>
+                itemKey(item.id, item.size, item.color, item.colorCode) !== key
+            );
             saveCart();
         },
         clearCart: function () {
@@ -64,14 +82,18 @@
                 price: item.price,
                 count: item.count,
                 imageUrl: item.imageUrl,
+                size: item.size,
+                color: item.color,
+                colorCode: item.colorCode,
+                key: itemKey(item.id, item.size, item.color, item.colorCode),
                 total: (item.price * item.count).toFixed(2)
             }));
         }
+        
     };
 })();
 
-$(document).ready(function () {
-    function updateCartDisplay() {
+function updateCartDisplay() {
         var cartItems = shoppingCart.listCart();
         var total = shoppingCart.totalCart();
         var count = shoppingCart.totalCount();
@@ -81,74 +103,92 @@ $(document).ready(function () {
 
         if (cartItems.length === 0) {
             $('.cart-items').html(
-                '<tr><td colspan="5" class="text-center">Your cart is empty</td></tr>'
+                '<tr><td colspan="6" class="text-center">Your cart is empty</td></tr>'
             );
         } else {
             var itemsHtml = '';
             cartItems.forEach(function (item) {
-                // move hidden input INSIDE the first <td> to keep table structure valid
                 itemsHtml += `
 <tr lang="en" dir="ltr">
   <td>
-    <div class="d-flex align-items-center">
-      <h6 class="mb-0">${item.name}</h6>
-      <img src="${item.imageUrl}" alt="${item.name}" class="img-thumbnail ms-3" style="width:60px;height:60px;object-fit:cover;">
-      <input type="hidden" name="Id" value="${item.id}" />
-    </div>
+    <img src="${item.imageUrl}" alt="${item.name}" class="img-thumbnail" style="width:80px;height:80px;object-fit:cover;">
+  </td>
+  <td>
+    <h6 class="mb-0">${item.name}</h6>
+    ${item.size ? `<small class="text-muted">المقاس: ${item.size}</small> </br>` : ''}
+    ${item.color ? `<small class="text-muted">اللون: ${item.color}</small>` : ''}
   </td>
   <td>${item.price} EGP</td>
   <td>
     <div class="input-group mx-auto" style="width: 140px;">
-      <button class="btn btn-outline-secondary decrease-item" data-id="${item.id}">-</button>
-      <input type="text" class="form-control text-center item-count" value="${item.count}" data-id="${item.id}">
-      <button class="btn btn-outline-secondary increase-item" data-id="${item.id}">+</button>
+      <button class="btn btn-outline-secondary decrease-item" data-key="${item.key}">-</button>
+      <input type="text" class="form-control text-center item-count" value="${item.count}" data-key="${item.key}">
+      <button class="btn btn-outline-secondary increase-item" data-key="${item.key}">+</button>
     </div>
   </td>
   <td>${item.total} EGP</td>
   <td>
-    <button class="btn btn-link text-danger delete-item" data-id="${item.id}">&times;</button>
+    <button class="btn btn-link text-danger delete-item" data-key="${item.key}">&times;</button>
   </td>
 </tr>`;
             });
             $('.cart-items').html(itemsHtml);
         }
-    }
+}
 
-    $(document).on('click', '.add-to-cart', function (e) {
+$(document).ready(function () {
+
+    $(document).on('click', '.add-to-cart, .btn-quick-cart', function (e) {
         e.preventDefault();
         var id = $(this).data('id');
         var name = $(this).data('name');
         var price = Number($(this).data('price'));
         var imageUrl = $(this).data('imageurl');
-        shoppingCart.addItemToCart(id, name, price, 1, imageUrl);
+        var color = $(this).data('color');
+
+        if ($(this).data('has-sizes') === true || $(this).data('has-sizes') === 'true') {
+            window.location.href = $(this).data('details-url');
+            return;
+        }
+
+        shoppingCart.addItemToCart(
+            id,
+            name,
+            price,
+            1,
+            imageUrl,
+            null,
+            color,
+            $(this).data('color-code')
+        );
         updateCartDisplay();
         $(this).closest('.modal').modal('hide');
     });
 
     $(document).on('click', '.increase-item', function () {
-        var id = $(this).data('id');
-        var count = parseInt($(`.item-count[data-id="${id}"]`).val());
-        shoppingCart.setCountForItem(id, count + 1);
+        var key = $(this).data('key');
+        var count = parseInt($(`.item-count[data-key="${key}"]`).val());
+        shoppingCart.setCountForItem(key, count + 1);
         updateCartDisplay();
     });
     $(document).on('click', '.decrease-item', function () {
-        var id = $(this).data('id');
-        var count = parseInt($(`.item-count[data-id="${id}"]`).val());
+        var key = $(this).data('key');
+        var count = parseInt($(`.item-count[data-key="${key}"]`).val());
         if (count > 1) {
-            shoppingCart.setCountForItem(id, count - 1);
+            shoppingCart.setCountForItem(key, count - 1);
             updateCartDisplay();
         }
     });
     $(document).on('change', '.item-count', function () {
-        var id = $(this).data('id');
+        var key = $(this).data('key');
         var count = parseInt($(this).val());
         if (!isNaN(count) && count > 0) {
-            shoppingCart.setCountForItem(id, count);
+            shoppingCart.setCountForItem(key, count);
         }
         updateCartDisplay();
     });
     $(document).on('click', '.delete-item', function () {
-        shoppingCart.removeItemById($(this).data('id'));
+        shoppingCart.removeItemById($(this).data('key'));
 
         updateCartDisplay();
     });
@@ -179,16 +219,16 @@ $(document).ready(function () {
                 const items = shoppingCart.listCart().map(i => ({
                     productId: i.id,    // ← هنا
                     quantity: i.count,
-                    unitPrice: i.price
+                    unitPrice: i.price,
+                    size: i.size,
+                    color: i.color,
+                    colorCode: i.colorCode
                 }));
 
                 $('#ItemsJson').val(JSON.stringify(items));
 
                 // 2. إرسال الفورم كاملاً (ليس عبر Ajax)
                 $('#checkoutForm').submit();
-                // 2) نرسل بيانات الطلب
-                localStorage.removeItem('shoppingCart');
-                localStorage.removeItem('cart');
             }
         });
     });

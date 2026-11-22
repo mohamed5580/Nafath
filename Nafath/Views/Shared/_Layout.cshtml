@@ -1,13 +1,14 @@
 ﻿@using Domin.Entity
 
 @inject Infrastructure.IRepository.Base.IRepository<ProductType> TypeRepo
+@inject Nafath.Services.ICompanyInformationService CompanyInformationService
 
 @{
     var productTypes = await TypeRepo.FindAllasync();
+    var companyInformation = await CompanyInformationService.GetAsync();
 }
 
 @inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
 
 
 <!DOCTYPE html>
@@ -16,23 +17,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#61daff">
-    <meta name="description" content="We will simple add to cart using javascript localstorage">
-    <meta name="keywords" content="add to cart, add to cart javascript, localstorage add to cart, ecommerce shopping javascript, shooping cart demo">
-    <meta name="author" content="Rajamanickam">
+    <meta name="theme-color" content="#080808">
+    <meta name="description" content="@companyInformation.Description">
+    <meta name="author" content="@companyInformation.Name">
 
-   
-
-    <title>Nafath </title>
-
-    <link rel="stylesheet" href="~/Admin/assets/css/backend-plugin.min.css">
-    <link rel="stylesheet" href="~/Admin/assets/css/backend.css?v=1.0.0">
-    <link rel="stylesheet" href="~/Admin/assets/vendor/@@fortawesome/fontawesome-free/css/all.min.css">
-    <link rel="stylesheet" href="~/Admin/assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css">
-    <link rel="stylesheet" href="~/Admin/assets/vendor/remixicon/fonts/remixicon.css">
+    <title>@ViewData["Title"] - @companyInformation.Name</title>
 
     <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="~/Nafas/assets/images/logoo.png">
+    <link rel="icon" type="image/x-icon" href="@Url.Content(string.IsNullOrWhiteSpace(companyInformation.LogoUrl) ? "~/Nafas/assets/images/logoo.png" : companyInformation.LogoUrl)">
     <link rel="stylesheet" href="~/Admin/plugins/sweetalert2/sweetalert2.min.css">
     <!-- Fonts -->
     <!-- Fonts -->
@@ -45,190 +37,114 @@
     <link href="~/Nafas/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/aos/aos.css" rel="stylesheet">
-    <link href="~/Nafas/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
     <link href="~/Nafas/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
     <link href="~/Nafas/assets/css/style.css" rel="stylesheet">
   
     <link href="~/Nafas/assets/css/main.css" rel="stylesheet">
+    <link href="~/Nafas/assets/css/storefront.css" rel="stylesheet">
+    <link href="~/Nafas/assets/css/theme.css" rel="stylesheet">
 </head>
 
 <body class="index-page">
 
-    <header id="header" class="header d-flex sticky-top ">
-        <div class="container-fluid container-xl position-relative d-flex align-items-center">
-
-            <a asp-area="" asp-controller="Home" asp-action="Index" class="logo d-flex ">
-                <img src="~/Nafas/assets/images/logoo.png" alt="">
-            </a>
-
-            <nav id="navmenu" class="navmenu">
-                <ul>
-                    <li class="nav-item active">
-                        <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link ">الرئيسية</a>
-                    </li>
-
-              
-                    <li class="dropdown">
-                        <a class="toggle-dropdown">
-                            <span class="toggle-dropdown shoptext" >المتجر</span>
-                            <i class="bi bi-chevron-down toggle-dropdown"></i>
-                        </a>
-                        <ul>
-                            @foreach (var type in productTypes)
-                            {
-                                <li>
-                                    <a asp-controller="Products"
-                                           asp-action="Index"
-                                           asp-route-typeId="@type.Id">
-                                        @type.Name
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </li>
-
-                    <li><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link" >من نحن</a></li>
-                    <li class=""><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Services">الخدمات</a></li>
-                    <li><a class="nav-link" href="https://www.facebook.com/friends/requests/?profile_id=61573614235805">اتصل بنا</a></li>
-                    <li class="dropdown">
-                      
-                    </li>
-                    <li></li>
-                </ul>
-                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-               
-            </nav>
-
-     
-            <!-- CART MODAL -->
-            <div class="modal fade " id="cartModal"
-                 data-bs-backdrop="false"
-                 tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg  ">
-                    <div class="modal-content">
-
-                        <div class="modal-header">
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            <h5 id="cartModalLabel" class="ms-auto">سلة المشتريات</h5>
-                        </div>
-                        <div class="modal-body">
-                            <div class="table-responsive">
-                                <div class="table-responsive">
-                                    <table class="table table-hover text-center text-nowrap">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th>المنتج</th>
-                                                <th>السعر</th>
-                                                <th>الكمية</th>
-                                                <th>السعر الكلي</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="cart-items">
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-end mt-4">
-                                <h4 style="color:#6a6a6a">
-                                    المبلغ الكلي: <span class="total-cart">0.00</span> EGP
-                                </h4>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">متابعة الشراء</button>
-                            <button type="button" class="btn btn-danger clear-cart">تفريغ</button>
-                            
-                            <a asp-controller="Order"
-                                   asp-action="Checkout"
-                                   class="btn btn-primary">
-                                اتمام الشراء
-                            </a>
-
-                        </div>
-                    </div>
-                </div>
+    <header id="header" class="store-header">
+    <div class="store-header-main container-fluid container-xl">
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="store-brand" aria-label="@companyInformation.Name - الصفحة الرئيسية">
+            <div class="logo d-flex ">
+                <img src="@Url.Content(string.IsNullOrWhiteSpace(companyInformation.LogoUrl) ? "~/Nafas/assets/images/logoo.png" : companyInformation.LogoUrl)"
+                     alt="@companyInformation.Name"
+                     style="line-height: 1; width:50px; object-fit:contain;">
             </div>
+            <span>@companyInformation.Name</span>
+        </a>
 
-            <!-- LOGIN MODAL -->
-            <div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false"
-                 tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
+        <form class="store-search" method="get" asp-area="" asp-controller="Products" asp-action="Index" role="search">
+            <input type="search" name="SearchTerm" placeholder="ابحث عن المنتجات والتصنيفات" aria-label="ابحث في المتجر" />
+            <button type="submit" aria-label="بحث"><i class="bi bi-search" aria-hidden="true"></i></button>
+        </form>
 
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="loginModalLabel">تسجيل الدخول</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                        </div>
-
-                        <div class="modal-body">
-                            <partial name="_LoginPartial" />
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
-
-        <ul class="navbar-nav flex-row align-items-center iconNav">
-            <!-- User Icon Dropdown -->
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                    @if (SignInManager.IsSignedIn(User))
-                    {
-                        var currentUser = await UserManager.GetUserAsync(User);
-                        var imgUrl = string.IsNullOrEmpty(currentUser?.AvatarFile)
-                            ? $"{Helper.PathImageuser}user1.jpg"
-                            : currentUser.AvatarFile;
-
-                        if (!imgUrl.StartsWith("~/") && !imgUrl.StartsWith("/") &&
-                            !imgUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
-                            !imgUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-                        {
-                            imgUrl = $"{Helper.PathImageuser}{imgUrl}";
-                        }
-
-                        <img src="@(Url.Content(imgUrl))"
-                             alt="Profile"
-                             class="rounded-circle"
-                             style="width:50px;height:50px;" />
-                    }
-                    else
-                    {
-                        <img src="~/Nafas/assets/images/user.png"
-                             alt="Profile"
-                             class="rounded-circle"
-                             style="width:50px;height:50px;" />
-                    }
-
-                   
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end p-3 " aria-labelledby="userDropdown">
-                    <!-- هنا ضع خيارات المستخدم أو partial login -->
+        <div class="store-header-actions">
+            <div class="dropdown">
+                <button class="store-action-button dropdown-toggle" type="button" id="storeAccountMenu" data-bs-toggle="dropdown" aria-expanded="false" aria-label="حساب المستخدم">
+                    <i class="bi bi-person-circle" aria-hidden="true"></i>
+                    <span class="store-action-label">حسابي</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="storeAccountMenu">
                     <partial name="_LoginPartial" />
                 </ul>
-            </li>
+            </div>
+            <button class="store-action-button" type="button" data-bs-toggle="modal" data-bs-target="#cartModal" aria-label="سلة المشتريات">
+                <i class="bi bi-cart3" aria-hidden="true"></i>
+                <span class="store-action-label">السلة</span>
+                <span class="store-cart-count" id="cart-badge">0</span>
+            </button>
+        </div>
+    </div>
 
-            <!-- Cart Icon Modal Trigger -->
+    <nav class="store-header-nav" aria-label="التنقل الرئيسي">
+        <div class="store-nav-inner container-fluid container-xl">
+            <details class="store-category-menu">
+                <summary><i class="bi bi-grid" aria-hidden="true"></i> التصنيفات <i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+                <div class="store-mega-panel">
+                    <h2>تسوق حسب التصنيف</h2>
+                    <div class="store-mega-grid">
+                        @foreach (var type in productTypes.OrderBy(type => type.Name) )
+                        {
+                            <a class="store-mega-link" asp-area="" asp-controller="Products" asp-action="Index" asp-route-ProductTypeId="@type.Id">
+                                <i class="bi bi-tag" aria-hidden="true"></i>
+                                <span>@type.Name</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </details>
+            <a asp-area="" asp-controller="Products" asp-action="Index">جميع المنتجات</a>
+            @foreach (var type in productTypes.OrderBy(type => type.Name).Take(8))
+            {
+                <a asp-area="" asp-controller="Products" asp-action="Index" asp-route-ProductTypeId="@type.Id">@type.Name</a>
+            }
+            <a asp-area="" asp-controller="Products" asp-action="Index" asp-route-SortBy="newest">وصل حديثاً</a>
+            <a asp-area="" asp-controller="Home" asp-action="About">عن @companyInformation.Name</a>
+        </div>
+    </nav>
 
-            <li class="nav-item">
-                <a class="nav-link position-relative" data-bs-toggle="modal" data-bs-target="#cartModal">
-                    <i class="bi bi-cart3 fs-4"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-badge">0</span>
-                </a>
-            </li>
-        </ul>
-    </header>
+    <div class="modal fade" id="cartModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content ">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                    <h5 id="cartModalLabel" class="ms-auto">سلة المشتريات</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center text-nowrap">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>صورة المنتج</th>
+                                    <th>اسم المنتج</th>
+                                    <th>السعر</th>
+                                    <th>الكمية</th>
+                                    <th>السعر الكلي</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="cart-items"></tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-end mt-4">
+                        <h4 class="text-secondary">المبلغ الكلي: <span class="total-cart">0.00</span> EGP</h4>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">متابعة التسوق</button>
+                    <button type="button" class="btn btn-danger clear-cart">تفريغ السلة</button>
+                    <a asp-controller="Order" asp-action="Checkout" class="btn btn-primary text-white"> أتمام الشراء </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
 
     <main class="main-content">
         @RenderBody()
@@ -257,13 +173,19 @@
             <div class="row gy-4">
                 <div class="col-lg-4 col-md-6 footer-about">
                     <a asp-area="" asp-controller="Home" asp-action="Index" class="logo d-flex ">
-                        <img src="~/Nafas/assets/images/logoo.png" class="w-25" alt="">
-                        <h1 class="sitename">نفاذ</h1>
+                        <img src="@Url.Content(string.IsNullOrWhiteSpace(companyInformation.LogoUrl) ? "~/Nafas/assets/images/logoo.png" : companyInformation.LogoUrl)" class="w-25" alt="@companyInformation.Name">
+                        <h1 class="sitename">@companyInformation.Name</h1>
                     </a>
                     <div class="footer-contact pt-3">
-                        <p>برج ستي ستار</p>
-                        <p>  6 أكتوبر </p>
-                        <p class="mt-3"><strong>الهاتف:</strong> <span>01126499600</span></p>
+                        <p>@companyInformation.Address</p>
+                        @if (!string.IsNullOrWhiteSpace(companyInformation.PhoneNumber))
+                        {
+                            <p class="mt-3"><strong>الهاتف:</strong> <a href="tel:@companyInformation.PhoneNumber">@companyInformation.PhoneNumber</a></p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(companyInformation.Email))
+                        {
+                            <p><strong>البريد:</strong> <a href="mailto:@companyInformation.Email">@companyInformation.Email</a></p>
+                        }
                     </div>
                 </div>
 
@@ -302,7 +224,7 @@
         </div>
 
         <div class="container copyright text-center mt-4">
-            <p>© <span>حقوق النشر</span> <strong class="px-1 sitename">Nafas</strong> <span>جميع الحقوق محفوظة</span></p>
+            <p>© <span>حقوق النشر</span> <strong class="px-1 sitename">@companyInformation.Name</strong> <span>جميع الحقوق محفوظة</span></p>
            
         </div>
 
@@ -312,20 +234,19 @@
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <!-- Preloader -->
-    <div id="preloader"></div>
+
     <script src="~/Admin/plugins/jquery/jquery.min.js"></script>
     <!-- Vendor JS Files -->
     <script src="~/Nafas/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/Nafas/assets/vendor/php-email-form/validate.js"></script>
     <script src="~/Nafas/assets/vendor/aos/aos.js"></script>
-    <script src="~/Nafas/assets/vendor/glightbox/js/glightbox.min.js"></script>
     <script src="~/Nafas/assets/vendor/purecounter/purecounter_vanilla.js"></script>
-    <script src="~/Nafas/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
-    <script src="~/Nafas/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
     <script src="~/Nafas/assets/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="~/Admin/plugins/sweetalert2/sweetalert2.all.min.js"></script>
     <script src="~/Nafas/assets/js/sweetalert.js"></script>
     <script src="~/Nafas/assets/js/main.js"></script>
+    <script src="~/Nafas/assets/nav.js"></script>
+
 
     <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -344,21 +265,23 @@
             });
     </script>
 
-    @if (SignInManager.IsSignedIn(User))
-    {
-        <script src="~/Nafas/assets/js/cart.js"></script>
-    }
-    else
-    {
-        <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const cartItems = document.querySelector('.cart-items');
-                    if (cartItems) {
-                        cartItems.innerHTML = '<tr><td colspan="5" class="text-center">Your cart is empty</td></tr>';
+    <script src="~/Nafas/assets/js/cart.js"></script>
+    <script>
+        window.isNafathUserSignedIn = @Json.Serialize(SignInManager.IsSignedIn(User));
+        window.nafasLoginUrl = '@Url.Page("/Account/Login", new { area = "Identity", returnUrl = Context.Request.Path })';
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.btn-quick-cart, .add-to-cart, #btnAddToCart').forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    if (!window.isNafathUserSignedIn) {
+                        event.preventDefault();
+                        event.stopImmediatePropagation();
+                        window.location.href = window.nafasLoginUrl;
                     }
-                });
-        </script>
-    }
+                }, true);
+            });
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 

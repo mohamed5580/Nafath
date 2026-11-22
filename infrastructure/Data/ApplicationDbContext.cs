@@ -80,11 +80,16 @@ namespace Infrastructure.Data
             });
 
 
-            builder.Entity<OrderItem>()
-            .HasOne(x => x.Product)
-            .WithMany(x => x.OrderItems)
-            .HasForeignKey(x => x.ProductId)
-            .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<OrderItem>(b =>
+            {
+                b.HasOne(x => x.Product)
+                 .WithMany(x => x.OrderItems)
+                 .HasForeignKey(x => x.ProductId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                b.Property(oi => oi.Size).HasMaxLength(10);
+                b.Property(oi => oi.Color).HasMaxLength(50);
+            });
 
 
             builder.Entity<ProductType>(b =>
@@ -104,11 +109,33 @@ namespace Infrastructure.Data
                  .WithOne(pi => pi.Product)
                  .HasForeignKey(pi => pi.ProductId)
                  .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasMany(p => p.Colors)
+                 .WithOne(pc => pc.Product)
+                 .HasForeignKey(pc => pc.ProductId)
+                 .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<ProductImage>(b =>
             {
                 b.Property(pi => pi.ImageUrl).IsRequired().HasMaxLength(500);
+            });
+
+            builder.Entity<ProductColor>(b =>
+            {
+                b.Property(pc => pc.ColorName).IsRequired().HasMaxLength(50);
+                b.Property(pc => pc.HexCode).IsRequired().HasMaxLength(7);
+            });
+
+            builder.Entity<CompanyInformation>(b =>
+            {
+                b.Property(x => x.Name).IsRequired().HasMaxLength(150);
+                b.Property(x => x.Address).IsRequired().HasMaxLength(300);
+                b.Property(x => x.PhoneNumber).IsRequired().HasMaxLength(50);
+                b.Property(x => x.Email).IsRequired().HasMaxLength(150);
+                b.Property(x => x.Description).HasMaxLength(2000);
+                b.Property(x => x.LogoUrl).HasMaxLength(500);
+                b.Property(x => x.MapUrl).HasMaxLength(1000);
             });
         }
 
@@ -119,7 +146,8 @@ namespace Infrastructure.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
-   
+        public DbSet<ProductColor> ProductColors { get; set; }
+        public DbSet<CompanyInformation> CompanyInformation { get; set; }
     }
 
 }

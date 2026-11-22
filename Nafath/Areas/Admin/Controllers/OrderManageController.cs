@@ -14,6 +14,7 @@ using System.Security.Claims;
 namespace Nafath.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public class OrderManageController : Controller
     {
         private readonly IRepository<Order> _orderRepo;
@@ -36,7 +37,7 @@ namespace Nafath.Areas.Admin.Controllers
             _userManager = userManager;
         }
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> Index(int page = 1)
         {
             const int pageSize = 20;
@@ -56,6 +57,7 @@ namespace Nafath.Areas.Admin.Controllers
                     .Include(o => o.User)
                     .Include(o => o.OrderItems)
                         .ThenInclude(oi => oi.Product)
+                            .ThenInclude(p => p.Colors)
                     .OrderByDescending(o => o.OrderDate)
             );
 
@@ -76,7 +78,10 @@ namespace Nafath.Areas.Admin.Controllers
                     ProductName = i.Product?.Name ?? "[لا يوجد]",
                     ImageUrl = i.Product?.ImageUrl ?? "/images/default.png",
                     Quantity = i.Quantity,
-                    UnitPrice = i.UnitPrice
+                    UnitPrice = i.UnitPrice,
+                    Size = i.Size,
+                    Color = i.Color,
+                    ColorCode = ResolveColorCode(i.Color, i.ColorCode, i.Product)
                 }).ToList()
             }).ToList();
 
@@ -102,51 +107,101 @@ namespace Nafath.Areas.Admin.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Checkout(CheckoutViewModel model, string ItemsJson)
+        public async Task<IActionResult> Checkout(CheckoutViewModel model, string? ItemsJson)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            model.Items = JsonConvert.DeserializeObject<List<CartItemDto>>(ItemsJson) ?? new List<CartItemDto>();
-            if (!model.Items.Any())
+            try
             {
-                ModelState.AddModelError("", "السلة فارغة.");
+                model.Items = string.IsNullOrWhiteSpace(ItemsJson)
+                    ? new List<CartItemDto>()
+                    : JsonConvert.DeserializeObject<List<CartItemDto>>(ItemsJson) ?? new List<CartItemDto>();
+            }
+            catch (JsonException)
+            {
+                ModelState.AddModelError(string.Empty, "تعذر قراءة محتويات السلة.");
                 return View(model);
+            }
+
+            if (model.Items.Count == 0)
+            {
+                ModelState.AddModelError(string.Empty, "السلة فارغة.");
+                return View(model);
+            }
+
+            if (model.Items.Any(item => item == null || item.ProductId <= 0 || item.Quantity <= 0))
+            {
+                ModelState.AddModelError(string.Empty, "تحتوي السلة على منتج أو كمية غير صالحة.");
+                return View(model);
+            }
+
+            var quantities = model.Items
+                .GroupBy(item => item.ProductId)
+                .Select(group => new
+                {
+                    ProductId = group.Key,
+                    Quantity = group.Sum(item => (long)item.Quantity)
+                })
+                .ToList();
+
+            if (quantities.Any(item => item.Quantity > int.MaxValue))
+            {
+                ModelState.AddModelError(string.Empty, "تتجاوز كمية أحد المنتجات الحد المسموح.");
+                return View(model);
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Challenge();
+
+            var productIds = quantities.Select(item => item.ProductId).ToArray();
+            var products = await _dbContext.Products
+                .Where(product => productIds.Contains(product.Id))
+                .ToDictionaryAsync(product => product.Id);
+
+            foreach (var item in quantities)
+            {
+                if (!products.TryGetValue(item.ProductId, out var product))
+                {
+                    ModelState.AddModelError(string.Empty, "أحد المنتجات الموجودة في السلة لم يعد متاحاً.");
+                    return View(model);
+                }
+
+                if (!product.IsAvailable || product.StockQuantity < item.Quantity)
+                {
+                    ModelState.AddModelError(string.Empty, $"الكمية المطلوبة من المنتج «{product.Name}» غير متوفرة حالياً.");
+                    return View(model);
+                }
+
+                if (!product.Price.HasValue || product.Price <= 0)
+                {
+                    ModelState.AddModelError(string.Empty, $"تعذر إتمام الطلب لأن سعر المنتج «{product.Name}» غير صالح.");
+                    return View(model);
+                }
             }
 
             await using var transaction = await _dbContext.Database.BeginTransactionAsync();
-
-            try
+            var order = new Order
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var order = new Order { UserId = userId, OrderDate = DateTime.Now };
-                await _orderRepo.AddOneAsync(order);
-                await _dbContext.SaveChangesAsync(); // Save to get Order Id
-
-                var items = new List<OrderItem>();
-                foreach (var ci in model.Items)
+                UserId = userId,
+                OrderDate = DateTime.Now,
+                OrderStatus = OrderStatuses.PendingReview,
+                PaymentMethod = model.PaymentMethod,
+                Address = model.Address,
+                MobileNumber = model.MobileNumber,
+                OrderItems = quantities.Select(item => new OrderItem
                 {
-                    items.Add(new OrderItem
-                    {
-                        OrderId = order.Id,
-                        ProductId = ci.ProductId,
-                        Quantity = ci.Quantity,
-                        UnitPrice = ci.UnitPrice
-                    });
-                }
-                
-                await _orderItemRepo.AddRangeAsync(items);
-                await _dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
+                    ProductId = item.ProductId,
+                    Quantity = (int)item.Quantity,
+                    UnitPrice = products[item.ProductId].Price!.Value
+                }).ToList()
+            };
 
-                return RedirectToAction("Confirmation", new { id = order.Id });
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                ModelState.AddModelError("", "حدث خطأ أثناء إنشاء الطلب. حاول مرة أخرى.");
-                return View(model);
-            }
+            await _dbContext.Orders.AddAsync(order);
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return RedirectToAction("Confirmation", new { id = order.Id });
         }
         [Authorize(Roles = "Admin")]
 
@@ -201,7 +256,10 @@ namespace Nafath.Areas.Admin.Controllers
 
             var orderItems = await _orderItemRepo.FindByConditionAsync(oi => oi.OrderId == id);
             var productIds = orderItems.Select(oi => oi.ProductId).Distinct();
-            var products = await _productRepo.FindByConditionAsync(p => productIds.Contains(p.Id));
+            var products = await _dbContext.Products
+                .Include(p => p.Colors)
+                .Where(p => productIds.Contains(p.Id))
+                .ToListAsync();
 
             var vm = new OrderDetailsViewModel
             {
@@ -215,7 +273,10 @@ namespace Nafath.Areas.Admin.Controllers
                         ProductName = prod.Name,
                         ImageUrl = prod.ImageUrl,
                         Quantity = oi.Quantity,
-                        UnitPrice = oi.UnitPrice
+                        UnitPrice = oi.UnitPrice,
+                        Size = oi.Size,
+                        Color = oi.Color,
+                        ColorCode = ResolveColorCode(oi.Color, oi.ColorCode, prod)
                     };
                 }).ToList()
             };
@@ -297,6 +358,23 @@ namespace Nafath.Areas.Admin.Controllers
             await _orderRepo.UpdateOneAsync(order);
 
             return Json(new { success = true, newStatus = orderStatus });
+        }
+
+        private static string? ResolveColorCode(string? color, string? colorCode, Product? product)
+        {
+            if (!string.IsNullOrWhiteSpace(colorCode))
+            {
+                return colorCode.Trim();
+            }
+
+            if (string.IsNullOrWhiteSpace(color) || product?.Colors == null)
+            {
+                return null;
+            }
+
+            return product.Colors
+                .FirstOrDefault(c => string.Equals(c.ColorName, color.Trim(), StringComparison.OrdinalIgnoreCase))
+                ?.HexCode;
         }
 
         private void SessionMsg(string MsgType, string Title, string Msg)

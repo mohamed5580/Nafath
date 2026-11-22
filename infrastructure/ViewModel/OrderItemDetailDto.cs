@@ -13,6 +13,9 @@ namespace Infrastructure.ViewModel
         public string ImageUrl { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
+        public string? Size { get; set; }
+        public string? Color { get; set; }
+        public string? ColorCode { get; set; }
         public decimal TotalPrice => Quantity * UnitPrice;
         public string OrderStatus { get; set; } = "قيد المراجعه"; // القيمة الافتراضية
     }

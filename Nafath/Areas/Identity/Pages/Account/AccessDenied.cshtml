@@ -1,10 +1,28 @@
 ﻿@page
 @model AccessDeniedModel
 @{
-    ViewData["Title"] = "Access denied";
+    ViewData["Title"] = "غير مسموح بالدخول";
 }
 
-<header>
-    <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+<div class="container py-5 text-center" dir="rtl">
+    <div class="alert alert-danger mx-auto" role="alert" style="max-width: 600px;">
+        <h1 class="h4 mb-3">@ViewData["Title"]</h1>
+        <p class="mb-2">ليس لديك الصلاحية للوصول إلى هذه الصفحة.</p>
+        <small>سيتم تحويلك إلى الصفحة الرئيسية خلال <span id="countdown">3</span> ثوانٍ.</small>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let seconds = 3;
+        const countdown = document.getElementById('countdown');
+        const timer = setInterval(() => {
+            seconds--;
+            countdown.textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(timer);
+                window.location.replace('@Url.Content("~/")');
+            }
+        }, 1000);
+    </script>
+}

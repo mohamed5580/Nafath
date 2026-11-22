@@ -1,0 +1,388 @@
+@model Domin.Entity.Product
+@using Domin.Entity
+@using Domin.Resource
+@inject IWebHostEnvironment Env
+
+@{
+    ViewData["Title"] = "تعديل المنتج";
+    var selectedSizes = Model.Sizes;
+}
+
+<partial name="_Notifications" />
+
+<div class="wrapper py-4" lang="ar" dir="rtl">
+    <div class="container-fluid">
+        <!-- Breadcrumb / Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="las la-edit text-primary me-1"></i> تعديل المنتج: @Model.Name</h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/Admin/Home/Index">الرئيسية</a></li>
+                        <li class="breadcrumb-item"><a asp-action="Index">إدارة المنتجات</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">تعديل</li>
+                    </ol>
+                </nav>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="las la-arrow-right me-1"></i> العودة للقائمة
+            </a>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger rounded-4 shadow-sm mb-4">
+                <h6 class="fw-bold"><i class="las la-exclamation-triangle me-1"></i> يرجى تصحيح الأخطاء التالية:</h6>
+                <div asp-validation-summary="All" class="text-danger mb-0"></div>
+            </div>
+        }
+
+        <!-- Edit Card -->
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="fw-bold mb-0">بيانات المنتج والمخزون</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-area="Admin" asp-controller="ProductsManager" asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    <input type="hidden" name="ImageUrl" value="@Model.ImageUrl" />
+
+                    <div class="row g-4">
+                        <!-- Product Name -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">اسم المنتج <span class="text-danger">*</span></label>
+                            <input name="Name" class="form-control" value="@Model.Name" required minlength="2" maxlength="100" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">التصنيف <span class="text-danger">*</span></label>
+                            <select name="ProductTypeId" class="form-select" required>
+                                <option value="">-- اختر التصنيف --</option>
+                                @if (ViewData["ProductTypeId"] is SelectList types)
+                                {
+                                    foreach (var t in types)
+                                    {
+                                        var isSelected = t.Value == Model.ProductTypeId.ToString();
+                                        <option value="@t.Value" selected="@isSelected">@t.Text</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="ProductTypeId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- SKU -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">كود المنتج (SKU)</label>
+                            <input name="SKU" class="form-control font-monospace" value="@Model.SKU" placeholder="مثال: CHR-001" maxlength="50" />
+                            <span asp-validation-for="SKU" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">السعر الحالي (EGP) <span class="text-danger">*</span></label>
+                            <input name="Price" type="number" class="form-control" step="0.01" min="0.01" value="@Model.Price" required />
+                            <span asp-validation-for="Price" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Old Price -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">السعر قبل الخصم (EGP)</label>
+                            <input name="OldPrice" type="number" class="form-control" step="0.01" min="0" value="@Model.OldPrice" placeholder="اختياري" />
+                            <span asp-validation-for="OldPrice" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Stock Quantity -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">الكمية بالمخزن <span class="text-danger">*</span></label>
+                            <input name="StockQuantity" type="number" class="form-control" min="0" value="@Model.StockQuantity" required />
+                            <span asp-validation-for="StockQuantity" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Low Stock Threshold -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">حد التنبيه بنقص المخزون</label>
+                            <input name="LowStockThreshold" type="number" class="form-control" min="0" value="@Model.LowStockThreshold" />
+                            <span asp-validation-for="LowStockThreshold" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="border rounded-4 p-3 bg-light">
+                                <label class="form-label fw-semibold d-block mb-1">
+                                    <i class="las la-ruler me-1 text-primary"></i> المقاسات المتاحة للمنتج (Sizes)
+                                </label>
+                                <small class="text-muted d-block mb-3">حددي المقاسات التي يتوفر بها هذا المنتج ليختار العميل مقاساً منها عند الطلب (أو اتركيها فارغة إذا كان المنتج لا يتطلب مقاساً):</small>
+                                
+                                <div class="d-flex flex-wrap gap-2 mb-3" id="editSizesContainer">
+                                    @foreach (var size in ProductSizeOptions.All)
+                                    {
+                                        var isSelected = selectedSizes.Contains(size, StringComparer.OrdinalIgnoreCase);
+                                        <input class="btn-check" type="checkbox" name="sizes" value="@size" id="size-@size" autocomplete="off" @(isSelected ? "checked" : "") />
+                                        <label class="btn btn-outline-primary px-3 py-2 rounded-pill fw-semibold" for="size-@size">@size</label>
+                                    }
+                                </div>
+
+                                @{
+                                    var customSizesVal = string.Join(", ", selectedSizes.Where(s => !ProductSizeOptions.All.Contains(s, StringComparer.OrdinalIgnoreCase)));
+                                }
+                                <div class="row align-items-center mt-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label small text-muted mb-1">مقاسات إضافية مخصصة (اختياري، مفصولة بفاصلة):</label>
+                                        <input type="text" name="customSizes" value="@customSizesVal" class="form-control form-control-sm" placeholder="مثال: 38, 40, 42" />
+                                    </div>
+                                    <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill me-1" onclick="toggleAllSizes(true)">تحديد الكل</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="toggleAllSizes(false)">إلغاء التحديد</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Colors -->
+                        <div class="col-12">
+                            <div class="border rounded-4 p-3 bg-light">
+                                <label class="form-label fw-semibold d-block mb-1">
+                                    <i class="las la-palette me-1 text-primary"></i> ألوان المنتج المتاحة (Product Colors)
+                                </label>
+                                <small class="text-muted d-block mb-3">يمكنك إضافة ألوان جديدة، اختيار كود HEX وتسمية اللون، أو حذف الألوان الحالية:</small>
+
+                                <!-- Color input row -->
+                                <div class="row g-2 align-items-end mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label small text-muted mb-1">اسم اللون</label>
+                                        <input type="text" id="newColorName" class="form-control form-control-sm" placeholder="مثال: أسود، كحلي، أحمر" maxlength="50" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small text-muted mb-1">كود اللون (HEX)</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="color" id="newColorPicker" class="form-control form-control-color p-1" value="#000000" title="اختر لوناً" style="max-width:46px;" />
+                                            <input type="text" id="newColorHex" class="form-control font-monospace" placeholder="#000000" maxlength="7" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="addColor()">
+                                            <i class="las la-plus me-1"></i> إضافة اللون
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Color swatches preview -->
+                                <div class="d-flex flex-wrap gap-2 mb-2" id="colorsPreview"></div>
+                                <small class="text-muted" id="noColorsHint">لم تتم إضافة ألوان لهذا المنتج بعد.</small>
+
+                                <!-- Hidden JSON field submitted with form -->
+                                <input type="hidden" name="colorsJson" id="colorsJsonInput" value="[]" />
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">الوصف <span class="text-danger">*</span></label>
+                            <textarea name="Description" class="form-control" rows="4" required minlength="5" maxlength="500">@Model.Description</textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Primary Image -->
+                        <div class="col-md-6">
+                            <div class="border rounded-4 p-3 bg-light">
+                                <label class="form-label fw-semibold d-block mb-3">الصورة الرئيسية للمنتج</label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img id="primaryPreview" src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/default.png" : Model.ImageUrl)"
+                                         class="rounded-3 border shadow-sm" style="max-height: 100px; width: 100px; object-fit: contain; background: #fff;" />
+                                    <div>
+                                        <label class="btn btn-primary btn-sm rounded-pill px-3">
+                                            <i class="las la-upload me-1"></i> تغيير الصورة الرئيسية
+                                            <input name="ImageFile" type="file" hidden accept="image/*" onchange="previewImage(event, 'primaryPreview')" />
+                                        </label>
+                                        <small class="text-muted d-block mt-1">PNG, JPG حتى 5MB</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Images -->
+                        <div class="col-md-6">
+                            <div class="border rounded-4 p-3 bg-light">
+                                <label class="form-label fw-semibold d-block mb-2">إضافة صور جديدة للمعرض</label>
+                                <input name="AdditionalImages" type="file" class="form-control" accept="image/*" multiple />
+                                <small class="text-muted d-block mt-1">يمكنك اختيار عدة صور معاً لإضافتها إلى المعرض.</small>
+                            </div>
+                        </div>
+
+                        <!-- Existing Gallery Images -->
+                        @if (Model.Images != null && Model.Images.Any())
+                        {
+                            <div class="col-12">
+                                <div class="border rounded-4 p-3 bg-white">
+                                    <label class="form-label fw-semibold d-block mb-2">الصور الإضافية الحالية في المعرض:</label>
+                                    <div class="d-flex gap-3 flex-wrap">
+                                        @foreach (var gImg in Model.Images)
+                                        {
+                                            <div class="position-relative border rounded-3 p-1 shadow-sm" id="gallery-box-@gImg.Id">
+                                                <img src="@gImg.ImageUrl" style="width: 80px; height: 80px; object-fit: cover;" class="rounded-2" />
+                                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 p-0 rounded-circle"
+                                                        style="width: 24px; height: 24px; line-height: 20px; transform: translate(30%, -30%);"
+                                                        onclick="deleteGalleryImage(@gImg.Id)" title="حذف الصورة">
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Available Switch -->
+                        <div class="col-12">
+                            <div class="form-check form-switch p-0">
+                                <input type="checkbox" name="IsAvailable" value="true" class="form-check-input ms-2" id="isAvailableCheck" @(Model.IsAvailable ? "checked" : "") />
+                                <label for="isAvailableCheck" class="form-check-label fw-semibold">متاح للطلب والعرض في المتجر</label>
+                                <input type="hidden" name="IsAvailable" value="false" />
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="col-12 border-top pt-4 d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">إلغاء</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm">
+                                <i class="las la-save me-1"></i> حفظ التعديلات
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <style>
+        .color-swatch-admin {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 6px;
+            border-radius: 999px;
+            border: 1.5px solid #dee2e6;
+            background: #fff;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: default;
+        }
+        .color-swatch-admin .dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.12);
+            flex-shrink: 0;
+        }
+        .color-swatch-admin .remove-color {
+            border: none;
+            background: none;
+            padding: 0 0 0 4px;
+            line-height: 1;
+            font-size: 1rem;
+            color: #999;
+            cursor: pointer;
+        }
+        .color-swatch-admin .remove-color:hover { color: #dc3545; }
+    </style>
+    <script>
+        @{
+            var colorsList = (Model.Colors ?? new List<Domin.Entity.ProductColor>())
+                .OrderBy(c => c.DisplayOrder)
+                .Select(c => new { id = c.Id, colorName = c.ColorName, hexCode = c.HexCode, displayOrder = c.DisplayOrder });
+            var initialColorsJson = System.Text.Json.JsonSerializer.Serialize(colorsList);
+        }
+        let colors = @Html.Raw(initialColorsJson) || [];
+
+        // Sync color picker <-> hex text input
+        document.getElementById('newColorPicker').addEventListener('input', function () {
+            document.getElementById('newColorHex').value = this.value.toUpperCase();
+        });
+        document.getElementById('newColorHex').addEventListener('input', function () {
+            const val = this.value.trim();
+            if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
+                document.getElementById('newColorPicker').value = val;
+            }
+        });
+
+        function addColor() {
+            const name = document.getElementById('newColorName').value.trim();
+            const hex = document.getElementById('newColorHex').value.trim();
+            if (!name) { alert('أدخل اسم اللون.'); return; }
+            if (!/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex)) { alert('أدخل كود HEX صحيح (مثال: #FF0000).'); return; }
+            colors.push({ id: 0, colorName: name, hexCode: hex.toUpperCase(), displayOrder: colors.length });
+            renderColors();
+            document.getElementById('newColorName').value = '';
+            document.getElementById('newColorHex').value = '';
+            document.getElementById('newColorPicker').value = '#000000';
+        }
+
+        function removeColor(idx) {
+            colors.splice(idx, 1);
+            colors.forEach((c, i) => c.displayOrder = i);
+            renderColors();
+        }
+
+        function renderColors() {
+            const container = document.getElementById('colorsPreview');
+            const hint = document.getElementById('noColorsHint');
+            container.innerHTML = '';
+            if (colors.length === 0) {
+                hint.classList.remove('d-none');
+            } else {
+                hint.classList.add('d-none');
+                colors.forEach((c, i) => {
+                    const el = document.createElement('span');
+                    el.className = 'color-swatch-admin';
+                    el.innerHTML = `<span class="dot" style="background:${c.hexCode};" title="${c.hexCode}"></span>
+                        ${c.colorName} <span class="text-muted small">(${c.hexCode})</span>
+                        <button type="button" class="remove-color" onclick="removeColor(${i})" title="حذف اللون">&times;</button>`;
+                    container.appendChild(el);
+                });
+            }
+            document.getElementById('colorsJsonInput').value = JSON.stringify(colors);
+        }
+
+        // Initialize display
+        renderColors();
+
+        function previewImage(event, previewId) {
+            const preview = document.getElementById(previewId);
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => preview.src = e.target.result;
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function toggleAllSizes(select) {
+            document.querySelectorAll('#editSizesContainer input.btn-check').forEach(cb => {
+                cb.checked = select;
+            });
+        }
+
+        function deleteGalleryImage(id) {
+            if (!confirm('هل تريد حذف هذه الصورة من المعرض؟')) return;
+
+            fetch(`/Admin/ProductsManager/DeleteGalleryImage?id=${id}`, {
+                method: 'POST'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const el = document.getElementById(`gallery-box-${id}`);
+                    if (el) el.remove();
+                } else {
+                    alert(data.message || 'حدث خطأ أثناء الحذف');
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
+}

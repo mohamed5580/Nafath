@@ -31,6 +31,10 @@ namespace Infrastructure.ViewModel
 
         public int LowStockThreshold { get; set; } = 3;
 
+        public List<string> Sizes { get; set; } = new();
+
+        public string? CustomSizes { get; set; }
+
         public bool IsAvailable { get; set; } = true;
 
         [Display(Name = "Main Image")]
@@ -38,5 +42,8 @@ namespace Infrastructure.ViewModel
 
         [Display(Name = "Gallery Images")]
         public List<IFormFile>? AdditionalImages { get; set; }
+
+        /// <summary>Colors submitted as JSON from the color-picker UI.</summary>
+        public string? ColorsJson { get; set; }
     }
 }

@@ -54,6 +54,12 @@ namespace Infrastructure.ViewModel
 
         [Required]
         public int ProductTypeId { get; set; }
+
+        /// <summary>Existing colors loaded from DB for rendering in Edit page.</summary>
+        public List<Domin.Entity.ProductColor> ExistingColors { get; set; } = new();
+
+        /// <summary>Colors submitted as JSON from the color-picker UI.</summary>
+        public string? ColorsJson { get; set; }
     }
 }
 

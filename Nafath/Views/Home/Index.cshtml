@@ -1,353 +1,215 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Infrastructure.ViewModel.HomePageViewModel
+@using Domin.Entity
+@using System.Collections.Generic
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "الرئيسية - نفاذ";
+    var products = Model.FeaturedProducts;
+    var campaignGroups = products.Chunk(3).ToList();
+    var swiperConfig = new
+    {
+        slidesPerView = 1,
+        spaceBetween = 0,
+        speed = 550,
+        loop = campaignGroups.Count > 1,
+        autoplay = campaignGroups.Count > 1
+            ? (object)new { delay = 5000, disableOnInteraction = false, pauseOnMouseEnter = true }
+            : false,
+        navigation = new { nextEl = "#storeCampaignNext", prevEl = "#storeCampaignPrevious" },
+        pagination = new { el = "#storeCampaignPagination", clickable = true }
+    };
 }
+
 <partial name="_Notifications" />
 
+<main class="store-home" lang="ar" dir="rtl">
+    <div class="store-home-container">
+        <section class="store-section" aria-label="عروض ومنتجات مختارة">
+            <div class="store-campaign">
 
+                <div class="store-campaign-copy">
+                    <span class="store-campaign-eyebrow">
+                        @(products.Count > 0 ? "اختيارات نفاذ" : "أهلاً بك في نفاذ")
+                    </span>
 
-<main class="main">
+                    <h1>
+                        @(products.Count > 0
+                            ? "اكتشف ما يناسبك"
+                            : "اكتشف مجموعتنا")
+                    </h1>
 
-    <!-- Hero Section -->
-    <section id="hero" class="hero section" lang="ar" dir="rtl">
-
-        <div class="container">
-            <div class="row gy-4">
-                <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center text-end" data-aos="fade-up">
-                    <h1>شركة نفاذ لتوريد وبيع وصيانة الأثاث المكتبي</h1>
                     <p>
-                        هل تبحث عن أثاث مكتبي عالي الجودة لبيئة عمل مريحة ومنظمة؟<br><br>
-
-                        شركة نفاذ تقدم لك الحلول المثالية لتوريد وبيع وصيانة الأثاث المكتبي لجميع الشركات، الوزارات، والمنشآت الحكومية
-
-                        نحن في نفاذ نقدم لكم:
-                        •	أثاث مكتبي مميز: من المكاتب الإدارية، الكراسي المريحة، وطاولات الاجتماعات إلى الحلول المتكاملة التي تتناسب مع احتياجات عملكم.
-                        •	خدمة توريد سريعة: نوفر لك الأثاث الذي يناسب احتياجاتك مع سرعة في التوريد والتسليم.
-                        •	خدمة صيانة شاملة: نقدم صيانة دورية وحلول تصليح فورية لضمان استمرارية الأداء المثالي لأثاثك المكتبي.
-
-                        ابدأ في تجهيز بيئة عملك مع نفاذ واحصل على الأثاث الذي يعزز الإنتاجية والراحة.
-                        لمزيد من المعلومات أو لطلب استشارة، تواصل معنا الآن!
+                        @(products.Count > 0
+                            ? "تصفح أحدث المنتجات المختارة بعناية، واعثر على تفاصيل تضيف لمسة مميزة إلى يومك."
+                            : "تصفح منتجاتنا واكتشف ما يناسب احتياجاتك.")
                     </p>
-                    <div class="d-flex">
-                        <a href="/Products" class="btn-get-started">تسوق الآن</a>
 
-                        <a asp-area="" asp-controller="Home" asp-action="About" class="btn-get-started mr-2 d-flex align-items-center  "><i class="bi bi-play-circle"></i><span>استكشف</span></a>
-                    </div>
-                </div>
-                <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-out" data-aos-delay="100">
-                    <img src="~/Nafas/assets/images/Chair3.png" class="img-fluid animated" alt="">
-                </div>
-            </div>
-        </div>
-
-    </section><!-- /Hero Section -->
-    <!-- Featured Services Section -->
-    <section id="featured-services" class="featured-services section">
-
-        <div class="container">
-
-            <div class="row gy-4">
-
-                <div class="col-lg-4 d-flex" data-aos="fade-up" data-aos-delay="100">
-                    <div class="service-item position-relative">
-                        <div class="icon"><i class="bi bi-activity icon"></i></div>
-                        <h4><a href="" class="stretched-link">شحن سريع ومجاني</a></h4>
-                        <p>نقدم خدمة شحن سريعة ومجانية لجميع الطلبات. نضمن وصول منتجاتك في الوقت المحدد وبحالة ممتازة.</p>
-                    </div>
-                </div><!-- End Service Item -->
-
-                <div class="col-lg-4 d-flex" data-aos="fade-up" data-aos-delay="200">
-                    <div class="service-item position-relative">
-                        <div class="icon"><i class="bi bi-bounding-box-circles icon"></i></div>
-                        <h4><a href="" class="stretched-link">سهولة التسوق</a></h4>
-                        <p>تجربة تسوق سهلة ومريحة. تصفح منتجاتنا بسهولة واطلب ما تريد بنقرة واحدة.</p>
-                    </div>
-                </div><!-- End Service Item -->
-
-                <div class="col-lg-4 d-flex" data-aos="fade-up" data-aos-delay="300">
-                    <div class="service-item position-relative">
-                        <div class="icon"><i class="bi bi-calendar4-week icon"></i></div>
-                        <h4><a href="" class="stretched-link">دعم مستمر</a></h4>
-                        <p>فريقنا متواجد دائماً لدعمك والإجابة على جميع استفساراتك.</p>
-                    </div>
-                </div><!-- End Service Item -->
-
-            </div>
-
-        </div>
-
-    </section><!-- /Featured Services Section -->
-
-    <!-- About Section -->
-    <section id="about" class="about section">
-
-        <!-- Section Title -->
-        <div class="container section-title" data-aos="fade-up">
-            <span>من نحن<br></span>
-            <h2>من نحن</h2>
-            <p>نحن ملتزمون بتقديم أفضل الحلول والخدمات لعملائنا الكرام.</p>
-        </div><!-- End Section Title -->
-
-        <div class="container">
-
-            <div class="row gy-4">
-                <div class="col-lg-6 position-relative align-self-start" data-aos="fade-up" data-aos-delay="100">
-                    <div class="img-fluid img-About">
-                        <iframe src="https://www.facebook.com/plugins/video.php?height=316&href=https%3A%2F%2Fwww.facebook.com%2F61573614235805%2Fvideos%2F1492041895100589%2F&show_text=false&width=560&t=0" width="98%" height="316" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
-                    </div>
-                    
-                </div>
-                <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="200">
-                    <h3>نحن نؤمن بالجودة والاحترافية في كل ما نقدمه.</h3>
-                    <p class="fst-italic">
-                        فريقنا يضم نخبة من الخبراء في مجال التصميم والتطوير لتقديم أفضل النتائج.
-                    </p>
-                    <ul>
-                        <li><i class="bi bi-check2-all"></i> <span>حلول مخصصة تناسب احتياجاتك.</span></li>
-                        <li><i class="bi bi-check2-all"></i> <span>دعم فني متواصل على مدار الساعة.</span></li>
-                        <li><i class="bi bi-check2-all"></i> <span>أسعار تنافسية وجودة عالية في جميع الخدمات.</span></li>
-                    </ul>
-                    <p>
-                        نسعى دائماً لتحقيق رضا عملائنا من خلال تقديم خدمات متكاملة واحترافية.
-                    </p>
-                </div>
-            </div>
-
-        </div>
-
-    </section><!-- /About Section -->
-    <!-- Stats Section -->
-    <section id="stats" class="stats section">
-
-        <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-            <div class="row gy-4">
-
-                <div class="col-lg-3 col-md-6">
-                    <div class="stats-item text-center w-100 h-100">
-                        <span data-purecounter-start="0" data-purecounter-end="232" data-purecounter-duration="1" class="purecounter"></span>
-                        <p>عملاء</p>
-                    </div>
-                </div><!-- End Stats Item -->
-
-                <div class="col-lg-3 col-md-6">
-                    <div class="stats-item text-center w-100 h-100">
-                        <span data-purecounter-start="0" data-purecounter-end="521" data-purecounter-duration="1" class="purecounter"></span>
-                        <p>مشاريع</p>
-                    </div>
-                </div><!-- End Stats Item -->
-
-                <div class="col-lg-3 col-md-6">
-                    <div class="stats-item text-center w-100 h-100">
-                        <span data-purecounter-start="0" data-purecounter-end="1453" data-purecounter-duration="1" class="purecounter"></span>
-                        <p>ساعات دعم</p>
-                    </div>
-                </div><!-- End Stats Item -->
-
-                <div class="col-lg-3 col-md-6">
-                    <div class="stats-item text-center w-100 h-100">
-                        <span data-purecounter-start="0" data-purecounter-end="32" data-purecounter-duration="1" class="purecounter"></span>
-                        <p>موظفون</p>
-                    </div>
-                </div><!-- End Stats Item -->
-
-            </div>
-
-        </div>
-
-    </section><!-- /Stats Section -->
-    <!-- Services Section -->
-    <section id="services" class="services section light-background">
-
-        <!-- Section Title -->
-        <div class="container section-title" data-aos="fade-up">
-            <span>الخدمات</span>
-            <h2>الخدمات</h2>
-            <p>نقدم مجموعة واسعة من الخدمات لتلبية جميع احتياجاتك.</p>
-        </div><!-- End Section Title -->
-
-        <div class="container">
-
-            <div class="row gy-4">
-
-                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                    <div class="service-item position-relative">
-                        <div class="icon">
-                            <i class="bi bi-activity"></i>
-                        </div>
-                        <a href="service-details.html" class="stretched-link">
-                            <h3>تصميم احترافي</h3>
-                        </a>
-                        <p>نصمم مواقع عصرية وجذابة تلبي تطلعاتك.</p>
-                    </div>
-                </div><!-- End Service Item -->
-
-                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                    <div class="service-item position-relative">
-                        <div class="icon">
-                            <i class="bi bi-broadcast"></i>
-                        </div>
-                        <a href="service-details.html" class="stretched-link">
-                            <h3>تطوير متكامل</h3>
-                        </a>
-                        <p>نطور حلولاً تقنية متقدمة تناسب أعمالك.</p>
-                    </div>
-                </div><!-- End Service Item -->
-
-                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                    <div class="service-item position-relative">
-                        <div class="icon">
-                            <i class="bi bi-easel"></i>
-                        </div>
-                        <a href="service-details.html" class="stretched-link">
-                            <h3>دعم فني</h3>
-                        </a>
-                        <p>دعم فني متواصل لضمان استمرارية عملك.</p>
-                    </div>
-                </div><!-- End Service Item -->
-                <!-- يمكنك إضافة المزيد من الخدمات هنا -->
-
-            </div>
-
-        </div>
-
-    </section><!-- /Services Section -->
-    <!-- Portfolio Section -->
-    <section id="portfolio" class="portfolio section">
-
-        <!-- Section Title -->
-        <div class="container section-title" data-aos="fade-up">
-            <span>أعمالنا</span>
-            <h2>أعمالنا</h2>
-            <p>تعرف على بعض من مشاريعنا المميزة.</p>
-        </div><!-- End Section Title -->
-        <!-- ... بقية القسم ... -->
-
-    </section><!-- /Portfolio Section -->
-    <!-- Testimonials Section -->
-    <section id="testimonials" class="testimonials section light-background">
-
-        <!-- Section Title -->
-        <div class="container section-title" data-aos="fade-up">
-            <span>آراء العملاء</span>
-            <h2>آراء العملاء</h2>
-            <p>آراء عملائنا تعكس جودة خدماتنا ورضاهم عن تجربتهم معنا.</p>
-        </div><!-- End Section Title -->
-        <!-- ... بقية القسم ... -->
-
-    </section><!-- /Testimonials Section -->
-    <!-- Call To Action Section -->
-    <section id="call-to-action" class="call-to-action section accent-background">
-
-        <div class="container">
-            <div class="row justify-content-center" data-aos="zoom-in" data-aos-delay="100">
-                <div class="col-xl-10">
-                    <div class="text-center">
-                        <h3>دعوة لاتخاذ إجراء</h3>
-                        <p>انضم إلينا اليوم واستفد من خدماتنا المميزة.</p>
-                        <a class="cta-btn" href="#">انضم الآن</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </section><!-- /Call To Action Section -->
-    <!-- Team Section -->
-    <section id="team" class="team section">
-
-        <!-- Section Title -->
-        <div class="container section-title" data-aos="fade-up">
-            <span>فريق العمل</span>
-            <h2>فريق العمل</h2>
-            <p>تعرف على فريقنا المحترف الذي يقف خلف نجاحنا.</p>
-        </div><!-- End Section Title -->
-        <!-- ... بقية القسم ... -->
-
-    </section><!-- /Team Section -->
-    <!-- Contact Section -->
-    <section id="contact" class="contact section">
-
-        <!-- Section Title -->
-        <div class="container section-title" data-aos="fade-up">
-            <span>تواصل معنا</span>
-            <h2>تواصل معنا</h2>
-            <p>نحن هنا للإجابة على جميع استفساراتك وتقديم الدعم اللازم.</p>
-        </div><!-- End Section Title -->
-
-        <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-            <div class="row gy-4">
-
-                <div class="col-lg-5">
-
-                    <div class="info-wrap">
-                        <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="200">
-                            <i class="bi bi-geo-alt flex-shrink-0"></i>
-                            <div>
-                                <h3>العنوان</h3>
-                                <p>برج ستي ستار، 6 أكتوبر</p>
-                            </div>
-                        </div><!-- End Info Item -->
-
-                        <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="300">
-                            <i class="bi bi-telephone flex-shrink-0"></i>
-                            <div>
-                                <h3>اتصل بنا</h3>
-                                <p>+201126499600 </p>
-                            </div>
-                        </div><!-- End Info Item -->
-
-                        <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
-                            <i class="bi bi-envelope flex-shrink-0"></i>
-                            <div>
-                                <h3>راسلنا</h3>
-                                <p>NafasCompany@gmail.com</p>
-                            </div>
-                        </div><!-- End Info Item -->
-
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6912.642435337959!2d30.94984788159632!3d29.970197277219395!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x145857479d1ad735%3A0xc52200f0209b434a!2z2LPZitiq2Yog2LPYqtin2LE!5e0!3m2!1sar!2seg!4v1783426249029!5m2!1sar!2seg" width="98%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-                    </div>
+                    <a asp-controller="Products"
+                       asp-action="Index"
+                       class="text-white store-campaign-cta ">
+                        تسوق الآن
+                        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    </a>
                 </div>
 
-                <div class="col-lg-7">
-                    <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
-                        <div class="row gy-4">
+                <div class="store-campaign-products">
 
-                            <div class="col-md-6">
-                                <label for="name-field" class="pb-2">اسمك</label>
-                                <input type="text" name="name" id="name-field" class="form-control" required="">
-                            </div>
+                    @if (products.Count > 0)
+                    {
+                        <div class="swiper store-campaign-swiper init-swiper">
 
-                            <div class="col-md-6">
-                                <label for="email-field" class="pb-2">البريد الإلكتروني</label>
-                                <input type="email" class="form-control" name="email" id="email-field" required="">
-                            </div>
+                            <script type="application/json" class="swiper-config">
+                                @Html.Raw(JsonSerializer.Serialize(swiperConfig))
+                            </script>
 
-                            <div class="col-md-12">
-                                <label for="subject-field" class="pb-2">الموضوع</label>
-                                <input type="text" class="form-control" name="subject" id="subject-field" required="">
-                            </div>
+                            <div class="swiper-wrapper">
+                                @foreach (var product in products.Take(3))
+                                {
+                                    <div class="swiper-slide">
+                                        <a asp-controller="Products"
+                                           asp-action="Details"
+                                           asp-route-id="@product.Id"
+                                           class="store-campaign-card">
 
-                            <div class="col-md-12">
-                                <label for="message-field" class="pb-2">رسالتك</label>
-                                <textarea class="form-control" name="message" rows="10" id="message-field" required=""></textarea>
-                            </div>
+                                            <div class="store-campaign-image">
+                                                <img src="@ProductImageUrl(product)"
+                                                     alt="@product.Name"
+                                                     loading="lazy" />
+                                            </div>
 
-                            <div class="col-md-12 text-center">
-                                <div class="loading">جاري الإرسال...</div>
-                                <div class="error-message"></div>
-                                <div class="sent-message">تم إرسال رسالتك. شكراً لتواصلك معنا!</div>
+                                            <span class="store-campaign-price">
+                                                @product.Price?.ToString("0.##") EGP
+                                            </span>
 
-                                <button type="submit">إرسال الرسالة</button>
+                                        </a>
+                                    </div>
+                                }
                             </div>
 
                         </div>
-                    </form>
-                </div><!-- End Contact Form -->
+                    }
+                    else
+                    {
+                        <div class="store-campaign-empty">
+                            <img src="~/Nafas/assets/images/Chair3.png"
+                                 alt="اكتشف منتجات نفاذ"
+                                 class="img-fluid" />
 
+                            <div class="store-campaign-empty-content">
+                                <h3>منتجاتنا في انتظارك</h3>
+                                <p>اكتشف مجموعتنا المميزة من المنتجات.</p>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+
+                @if (products.Count > 1)
+                {
+                    <button id="storeCampaignPrevious"
+                            class="store-campaign-control prev"
+                            type="button"
+                            aria-label="المنتجات السابقة">
+                        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                    </button>
+
+                    <button id="storeCampaignNext"
+                            class="store-campaign-control next"
+                            type="button"
+                            aria-label="المنتجات التالية">
+                        <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                    </button>
+
+                    <div id="storeCampaignPagination" class="store-campaign-pagination" aria-label="صفحات العروض"></div>
+                }
             </div>
+        </section>
+        <section class="store-section" aria-labelledby="storeCategoriesTitle">
+            <div class="store-section-heading">
+                <div>
+                    <h2 id="storeCategoriesTitle">تسوق الان</h2>
+                    <p>اعثر بسرعة على ما تبحث عنه</p>
+                </div>
+                <a asp-controller="Products" asp-action="Index">عرض كل المنتجات <i class="bi bi-arrow-left" aria-hidden="true"></i></a>
+            </div>
+            <div class="store-category-track">
+                @foreach (var category in Model.Categories)
+                {
+                    var sampleProduct = products.FirstOrDefault(product => product.ProductTypeId == category.Id);
+                    <a class="store-category-card" asp-controller="Products" asp-action="Index" asp-route-ProductTypeId="@category.Id">
+                        <span class="store-category-image">
+                            @if (sampleProduct != null)
+                            {
+                                <img src="@ProductImageUrl(sampleProduct)" alt="" loading="lazy" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-grid" aria-hidden="true"></i>
+                            }
+                        </span>
+                        <span class="store-category-name">@category.Name</span>
+                    </a>
+                }
+                @if (Model.Categories.Count == 0)
+                {
+                    <div class="store-empty-state">ستظهر التصنيفات هنا بعد إضافتها إلى المتجر.</div>
+                }
+            </div>
+        </section>
 
-        </div>
+        <section class="store-section" aria-labelledby="storeFeaturedTitle">
+            <div class="store-section-heading">
+                <div>
+                    <h2 id="storeFeaturedTitle">وصل حديثاً</h2>
+                    <p>أحدث المنتجات المتوفرة في المتجر</p>
+                </div>
+                <a asp-controller="Products" asp-action="Index" asp-route-SortBy="newest">تصفح المتجر <i class="bi bi-arrow-left" aria-hidden="true"></i></a>
+            </div>
+            <div class="store-featured-grid">
+                @foreach (var product in products)
+                {
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="store-featured-card">
+                        <span class="store-featured-image">
 
-    </section><!-- /Contact Section -->
-
+                            @if (product.IsOnSale)
+                            {
+                                <span class="store-sale-badge">عرض</span>
+                            }
+                            <img src="@ProductImageUrl(product)" alt="@product.Name" loading="lazy" />
+                        </span>
+                        <span class="store-featured-info">
+                            <span class="store-featured-category">@(product.ProductType?.Name ?? "منتجات نفاذ")</span>
+                            <span class="store-featured-title">@product.Name</span>
+                            <span class="store-featured-price">
+                                @product.Price?.ToString("0.##") EGP
+                                @if (product.IsOnSale)
+                                {
+                                    <span class="store-featured-old-price">@product.OldPrice?.ToString("0.##") EGP</span>
+                                }
+                            </span>
+                        </span>
+                    </a>
+                }
+                @if (products.Count == 0)
+                {
+                    <div class="store-empty-state">لا توجد منتجات متاحة حالياً. يرجى العودة قريباً.</div>
+                }
+            </div>
+        </section>
+    </div>
 </main>
+
+@functions {
+    private string ProductImageUrl(Product product)
+    {
+        var imageUrl = product.Images?
+            .OrderByDescending(image => image.IsPrimary)
+            .ThenBy(image => image.DisplayOrder)
+            .Select(image => image.ImageUrl)
+            .FirstOrDefault();
+
+        imageUrl = string.IsNullOrWhiteSpace(imageUrl) ? product.ImageUrl : imageUrl;
+        return Url.Content(string.IsNullOrWhiteSpace(imageUrl) ? "~/Nafas/assets/images/Chair3.png" : imageUrl);
+    }
+}

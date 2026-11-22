@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Text.Json;
 
 namespace Nafath.Areas.Admin.Controllers
 {
@@ -15,23 +16,26 @@ namespace Nafath.Areas.Admin.Controllers
         private readonly IRepository<Product> _repo;
         private readonly IRepository<ProductType> _typeRepo;
         private readonly IRepository<ProductImage> _imageRepo;
+        private readonly IRepository<ProductColor> _colorRepo;
         private readonly IWebHostEnvironment _env;
 
         public ProductsManagerController(
             IRepository<Product> repo,
             IRepository<ProductType> typeRepo,
             IRepository<ProductImage> imageRepo,
+            IRepository<ProductColor> colorRepo,
             IWebHostEnvironment env)
         {
             _repo = repo;
             _typeRepo = typeRepo;
             _imageRepo = imageRepo;
+            _colorRepo = colorRepo;
             _env = env;
         }
 
         public async Task<IActionResult> ProductsByType(int typeId)
         {
-            var products = await _repo.Query("ProductType", "Images")
+            var products = await _repo.Query("ProductType", "Images", "Colors")
                 .Where(p => p.ProductTypeId == typeId)
                 .ToListAsync();
             return View(products);
@@ -40,7 +44,7 @@ namespace Nafath.Areas.Admin.Controllers
         public async Task<IActionResult> Index(int page = 1, int pageSize = 20)
         {
             page = page < 1 ? 1 : page;
-            var query = _repo.Query("ProductType", "Images").OrderByDescending(p => p.Id);
+            var query = _repo.Query("ProductType", "Images", "Colors").OrderByDescending(p => p.Id);
             var total = await query.CountAsync();
             var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
@@ -55,7 +59,7 @@ namespace Nafath.Areas.Admin.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-            var product = await _repo.Query("ProductType", "Images")
+            var product = await _repo.Query("ProductType", "Images", "Colors")
                 .FirstOrDefaultAsync(p => p.Id == id);
             if (product == null) return NotFound();
             return View(product);
@@ -88,6 +92,12 @@ namespace Nafath.Areas.Admin.Controllers
                 return View("Index", items);
             }
 
+            var allSizes = (vm.Sizes ?? new List<string>()).ToList();
+            if (!string.IsNullOrWhiteSpace(vm.CustomSizes))
+            {
+                allSizes.AddRange(vm.CustomSizes.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            }
+
             var product = new Product
             {
                 Name = vm.Name,
@@ -98,6 +108,7 @@ namespace Nafath.Areas.Admin.Controllers
                 SKU = vm.SKU,
                 StockQuantity = vm.StockQuantity,
                 LowStockThreshold = vm.LowStockThreshold,
+                AvailableSizes = ProductSizeOptions.Serialize(allSizes),
                 IsAvailable = vm.IsAvailable
             };
 
@@ -135,6 +146,24 @@ namespace Nafath.Areas.Admin.Controllers
             }
 
             await _repo.AddOneAsync(product);
+
+            // Save colors
+            if (!string.IsNullOrWhiteSpace(vm.ColorsJson))
+            {
+                var colorDtos = ParseColorsJson(vm.ColorsJson);
+                int colorOrder = 0;
+                foreach (var dto in colorDtos)
+                {
+                    await _colorRepo.AddOneAsync(new ProductColor
+                    {
+                        ProductId = product.Id,
+                        ColorName = dto.ColorName.Trim(),
+                        HexCode = dto.HexCode.Trim(),
+                        DisplayOrder = colorOrder++
+                    });
+                }
+            }
+
             SessionMsg(Helper.Success, "تم", "تم إضافة المنتج بنجاح");
 
             return RedirectToAction(nameof(Index));
@@ -143,7 +172,7 @@ namespace Nafath.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-            var product = await _repo.Query("ProductType", "Images").FirstOrDefaultAsync(p => p.Id == id.Value);
+            var product = await _repo.Query("ProductType", "Images", "Colors").FirstOrDefaultAsync(p => p.Id == id.Value);
             if (product == null) return NotFound();
 
             await PopulateTypesDropDown(product.ProductTypeId);
@@ -156,12 +185,36 @@ namespace Nafath.Areas.Admin.Controllers
             int id,
             Product product,
             IFormFile? ImageFile,
-            List<IFormFile>? AdditionalImages)
+            List<IFormFile>? AdditionalImages,
+            List<string>? sizes,
+            string? customSizes,
+            string? colorsJson)
         {
             if (id != product.Id) return NotFound();
+
+            // Clear navigation collections and auxiliary properties from ModelState validation
+            ModelState.Remove("ProductType");
+            ModelState.Remove("Images");
+            ModelState.Remove("Colors");
+            ModelState.Remove("OrderItems");
+            ModelState.Remove("ImageFile");
+
+            var allSizes = (sizes ?? new List<string>()).ToList();
+            if (!string.IsNullOrWhiteSpace(customSizes))
+            {
+                allSizes.AddRange(customSizes.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            }
+            product.AvailableSizes = ProductSizeOptions.Serialize(allSizes);
+
             if (!ModelState.IsValid)
             {
                 await PopulateTypesDropDown(product.ProductTypeId);
+                var existingWithImages = await _repo.Query("Images", "Colors").FirstOrDefaultAsync(p => p.Id == id);
+                if (existingWithImages != null)
+                {
+                    product.Images = existingWithImages.Images;
+                    product.Colors = existingWithImages.Colors;
+                }
                 return View(product);
             }
 
@@ -197,6 +250,29 @@ namespace Nafath.Areas.Admin.Controllers
                         ImageUrl = $"/uploads/products/{galleryFileName}",
                         DisplayOrder = order++,
                         IsPrimary = false
+                    });
+                }
+            }
+
+            // Sync colors: delete existing, re-insert from JSON
+            var existingColors = await _colorRepo.Query()
+                .Where(c => c.ProductId == id)
+                .ToListAsync();
+            if (existingColors.Any())
+                await _colorRepo.DeleteRangeAsync(existingColors);
+
+            if (!string.IsNullOrWhiteSpace(colorsJson))
+            {
+                var colorDtos = ParseColorsJson(colorsJson);
+                int colorOrder = 0;
+                foreach (var dto in colorDtos)
+                {
+                    await _colorRepo.AddOneAsync(new ProductColor
+                    {
+                        ProductId = product.Id,
+                        ColorName = dto.ColorName.Trim(),
+                        HexCode = dto.HexCode.Trim(),
+                        DisplayOrder = colorOrder++
                     });
                 }
             }
@@ -285,6 +361,46 @@ namespace Nafath.Areas.Admin.Controllers
             HttpContext.Session.SetString(Helper.MsgType, MsgType);
             HttpContext.Session.SetString(Helper.Title, Title);
             HttpContext.Session.SetString(Helper.Msg, Msg);
+        }
+
+        /// <summary>
+        /// Parses a JSON array of color objects from the hidden form field.
+        /// Expected shape: [{"colorName":"Red","hexCode":"#FF0000"}, ...]
+        /// </summary>
+        private static List<ProductColorDto> ParseColorsJson(string json)
+        {
+            try
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<List<ProductColorDto>>(json, options) ?? new();
+            }
+            catch
+            {
+                return new();
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteColor(int id)
+        {
+            var color = await _colorRepo.FindByIdasync(id);
+            if (color != null)
+            {
+                await _colorRepo.DeleteOneAsync(color);
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "اللون غير موجود." });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProductColors(int productId)
+        {
+            var colors = await _colorRepo.Query()
+                .Where(c => c.ProductId == productId)
+                .OrderBy(c => c.DisplayOrder)
+                .Select(c => new { c.Id, c.ColorName, c.HexCode, c.DisplayOrder })
+                .ToListAsync();
+            return Json(colors);
         }
     }
 }

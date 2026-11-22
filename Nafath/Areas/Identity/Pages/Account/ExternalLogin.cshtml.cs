@@ -153,6 +153,15 @@ namespace Nafath.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                if (await _userManager.FindByEmailAsync(Input.Email) != null ||
+                    await _userManager.FindByNameAsync(Input.Email) != null)
+                {
+                    ModelState.AddModelError(nameof(Input.Email), "هذا البريد الإلكتروني أو اسم المستخدم مستخدم بالفعل.");
+                    ProviderDisplayName = info.ProviderDisplayName;
+                    ReturnUrl = returnUrl;
+                    return Page();
+                }
+
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
@@ -164,6 +173,20 @@ namespace Nafath.Areas.Identity.Pages.Account
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
+                        result = await _userManager.AddToRoleAsync(user, "User");
+                        if (!result.Succeeded)
+                        {
+                            await _userManager.DeleteAsync(user);
+                            foreach (var error in result.Errors)
+                            {
+                                ModelState.AddModelError(string.Empty, error.Description);
+                            }
+
+                            ProviderDisplayName = info.ProviderDisplayName;
+                            ReturnUrl = returnUrl;
+                            return Page();
+                        }
+
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
                         var userId = await _userManager.GetUserIdAsync(user);

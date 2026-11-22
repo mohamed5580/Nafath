@@ -1,0 +1,108 @@
+:root {
+  --bs-primary: #10bc69;
+  --bs-primary-rgb: 16, 188, 105;
+  --bs-secondary: #5f687b;
+  --bs-secondary-rgb: 95, 104, 123;
+  --bs-success: #10bc69;
+  --bs-success-rgb: 16, 188, 105;
+  --bs-link-color: #10bc69;
+  --bs-link-hover-color: #0ca45b;
+  --bs-link-color-rgb: 16, 188, 105;
+  --bs-link-hover-color-rgb: 12, 164, 91;
+  --nafas-accent: #10bc69;
+  --nafas-accent-dark: #0ca45b;
+  --nafas-heading: #5f687b;
+}
+
+.btn-primary,
+.page-link.active,
+.active > .page-link {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: #10bc69;
+  --bs-btn-border-color: #10bc69;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #0ca45b;
+  --bs-btn-hover-border-color: #0ca45b;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #099951;
+  --bs-btn-active-border-color: #099951;
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: #10bc69;
+  --bs-btn-disabled-border-color: #10bc69;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #10bc69;
+  --bs-btn-border-color: #10bc69;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #10bc69;
+  --bs-btn-hover-border-color: #10bc69;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #0ca45b;
+  --bs-btn-active-border-color: #0ca45b;
+}
+
+.btn-success,
+.badge.bg-success,
+.alert-success,
+.bg-success {
+  background-color: #10bc69 !important;
+  border-color: #10bc69 !important;
+}
+
+.btn-success {
+  --bs-btn-bg: #10bc69;
+  --bs-btn-border-color: #10bc69;
+  --bs-btn-hover-bg: #0ca45b;
+  --bs-btn-hover-border-color: #0ca45b;
+}
+
+.text-primary,
+a,
+.nav-link,
+.page-link {
+  color: #10bc69 !important;
+}
+
+.text-secondary,
+h1, h2, h3, h4, h5, h6 {
+  color: var(--nafas-heading);
+}
+
+.border-primary {
+  border-color: #10bc69 !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: #81dab0;
+  box-shadow: 0 0 0 .25rem rgba(16, 188, 105, .25);
+}
+
+.form-check-input:checked,
+.form-check-input:focus {
+  background-color: #10bc69;
+  border-color: #10bc69;
+}
+
+.pagination {
+  --bs-pagination-active-bg: #10bc69;
+  --bs-pagination-active-border-color: #10bc69;
+  --bs-pagination-focus-color: #0ca45b;
+  --bs-pagination-focus-box-shadow: 0 0 0 .25rem rgba(16, 188, 105, .25);
+}
+
+.dropdown-item.active,
+.dropdown-item:active,
+.list-group-item.active {
+  color: #fff;
+  background-color: #10bc69;
+  border-color: #10bc69;
+}
+
+.progress-bar,
+.spinner-border.text-primary,
+.spinner-grow.text-primary {
+  background-color: #10bc69;
+}

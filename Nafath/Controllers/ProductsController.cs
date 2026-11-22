@@ -36,7 +36,7 @@ namespace Nafath.Controllers
             filter.Page = filter.Page < 1 ? 1 : filter.Page;
             filter.PageSize = filter.PageSize < 1 ? 12 : filter.PageSize;
 
-            var baseQuery = _productRepo.Query("ProductType", "Images");
+            var baseQuery = _productRepo.Query("ProductType", "Images", "Colors");
 
             // Calculate overall price range for filter UI
             var allPrices = await _productRepo.Query()
@@ -117,7 +117,7 @@ namespace Nafath.Controllers
         {
             if (id == null) return NotFound();
 
-            var product = await _productRepo.Query("ProductType", "Images")
+            var product = await _productRepo.Query("ProductType", "Images", "Colors")
                 .FirstOrDefaultAsync(p => p.Id == id.Value);
 
             if (product == null) return NotFound();

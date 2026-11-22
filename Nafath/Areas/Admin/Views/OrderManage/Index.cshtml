@@ -128,7 +128,24 @@
                                              alt="@item.ProductName"
                                              width="50" height="50" />
                                     </td>
-                                    <td>@item.ProductName</td>
+                                    <td>
+                                        @item.ProductName
+                                        @if (!string.IsNullOrEmpty(item.Size))
+                                        {
+                                            <div class="small text-muted">المقاس: @item.Size</div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(item.Color))
+                                        {
+                                            <div class="small text-muted d-flex align-items-center" style="gap:6px;">
+                                                <span>اللون: @item.Color</span>
+                                                @if (!string.IsNullOrEmpty(item.ColorCode))
+                                                {
+                                                    <span style="display:inline-block;width:14px;height:14px;border-radius:50%;background-color:@item.ColorCode;border:1px solid #ccc;"
+                                                          title="@item.ColorCode"></span>
+                                                }
+                                            </div>
+                                        }
+                                    </td>
                                     <td>@item.Quantity</td>
                                     <td>@item.UnitPrice.ToString("N2")</td>
                                     <td>@(item.Quantity* item.UnitPrice)</td>
